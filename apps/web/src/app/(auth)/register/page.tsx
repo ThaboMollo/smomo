@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { toE164, validatePassport, validateSaId } from '@smomo/shared';
 
@@ -24,6 +24,11 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const [next, setNext] = useState<string | null>(null);
+
+  useEffect(() => {
+    setNext(new URLSearchParams(window.location.search).get('next'));
+  }, []);
 
   const idType = nationality === 'sa' ? 'sa_id' : 'passport';
   const idOk = useMemo(() => {
@@ -66,7 +71,7 @@ export default function RegisterPage() {
         idNumber: idNumber.trim(),
         idCountry: nationality === 'foreign' ? country.trim() : 'South Africa',
       });
-      router.push('/app');
+      router.push(next || '/app');
       router.refresh();
     } catch (err: any) {
       setError(err?.message ?? 'Could not complete registration');
@@ -108,7 +113,10 @@ export default function RegisterPage() {
       </form>
       <p className="mt-4 text-center text-sm text-text-muted">
         Already have an account?{' '}
-        <Link href="/login" className="font-semibold text-primary">
+        <Link
+          href={next ? `/login?next=${encodeURIComponent(next)}` : '/login'}
+          className="font-semibold text-primary"
+        >
           Log in
         </Link>
       </p>

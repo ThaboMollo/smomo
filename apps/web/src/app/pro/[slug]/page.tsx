@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { CATEGORY_LABEL, CATEGORY_SLUGS } from '@/lib/catalog';
-import { Avatar, Badge, Card, Container, Stars } from '@/components/ui';
+import { Avatar, Badge, Button, Card, Container, Stars } from '@/components/ui';
 import { SITE_URL } from '@/lib/env';
 import { getProvider } from '@/lib/public-api';
 
@@ -135,7 +135,15 @@ export default async function ProviderPage({ params }: Params) {
 
       <section className="mt-12 rounded-2xl bg-primary-soft p-8 text-center">
         <h2 className="text-xl font-bold">Want to book {p.business_name ?? 'this pro'}?</h2>
-        <p className="mt-1 text-text-muted">Get the Smomo app to send a request and receive an offer.</p>
+        <p className="mt-1 text-text-muted">Send a request and get an offer — right here on the web.</p>
+        <div className="mt-5 flex justify-center">
+          <Button href={`/app/request/new?target=${p.id}&category=${p.categories[0] ?? ''}`}>
+            Request a booking
+          </Button>
+        </div>
+        <p className="mt-3 text-sm text-text-faint">
+          You&apos;ll sign in (or create a free account) to send your request.
+        </p>
       </section>
     </Container>
   );

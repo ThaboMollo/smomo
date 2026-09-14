@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { createClient } from '@/lib/supabase/client';
 
@@ -12,6 +12,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const [next, setNext] = useState<string | null>(null);
+
+  useEffect(() => {
+    setNext(new URLSearchParams(window.location.search).get('next'));
+  }, []);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,10 +28,6 @@ export default function LoginPage() {
       setError(err.message);
       return;
     }
-    const next =
-      typeof window !== 'undefined'
-        ? new URLSearchParams(window.location.search).get('next')
-        : null;
     router.push(next || '/app');
     router.refresh();
   };
@@ -62,7 +63,10 @@ export default function LoginPage() {
       </form>
       <p className="mt-4 text-center text-sm text-text-muted">
         New here?{' '}
-        <Link href="/register" className="font-semibold text-primary">
+        <Link
+          href={next ? `/register?next=${encodeURIComponent(next)}` : '/register'}
+          className="font-semibold text-primary"
+        >
           Create an account
         </Link>
       </p>

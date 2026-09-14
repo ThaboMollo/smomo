@@ -27,6 +27,15 @@ export default function RequestDetail() {
     },
   });
 
+  const cancel = useMutation({
+    mutationFn: () => api.requests.cancel(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['request', id] });
+      qc.invalidateQueries({ queryKey: ['my-requests'] });
+      router.push('/app');
+    },
+  });
+
   if (isLoading) return <p className="text-text-muted">Loading…</p>;
   const request = data?.request;
   if (!request) return <p className="text-text-muted">Request not found.</p>;
@@ -94,6 +103,18 @@ export default function RequestDetail() {
           </Card>
         ))}
       </div>
+
+      {isOpen ? (
+        <button
+          onClick={() => {
+            if (confirm('Stop receiving offers for this request?')) cancel.mutate();
+          }}
+          disabled={cancel.isPending}
+          className="mt-6 w-full rounded-xl border border-border py-3 text-sm font-semibold text-text-muted hover:bg-card-muted disabled:opacity-50"
+        >
+          {cancel.isPending ? 'Cancelling…' : 'Cancel request'}
+        </button>
+      ) : null}
     </div>
   );
 }

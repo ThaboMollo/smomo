@@ -1,6 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -45,6 +46,8 @@ export default function BookingDetail() {
   if (!booking) return <p className="text-text-muted">Booking not found.</p>;
   const isClient = booking.client_id === userId;
   const other = isClient ? booking.practitioner : booking.client;
+  const active = booking.status === 'confirmed' || booking.status === 'in_progress';
+  const clientReviewDone = (data?.reviews ?? []).some((r) => r.direction === 'c2p');
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -58,8 +61,21 @@ export default function BookingDetail() {
       </div>
 
       <Card>
-        <p className="font-semibold">{other?.full_name ?? (isClient ? 'Provider' : 'Client')}</p>
-        <div className="mt-2 space-y-1 text-sm text-text-muted">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="font-semibold">{other?.full_name ?? (isClient ? 'Provider' : 'Client')}</p>
+            <p className="text-sm text-text-muted">{isClient ? 'Your provider' : 'Your client'}</p>
+          </div>
+          {other?.phone ? (
+            <a
+              href={`tel:${other.phone}`}
+              className="rounded-xl border border-border px-3 py-2 text-sm font-semibold text-primary hover:bg-card-muted"
+            >
+              Call
+            </a>
+          ) : null}
+        </div>
+        <div className="mt-3 space-y-1 border-t border-border pt-3 text-sm text-text-muted">
           <p>When: {formatWhen(booking.scheduled_at)}</p>
           <p>Where: {BOOKING_MODE_LABEL[booking.booking_mode]}</p>
           {booking.address ? <p>Address: {booking.address}</p> : null}
@@ -68,7 +84,21 @@ export default function BookingDetail() {
       </Card>
 
       {!isClient && (booking.status === 'confirmed' || booking.status === 'in_progress') ? (
-        <PractitionerActions bookingId={id} clientId={booking.client_id} status={booking.status} onDone={refetch} />
+        <PractitionerActions
+          bookingId={id}
+          clientId={booking.client_id}
+          status={booking.status}
+          consent={!!booking.client_consented_to_portfolio}
+          onDone={refetch}
+        />
+      ) : null}
+
+      {isClient && booking.status === 'completed' && !clientReviewDone ? (
+        <ClientReview
+          bookingId={id}
+          practitionerId={booking.practitioner_id}
+          onDone={refetch}
+        />
       ) : null}
 
       <section>
@@ -84,7 +114,101 @@ export default function BookingDetail() {
         <h2 className="mb-3 text-lg font-bold">Chat</h2>
         {userId ? <ChatPanel bookingId={id} userId={userId} /> : null}
       </section>
+
+      <div className="flex flex-col gap-2 border-t border-border pt-6">
+        {active ? <CancelBooking bookingId={id} isClient={isClient} onDone={refetch} /> : null}
+        {other?.id ? (
+          <Link
+            href={`/app/report?userId=${other.id}&bookingId=${id}`}
+            className="text-center text-sm font-medium text-text-muted hover:text-text"
+          >
+            Report a problem
+          </Link>
+        ) : null}
+      </div>
     </div>
+  );
+}
+
+function CancelBooking({
+  bookingId,
+  isClient,
+  onDone,
+}: {
+  bookingId: string;
+  isClient: boolean;
+  onDone: () => void;
+}) {
+  const cancel = useMutation({
+    mutationFn: () =>
+      api.bookings.cancel(bookingId, {
+        reason: isClient ? 'Cancelled by client' : 'Cancelled by practitioner',
+      }),
+    onSuccess: onDone,
+  });
+  return (
+    <button
+      onClick={() => {
+        if (confirm('Cancel this booking?')) cancel.mutate();
+      }}
+      disabled={cancel.isPending}
+      className="rounded-xl border border-border py-3 text-sm font-semibold text-text-muted hover:bg-card-muted disabled:opacity-50"
+    >
+      {cancel.isPending ? 'Cancelling…' : 'Cancel booking'}
+    </button>
+  );
+}
+
+function ClientReview({
+  bookingId,
+  practitionerId,
+  onDone,
+}: {
+  bookingId: string;
+  practitionerId: string;
+  onDone: () => void;
+}) {
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [error, setError] = useState<string>();
+
+  const submit = useMutation({
+    mutationFn: () =>
+      api.reviews.client({ bookingId, practitionerId, rating, comment: comment.trim() || undefined }),
+    onSuccess: onDone,
+    onError: (e: any) => setError(e?.message ?? 'Could not submit review'),
+  });
+
+  return (
+    <Card className="space-y-3">
+      <p className="font-semibold">Leave a review</p>
+      <p className="text-sm text-text-muted">How was your experience with this provider?</p>
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            onClick={() => setRating(n)}
+            className={`text-3xl ${n <= rating ? 'text-primary' : 'text-text-faint'}`}
+          >
+            ★
+          </button>
+        ))}
+      </div>
+      <input
+        placeholder="Tell others about your experience (optional)"
+        className="w-full rounded-xl border border-border bg-card px-3 py-2 text-sm"
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+      />
+      {error ? <p className="text-sm text-danger">{error}</p> : null}
+      <button
+        onClick={() => submit.mutate()}
+        disabled={submit.isPending}
+        className="w-full rounded-xl bg-primary py-3 font-semibold text-white disabled:opacity-50"
+      >
+        {submit.isPending ? 'Submitting…' : 'Submit review'}
+      </button>
+    </Card>
   );
 }
 
@@ -92,11 +216,13 @@ function PractitionerActions({
   bookingId,
   clientId,
   status,
+  consent,
   onDone,
 }: {
   bookingId: string;
   clientId: string;
   status: 'confirmed' | 'in_progress';
+  consent: boolean;
   onDone: () => void;
 }) {
   const [rating, setRating] = useState(5);
@@ -106,8 +232,9 @@ function PractitionerActions({
 
   const start = useMutation({ mutationFn: () => api.bookings.start(bookingId), onSuccess: onDone });
 
+  // Public portfolio bucket only if the client consented, else the private proof bucket.
   const upload = useMutation({
-    mutationFn: (file: File) => uploadImage('portfolio', file),
+    mutationFn: (file: File) => uploadImage(consent ? 'portfolio' : 'proof-private', file),
     onSuccess: (url) => setProofUrl(url),
     onError: (e: any) => setError(e?.message ?? 'Upload failed'),
   });
@@ -141,7 +268,12 @@ function PractitionerActions({
   return (
     <Card className="space-y-3">
       <p className="font-semibold">Complete job</p>
-      <p className="text-sm text-text-muted">Capture a photo of the finished work (adds to your portfolio).</p>
+      <p className="text-sm text-text-muted">
+        Upload a photo of the finished work.{' '}
+        {consent
+          ? 'The client agreed this can appear in your public portfolio.'
+          : 'The client did not consent to public use — this stays private proof only.'}
+      </p>
       {proofUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={proofUrl} alt="Proof of work" className="h-40 w-full rounded-xl object-cover" />

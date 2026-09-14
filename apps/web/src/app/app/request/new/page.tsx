@@ -15,6 +15,7 @@ const CAPE_TOWN = { latitude: -33.9249, longitude: 18.4241 };
 
 export default function NewRequest() {
   const router = useRouter();
+  const [target, setTarget] = useState<string | null>(null);
   const [category, setCategory] = useState<ServiceCategory | null>(null);
   const [mode, setMode] = useState<BookingMode>('mobile');
   const [description, setDescription] = useState('');
@@ -25,6 +26,15 @@ export default function NewRequest() {
   const [file, setFile] = useState<File | null>(null);
   const [coords, setCoords] = useState(CAPE_TOWN);
   const [error, setError] = useState<string>();
+
+  // Directed request: `?target=<providerId>&category=<cat>` prefills for a specific pro.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get('target');
+    const c = params.get('category');
+    if (t) setTarget(t);
+    if (c) setCategory(c as ServiceCategory);
+  }, []);
 
   useEffect(() => {
     navigator.geolocation?.getCurrentPosition(
@@ -57,6 +67,7 @@ export default function NewRequest() {
         budgetMin: budgetMin ? Number(budgetMin) : null,
         budgetMax: budgetMax ? Number(budgetMax) : null,
         imageUrl,
+        targetPractitionerId: target,
         consent,
         expiresMinutes: 30,
       });
@@ -68,7 +79,12 @@ export default function NewRequest() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="text-2xl font-bold">Post a request</h1>
+      <h1 className="text-2xl font-bold">{target ? 'Request this pro' : 'Post a request'}</h1>
+      {target ? (
+        <p className="mt-1 text-sm text-text-muted">
+          This request goes directly to the provider you picked.
+        </p>
+      ) : null}
 
       <p className="mt-6 mb-2 text-sm font-semibold text-text-muted">What do you need?</p>
       <div className="flex flex-wrap gap-2">
@@ -120,7 +136,7 @@ export default function NewRequest() {
         disabled={publish.isPending}
         className="mt-6 w-full rounded-xl bg-primary py-3 font-semibold text-white hover:bg-primary-dark disabled:opacity-50"
       >
-        {publish.isPending ? 'Posting…' : 'Post to nearby pros'}
+        {publish.isPending ? 'Posting…' : target ? 'Send request' : 'Post to nearby pros'}
       </button>
     </div>
   );

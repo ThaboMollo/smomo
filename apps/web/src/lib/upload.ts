@@ -1,7 +1,9 @@
 import { createClient } from '@/lib/supabase/client';
 
-/** Upload an image to a public Storage bucket and return its public URL. */
-export async function uploadImage(bucket: 'portfolio' | 'avatars', file: File): Promise<string> {
+export type StorageBucket = 'portfolio' | 'avatars' | 'request-photos' | 'proof-private';
+
+/** Upload an image to a Storage bucket and return its public URL. */
+export async function uploadImage(bucket: StorageBucket, file: File): Promise<string> {
   const supabase = createClient();
   const {
     data: { user },
