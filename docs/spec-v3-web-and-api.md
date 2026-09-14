@@ -143,7 +143,20 @@ smomo/
   (polling refetch), admin queues (payment disputes + reports resolve/dismiss), and booking page
   extended with practitioner actions (start job, complete + proof-photo upload + rate client).
   `uploadImage()` helper → Supabase Storage. `next build` green (all `/app/*` dynamic).
-- ⏳ **Phase 8** — deploy (Vercel web + api, env wiring, mobile EAS). Credential-driven; do with user.
+- ✅ **Phase 8** — deployed to Vercel (team `thabomollos-projects`, hobby). Two git-linked projects
+  off `github.com/ThaboMollo/smomo` (private), auto-deploy on push to `main`:
+  - **smomo-api** (`prj_Q5c9mNUlUlR4IKTyAyPmqjNgVPfq`, root `apps/api`) → **https://smomo-api.vercel.app**.
+    NestJS as a serverless function: `apps/api/api/index.ts` (cached Express instance from compiled
+    `dist/`), `vercel.json` builds via `pnpm --filter=api... run build`, `outputDirectory: public`
+    (static landing), rewrites `/(.*) → /api`. Env: `SUPABASE_URL`, `SUPABASE_ANON_KEY` (prod+preview).
+    Verified: `/v1/health` = `{"ok":true}`, `/v1/public/*` returns live Supabase data.
+  - **smomo** (`prj_2RLafC3xLWxKzhb9Bt54h77dlxgE`, root `apps/web`) → **https://smomo.vercel.app**.
+    Next.js; `vercel.json` builds via `pnpm --filter=web... run build`. Env (prod+preview):
+    `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_API_URL` +
+    `API_URL` = `https://smomo-api.vercel.app/v1`, `NEXT_PUBLIC_SITE_URL` = `https://smomo.vercel.app`.
+    Verified: home/login/sitemap 200; SEO listing renders JSON-LD + live API data (SSR → prod API).
+  - NOTE: hobby plan = 1 concurrent build, so a push builds api+web sequentially (one may queue).
+  - PENDING: mobile EAS build with `EXPO_PUBLIC_API_URL=https://smomo-api.vercel.app/v1`.
 
 ## BUILD SEQUENCE
 1. **Monorepo**: init `pnpm-workspace.yaml` + `turbo.json`; `git mv` current app → `apps/mobile`;
