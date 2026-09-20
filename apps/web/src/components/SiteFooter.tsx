@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { BrandLogo } from '@/components/BrandLogo';
@@ -24,9 +25,17 @@ export function SiteFooter() {
               Beauty, hair, nails, make-up &amp; ink — booked to you or to their studio.
             </p>
           </div>
-          <p className="font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[0.18em] text-text-muted">
-            Hair ✦ Nails ✦ Make-up ✦ Beauty ✦ Tattoo
-          </p>
+          <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-text-muted">
+            <Link href="/how-it-works" className="hover:text-text">
+              How it works
+            </Link>
+            <Link href="/download" className="hover:text-text">
+              Get the app
+            </Link>
+            <Link href="/login" className="hover:text-text">
+              Sign in
+            </Link>
+          </nav>
         </div>
         <hr className="hr my-8" />
         <p className="text-sm text-text-faint">© {new Date().getFullYear()} Smomo. South Africa.</p>

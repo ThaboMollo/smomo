@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Alert, ScrollView, Switch, View } from 'react-native';
 
 import { CATEGORIES, type ServiceCategory, type ServiceMode } from '@/lib/categories';
+import { SOCIAL_PLATFORMS } from '@smomo/shared';
 import { toE164 } from '@/lib/format';
 import { getCurrentCoords, reverseGeocode } from '@/lib/location';
 import { spacing, useTheme } from '@/lib/theme';
@@ -27,6 +28,12 @@ export default function EditStudio() {
   const [requiresDeposit, setRequiresDeposit] = useState(!!practitioner?.requires_deposit);
   const [depositPct, setDepositPct] = useState(String(practitioner?.deposit_percentage ?? 20));
   const [address, setAddress] = useState(practitioner?.base_address ?? '');
+  const [socials, setSocials] = useState<Record<string, string>>({
+    instagram: practitioner?.instagram ?? '',
+    facebook: practitioner?.facebook ?? '',
+    x_handle: practitioner?.x_handle ?? '',
+    tiktok: practitioner?.tiktok ?? '',
+  });
   const [error, setError] = useState<string>();
 
   const toggleCategory = (c: ServiceCategory) =>
@@ -55,6 +62,10 @@ export default function EditStudio() {
       travelRadiusKm: Number(radiusKm) || 15,
       requiresDeposit,
       depositPercentage: requiresDeposit ? Number(depositPct) || 0 : null,
+      instagram: socials.instagram || null,
+      facebook: socials.facebook || null,
+      tiktok: socials.tiktok || null,
+      xHandle: socials.x_handle || null,
     });
     await savePayshap.mutateAsync(proxy);
     safeBack();
@@ -110,6 +121,24 @@ export default function EditStudio() {
           onPress={onUpdateLocation}
           style={{ marginBottom: spacing.lg }}
         />
+
+        <AppText variant="small" color="textMuted" weight="600" style={{ marginBottom: spacing.xs }}>
+          Social media
+        </AppText>
+        <AppText variant="caption" color="textFaint" style={{ marginBottom: spacing.sm }}>
+          Add your usernames so clients can see your work elsewhere — just the handle, no @ or link.
+        </AppText>
+        {SOCIAL_PLATFORMS.map((platform) => (
+          <Input
+            key={platform.key}
+            label={platform.label}
+            value={socials[platform.key] ?? ''}
+            onChangeText={(t) => setSocials((s) => ({ ...s, [platform.key]: t }))}
+            placeholder={platform.placeholder}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+        ))}
 
         {error ? (
           <AppText variant="small" color="danger" style={{ marginBottom: spacing.sm }}>

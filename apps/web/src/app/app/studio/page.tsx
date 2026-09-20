@@ -60,6 +60,9 @@ function StudioOverview({ onChange }: { onChange: () => void }) {
       </Card>
 
       <div className="grid gap-3 sm:grid-cols-2">
+        <Link href="/app/studio/profile">
+          <Card className="hover:bg-primary-100">Edit profile & socials →</Card>
+        </Link>
         <Link href="/app/studio/services">
           <Card className="hover:bg-primary-100">Manage services →</Card>
         </Link>

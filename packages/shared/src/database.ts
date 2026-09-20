@@ -299,11 +299,15 @@ export type Database = {
           categories: Database["public"]["Enums"]["service_category"][]
           created_at: string
           deposit_percentage: number | null
+          facebook: string | null
           id: string
+          instagram: string | null
           is_online: boolean
           jobs_done: number
           payshap_proxy: string | null
           rating: number | null
+          tiktok: string | null
+          x_handle: string | null
           rating_count: number
           requires_deposit: boolean
           slug: string | null
@@ -324,11 +328,15 @@ export type Database = {
           categories?: Database["public"]["Enums"]["service_category"][]
           created_at?: string
           deposit_percentage?: number | null
+          facebook?: string | null
           id: string
+          instagram?: string | null
           is_online?: boolean
           jobs_done?: number
           payshap_proxy?: string | null
           rating?: number | null
+          tiktok?: string | null
+          x_handle?: string | null
           rating_count?: number
           requires_deposit?: boolean
           slug?: string | null
@@ -349,11 +357,15 @@ export type Database = {
           categories?: Database["public"]["Enums"]["service_category"][]
           created_at?: string
           deposit_percentage?: number | null
+          facebook?: string | null
           id?: string
+          instagram?: string | null
           is_online?: boolean
           jobs_done?: number
           payshap_proxy?: string | null
           rating?: number | null
+          tiktok?: string | null
+          x_handle?: string | null
           rating_count?: number
           requires_deposit?: boolean
           slug?: string | null

@@ -1,0 +1,39 @@
+{
+  "cli": {
+    "version": ">= 12.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://smomo-api.vercel.app/v1",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://ltnjiihfgvwtzrmtkclh.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_SzFaECNVvxn1EnIQ_xnhAw_NLXmtS4P"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://smomo-api.vercel.app/v1",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://ltnjiihfgvwtzrmtkclh.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_SzFaECNVvxn1EnIQ_xnhAw_NLXmtS4P"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "android": { "buildType": "app-bundle" },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://smomo-api.vercel.app/v1",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://ltnjiihfgvwtzrmtkclh.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_SzFaECNVvxn1EnIQ_xnhAw_NLXmtS4P"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

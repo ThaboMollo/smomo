@@ -6,9 +6,11 @@ import { useParams } from 'next/navigation';
 
 import {
   SERVICE_MODE_LABEL,
+  SOCIAL_PLATFORMS,
   categoryLabel,
   formatTimeAgo,
   formatZar,
+  socialUrl,
 } from '@smomo/shared';
 
 import { Avatar, Badge, Card, Stars } from '@/components/ui';
@@ -71,6 +73,30 @@ export default function ProviderProfile() {
       </div>
 
       {practitioner.bio ? <p>{practitioner.bio}</p> : null}
+
+      {/* Socials */}
+      {(() => {
+        const socials = SOCIAL_PLATFORMS.map((platform) => ({
+          platform,
+          url: socialUrl(platform, practitioner[platform.key]),
+        })).filter((s) => s.url);
+        return socials.length ? (
+          <div className="flex flex-wrap gap-2">
+            {socials.map(({ platform, url }) => (
+              <a
+                key={platform.key}
+                href={url!}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                className="inline-flex items-center gap-1.5 rounded border border-border px-3 py-1.5 text-sm text-text-muted transition-colors hover:border-primary hover:text-primary-700"
+              >
+                {platform.label}
+                <span aria-hidden className="text-text-faint">↗</span>
+              </a>
+            ))}
+          </div>
+        ) : null;
+      })()}
 
       {/* Portfolio */}
       {portfolio.length > 0 ? (

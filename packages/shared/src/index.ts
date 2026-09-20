@@ -4,3 +4,4 @@ export * from './categories';
 export * from './format';
 export * from './saId';
 export * from './contracts';
+export * from './socials';

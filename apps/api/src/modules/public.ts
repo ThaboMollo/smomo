@@ -87,6 +87,10 @@ class PublicController {
       jobs_done: pp.jobs_done,
       base_address: pp.base_address,
       avatar_url: anyPp.profile?.avatar_url ?? null,
+      instagram: anyPp.instagram ?? null,
+      facebook: anyPp.facebook ?? null,
+      tiktok: anyPp.tiktok ?? null,
+      x_handle: anyPp.x_handle ?? null,
       services: (svc.data ?? []) as PublicProvider['services'],
       portfolio: (pf.data ?? []) as PublicProvider['portfolio'],
       reviews: (rv.data ?? []).map((r: any) => ({

@@ -1,8 +1,9 @@
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { safeBack } from '@/lib/nav';
-import { ScrollView, useWindowDimensions, View } from 'react-native';
+import { Linking, Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 
+import { SOCIAL_PLATFORMS, socialUrl } from '@smomo/shared';
 import { SERVICE_MODE_LABEL, categoryEmoji, categoryLabel } from '@/lib/categories';
 import { formatTimeAgo, formatZar } from '@/lib/format';
 import { radius, spacing, useTheme } from '@/lib/theme';
@@ -100,6 +101,35 @@ export default function ProviderProfile() {
             {practitioner.bio}
           </AppText>
         ) : null}
+
+        {/* Socials */}
+        {(() => {
+          const socials = SOCIAL_PLATFORMS.map((platform) => ({
+            platform,
+            url: socialUrl(platform, practitioner[platform.key]),
+          })).filter((s) => s.url);
+          return socials.length ? (
+            <Row style={{ gap: spacing.sm, flexWrap: 'wrap', marginTop: spacing.md }}>
+              {socials.map(({ platform, url }) => (
+                <Pressable
+                  key={platform.key}
+                  onPress={() => Linking.openURL(url!)}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    borderRadius: radius.sm,
+                    paddingHorizontal: spacing.md,
+                    paddingVertical: spacing.sm,
+                  }}
+                >
+                  <AppText variant="small" color="textMuted">
+                    {platform.label} ↗
+                  </AppText>
+                </Pressable>
+              ))}
+            </Row>
+          ) : null;
+        })()}
 
         {/* Portfolio */}
         {portfolio.length ? (

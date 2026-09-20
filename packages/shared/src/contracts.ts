@@ -103,6 +103,16 @@ export const zSubmitIdentity = z.object({
 export type SubmitIdentityInput = z.infer<typeof zSubmitIdentity>;
 
 /* ----------------------------- Practitioner ----------------------------- */
+// A social handle: username only (no @, no URL, no spaces). Empty string → null.
+const zHandle = z
+  .string()
+  .trim()
+  .max(50)
+  .transform((s) => s.replace(/^@+/, '').trim())
+  .transform((s) => (s.length ? s : null))
+  .nullable()
+  .optional();
+
 export const zSaveBusinessProfile = z.object({
   businessName: z.string().min(2).max(120),
   bio: z.string().max(1000).optional(),
@@ -112,6 +122,10 @@ export const zSaveBusinessProfile = z.object({
   travelRadiusKm: z.number().positive().max(200),
   requiresDeposit: z.boolean(),
   depositPercentage: z.number().int().min(0).max(100).nullable().optional(),
+  instagram: zHandle,
+  facebook: zHandle,
+  tiktok: zHandle,
+  xHandle: zHandle,
 });
 export type SaveBusinessProfileInput = z.infer<typeof zSaveBusinessProfile>;
 

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Cormorant_Garamond, Lora } from 'next/font/google';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
@@ -6,6 +6,7 @@ import '@fortawesome/fontawesome-svg-core/styles.css';
 import './globals.css';
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader';
+import { PwaProvider } from '@/components/PwaProvider';
 import { SITE_NAME, SITE_URL } from '@/lib/env';
 
 // We import the Font Awesome CSS manually above; disable auto-injection so the
@@ -32,8 +33,33 @@ export const metadata: Metadata = {
   },
   description:
     'Find and book trusted hairdressers, nail technicians, make-up artists, beauticians and tattoo artists near you in South Africa. Post a request and get offers.',
+  applicationName: SITE_NAME,
+  icons: {
+    icon: [
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: SITE_NAME,
+  },
+  formatDetection: { telephone: false },
   openGraph: { siteName: SITE_NAME, type: 'website', locale: 'en_ZA' },
   twitter: { card: 'summary_large_image' },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#6d28d9' },
+    { media: '(prefers-color-scheme: dark)', color: '#2e1065' },
+  ],
+  colorScheme: 'light dark',
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 // Runs before paint so the correct theme is applied with no flash of the wrong one.
@@ -47,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         <main className="min-h-[70vh]">{children}</main>
         <SiteFooter />
+        <PwaProvider />
       </body>
     </html>
   );

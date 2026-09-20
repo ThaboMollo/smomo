@@ -89,6 +89,13 @@ export function SiteHeader() {
               </div>
             ) : null}
           </div>
+
+          <Link
+            href="/download"
+            className="border-b border-transparent pb-0.5 hover:border-primary hover:text-text"
+          >
+            Get the app
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">

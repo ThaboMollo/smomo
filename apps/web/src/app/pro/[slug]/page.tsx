@@ -2,6 +2,8 @@ import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
+import { SOCIAL_PLATFORMS, socialUrl } from '@smomo/shared';
+
 import { CATEGORY_LABEL, CATEGORY_SLUGS } from '@/lib/catalog';
 import { Icon } from '@/components/Icon';
 import { Avatar, Badge, Button, Card, Container, Plate, Stars } from '@/components/ui';
@@ -40,6 +42,11 @@ export default async function ProviderPage({ params }: Params) {
   const p = await getProvider(slug);
   if (!p) notFound();
 
+  const socials = SOCIAL_PLATFORMS.map((platform) => ({
+    platform,
+    url: socialUrl(platform, p[platform.key]),
+  })).filter((s): s is { platform: (typeof SOCIAL_PLATFORMS)[number]; url: string } => s.url !== null);
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HealthAndBeautyBusiness',
@@ -53,6 +60,7 @@ export default async function ProviderPage({ params }: Params) {
       p.rating != null && p.rating_count > 0
         ? { '@type': 'AggregateRating', ratingValue: p.rating, reviewCount: p.rating_count }
         : undefined,
+    sameAs: socials.length ? socials.map((s) => s.url) : undefined,
     url: `${SITE_URL}/pro/${p.slug}`,
   };
 
@@ -84,6 +92,23 @@ export default async function ProviderPage({ params }: Params) {
       </div>
 
       {p.bio ? <p className="mt-6 max-w-2xl text-text-muted">{p.bio}</p> : null}
+
+      {socials.length > 0 ? (
+        <div className="mt-5 flex flex-wrap items-center gap-2">
+          {socials.map(({ platform, url }) => (
+            <a
+              key={platform.key}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              className="inline-flex items-center gap-1.5 rounded border border-border px-3 py-1.5 text-sm text-text-muted transition-colors hover:border-primary hover:text-primary-700"
+            >
+              {platform.label}
+              <span aria-hidden className="text-text-faint">↗</span>
+            </a>
+          ))}
+        </div>
+      ) : null}
 
       {p.portfolio.length > 0 ? (
         <section className="mt-10">

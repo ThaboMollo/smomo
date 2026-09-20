@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const paths = [
     '',
     '/how-it-works',
+    '/download',
     ...CATEGORY_SLUG_LIST.map((c) => `/${c}`),
     ...CITIES.map((c) => `/city/${c}`),
     ...CATEGORY_SLUG_LIST.flatMap((cat) => CITIES.map((city) => `/${cat}/${city}`)),

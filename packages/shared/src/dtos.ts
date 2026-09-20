@@ -104,6 +104,10 @@ export type PublicProvider = {
   jobs_done: number;
   base_address: string | null;
   avatar_url: string | null;
+  instagram: string | null;
+  facebook: string | null;
+  tiktok: string | null;
+  x_handle: string | null;
   services: Pick<Service, 'id' | 'category' | 'title' | 'description' | 'indicative_price_zar'>[];
   portfolio: Pick<PortfolioItem, 'id' | 'image_url' | 'caption' | 'category'>[];
   reviews: { rating: number; comment: string | null; created_at: string; reviewer_name: string | null }[];

@@ -51,6 +51,10 @@ class PractitionerController {
       travel_radius_km: input.travelRadiusKm,
       requires_deposit: input.requiresDeposit,
       deposit_percentage: input.requiresDeposit ? (input.depositPercentage ?? 0) : null,
+      instagram: input.instagram ?? null,
+      facebook: input.facebook ?? null,
+      tiktok: input.tiktok ?? null,
+      x_handle: input.xHandle ?? null,
     });
     if (error) throw error;
     await db.from('profiles').update({ is_practitioner: true }).eq('id', user.id);
