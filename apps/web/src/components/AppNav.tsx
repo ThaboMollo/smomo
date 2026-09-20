@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 
+import { BrandLogo } from '@/components/BrandLogo';
 import { Container } from '@/components/ui';
 import { SignOutButton } from '@/components/SignOutButton';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useMe } from '@/lib/use-me';
 
 export function AppNav() {
@@ -15,8 +17,8 @@ export function AppNav() {
     <div className="border-b border-border bg-card">
       <Container className="flex h-14 items-center justify-between">
         <nav className="flex items-center gap-4 overflow-x-auto text-sm font-medium">
-          <Link href="/app" className="font-extrabold">
-            💅 Smomo
+          <Link href="/app" aria-label="Smomo" className="shrink-0">
+            <BrandLogo className="h-7 w-auto" priority />
           </Link>
           <Link href="/app" className="text-text-muted hover:text-text">
             Dashboard
@@ -47,6 +49,7 @@ export function AppNav() {
           ) : null}
         </nav>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           <Link href="/app/profile" className="text-sm font-medium text-text-muted hover:text-text">
             Profile
           </Link>

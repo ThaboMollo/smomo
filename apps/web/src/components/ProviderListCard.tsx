@@ -7,10 +7,10 @@ import { Avatar, Card, Stars } from '@/components/ui';
 export function ProviderListCard({ p }: { p: PublicProviderListItem }) {
   return (
     <Link href={`/pro/${p.slug}`}>
-      <Card className="flex items-center gap-4 transition-shadow hover:shadow-md">
+      <Card className="flex items-center gap-4 transition-colors hover:bg-primary-100">
         <Avatar name={p.business_name} size={56} />
         <div className="min-w-0 flex-1">
-          <div className="truncate font-semibold">{p.business_name ?? 'Provider'}</div>
+          <div className="truncate font-medium">{p.business_name ?? 'Provider'}</div>
           <div className="mt-1">
             <Stars rating={p.rating} count={p.rating_count} />
           </div>

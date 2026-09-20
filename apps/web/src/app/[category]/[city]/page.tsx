@@ -73,7 +73,7 @@ export default async function ListingPage({ params }: Params) {
         / <Link href={`/${category}`} className="hover:text-text">{label}</Link> / {cityName}
       </nav>
 
-      <h1 className="mt-2 text-3xl font-extrabold tracking-tight">
+      <h1 className="mt-2 text-4xl tracking-tight">
         {label} in {cityName}
       </h1>
       <p className="mt-1 text-text-muted">
@@ -89,7 +89,7 @@ export default async function ListingPage({ params }: Params) {
       {items.length === 0 ? (
         <p className="mt-10 text-text-muted">
           No {label.toLowerCase()} listed in {cityName} yet — check back soon, or{' '}
-          <Link href={`/${category}`} className="text-primary">
+          <Link href={`/${category}`} className="text-primary-700">
             browse all {label.toLowerCase()}
           </Link>
           .

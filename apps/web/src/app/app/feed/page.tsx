@@ -5,7 +5,6 @@ import { useState } from 'react';
 
 import {
   BOOKING_MODE_LABEL,
-  categoryEmoji,
   categoryLabel,
   formatBudget,
   formatDistance,
@@ -13,6 +12,7 @@ import {
   timeLeft,
 } from '@smomo/shared';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
 import { Badge, Card } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useMe } from '@/lib/use-me';
@@ -51,9 +51,9 @@ export default function Feed() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl font-bold">Client requests</h1>
+      <h1 className="text-2xl">Client requests</h1>
       {!verified ? (
-        <Card className="mt-4 bg-primary-soft">You can appear in search, but you must be verified to accept bookings.</Card>
+        <Card className="mt-4 border-primary-300 bg-primary-100">You can appear in search, but you must be verified to accept bookings.</Card>
       ) : null}
       {!online ? (
         <Card className="mt-4">You're offline. Go online from your Studio to receive requests.</Card>
@@ -62,8 +62,9 @@ export default function Feed() {
           {(feed.data ?? []).map((r) => (
             <Card key={r.request_id}>
               <div className="flex items-center justify-between">
-                <span className="font-semibold">
-                  {categoryEmoji(r.category)} {categoryLabel(r.category)}
+                <span className="inline-flex items-center gap-1.5 font-medium">
+                  <CategoryIcon category={r.category} size={16} />
+                  {categoryLabel(r.category)}
                 </span>
                 <Badge tone="primary">{timeLeft(r.expires_at)}</Badge>
               </div>
@@ -80,19 +81,19 @@ export default function Feed() {
                 <Badge tone="success">Offer sent</Badge>
               ) : openId === r.request_id ? (
                 <div className="mt-3 space-y-2">
-                  <input placeholder="Your price (R)" inputMode="numeric" className="w-full rounded-xl border border-border bg-card px-3 py-2 text-sm" value={price} onChange={(e) => setPrice(e.target.value)} />
-                  <input placeholder="Message (optional)" className="w-full rounded-xl border border-border bg-card px-3 py-2 text-sm" value={message} onChange={(e) => setMessage(e.target.value)} />
+                  <input placeholder="Your price (R)" inputMode="numeric" className="w-full rounded border border-border bg-card px-3 py-2 text-sm" value={price} onChange={(e) => setPrice(e.target.value)} />
+                  <input placeholder="Message (optional)" className="w-full rounded border border-border bg-card px-3 py-2 text-sm" value={message} onChange={(e) => setMessage(e.target.value)} />
                   <div className="flex gap-2">
-                    <button onClick={() => makeOffer.mutate(r.request_id)} disabled={!price || makeOffer.isPending} className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+                    <button onClick={() => makeOffer.mutate(r.request_id)} disabled={!price || makeOffer.isPending} className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700 disabled:opacity-50">
                       Send offer
                     </button>
-                    <button onClick={() => setOpenId(null)} className="rounded-xl border border-border px-4 py-2 text-sm">
+                    <button onClick={() => setOpenId(null)} className="rounded border border-border px-4 py-2 text-sm">
                       Cancel
                     </button>
                   </div>
                 </div>
               ) : (
-                <button onClick={() => setOpenId(r.request_id)} className="mt-3 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white">
+                <button onClick={() => setOpenId(r.request_id)} className="mt-3 rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700">
                   Make an offer
                 </button>
               )}

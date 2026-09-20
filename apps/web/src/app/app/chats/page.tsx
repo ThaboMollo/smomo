@@ -3,8 +3,9 @@
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 
-import { categoryEmoji, categoryLabel, formatWhen, type BookingWithParties } from '@smomo/shared';
+import { categoryLabel, formatWhen, type BookingWithParties } from '@smomo/shared';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
 import { Avatar, Badge, Card } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useMe } from '@/lib/use-me';
@@ -35,25 +36,26 @@ export default function Chats() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-bold">Chats</h1>
+      <h1 className="text-2xl">Chats</h1>
       <div className="space-y-3">
         {conversations.map(({ booking: b, asClient: iAmClient }) => {
           const other = iAmClient ? b.practitioner : b.client;
           return (
             <Link key={b.id} href={`/app/booking/${b.id}`}>
-              <Card className="flex items-center gap-4 transition-shadow hover:shadow-md">
+              <Card className="flex items-center gap-4 transition-colors hover:bg-primary-100">
                 <Avatar name={other?.full_name ?? null} size={44} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="truncate font-semibold">
+                    <span className="truncate font-medium">
                       {other?.full_name ?? (iAmClient ? 'Provider' : 'Client')}
                     </span>
                     <Badge tone={b.status === 'completed' ? 'success' : 'primary'}>
                       {b.status.replace('_', ' ')}
                     </Badge>
                   </div>
-                  <p className="text-sm text-text-muted">
-                    {categoryEmoji(b.category)} {categoryLabel(b.category)} · {formatWhen(b.scheduled_at)}
+                  <p className="flex items-center gap-1.5 text-sm text-text-muted">
+                    <CategoryIcon category={b.category} size={14} />
+                    {categoryLabel(b.category)} · {formatWhen(b.scheduled_at)}
                   </p>
                 </div>
               </Card>

@@ -6,11 +6,12 @@ import { useEffect, useState } from 'react';
 
 import { BOOKING_MODE_LABEL, CATEGORIES, type BookingMode, type ServiceCategory } from '@smomo/shared';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
 import { Button } from '@/components/ui';
 import { api } from '@/lib/api';
 import { createClient } from '@/lib/supabase/client';
 
-const inputCls = 'w-full rounded-xl border border-border bg-card px-4 py-3';
+const inputCls = 'w-full rounded border border-border bg-card px-4 py-3';
 const CAPE_TOWN = { latitude: -33.9249, longitude: 18.4241 };
 
 export default function NewRequest() {
@@ -79,33 +80,33 @@ export default function NewRequest() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="text-2xl font-bold">{target ? 'Request this pro' : 'Post a request'}</h1>
+      <h1 className="text-2xl">{target ? 'Request this pro' : 'Post a request'}</h1>
       {target ? (
         <p className="mt-1 text-sm text-text-muted">
           This request goes directly to the provider you picked.
         </p>
       ) : null}
 
-      <p className="mt-6 mb-2 text-sm font-semibold text-text-muted">What do you need?</p>
+      <p className="mt-6 mb-2 text-sm font-medium text-text-muted">What do you need?</p>
       <div className="flex flex-wrap gap-2">
         {CATEGORIES.map((c) => (
           <button
             key={c.value}
             onClick={() => setCategory(c.value)}
-            className={`rounded-full border px-4 py-2 text-sm font-medium ${category === c.value ? 'border-primary bg-primary text-white' : 'border-border bg-card'}`}
+            className={`rounded border px-4 py-2 text-sm font-medium ${category === c.value ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}
           >
-            {c.emoji} {c.label}
+            <span className="inline-flex items-center gap-1.5"><CategoryIcon category={c.value} size={14} />{c.label}</span>
           </button>
         ))}
       </div>
 
-      <p className="mt-6 mb-2 text-sm font-semibold text-text-muted">Where?</p>
+      <p className="mt-6 mb-2 text-sm font-medium text-text-muted">Where?</p>
       <div className="flex gap-2">
         {(['mobile', 'studio'] as BookingMode[]).map((m) => (
           <button
             key={m}
             onClick={() => setMode(m)}
-            className={`flex-1 rounded-xl border px-3 py-2 text-sm font-medium ${mode === m ? 'border-primary bg-primary text-white' : 'border-border bg-card'}`}
+            className={`flex-1 rounded border px-3 py-2 text-sm font-medium ${mode === m ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}
           >
             {BOOKING_MODE_LABEL[m]}
           </button>
@@ -134,7 +135,7 @@ export default function NewRequest() {
       <button
         onClick={() => publish.mutate()}
         disabled={publish.isPending}
-        className="mt-6 w-full rounded-xl bg-primary py-3 font-semibold text-white hover:bg-primary-dark disabled:opacity-50"
+        className="mt-6 w-full rounded border border-primary hover:bg-primary-100 py-3 font-medium text-primary-700 active:bg-primary-200 disabled:opacity-50"
       >
         {publish.isPending ? 'Posting…' : target ? 'Send request' : 'Post to nearby pros'}
       </button>

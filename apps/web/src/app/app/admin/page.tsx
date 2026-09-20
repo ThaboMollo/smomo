@@ -30,12 +30,12 @@ export default function Admin() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <section>
-        <h1 className="text-2xl font-bold">Payment disputes</h1>
+        <h1 className="text-2xl">Payment disputes</h1>
         <div className="mt-4 space-y-3">
           {(disputes.data ?? []).map((d: any) => (
             <Card key={d.id}>
               <div className="flex items-center justify-between">
-                <span className="font-semibold">{formatZar(d.amount_zar)} · {d.payment_type}</span>
+                <span className="tnum font-medium">{formatZar(d.amount_zar)} · {d.payment_type}</span>
                 <Badge tone="danger">disputed</Badge>
               </div>
               <p className="mt-1 text-sm text-text-muted">
@@ -44,10 +44,10 @@ export default function Admin() {
               </p>
               {d.dispute_reason ? <p className="mt-1 text-sm">Reason: {d.dispute_reason}</p> : null}
               <div className="mt-3 flex gap-2">
-                <button onClick={() => resolveDispute.mutate({ id: d.id, resolveAs: 'verified' })} disabled={resolveDispute.isPending} className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+                <button onClick={() => resolveDispute.mutate({ id: d.id, resolveAs: 'verified' })} disabled={resolveDispute.isPending} className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700 disabled:opacity-50">
                   Mark verified
                 </button>
-                <button onClick={() => resolveDispute.mutate({ id: d.id, resolveAs: 'rejected' })} disabled={resolveDispute.isPending} className="rounded-xl border border-border px-4 py-2 text-sm">
+                <button onClick={() => resolveDispute.mutate({ id: d.id, resolveAs: 'rejected' })} disabled={resolveDispute.isPending} className="rounded border border-border px-4 py-2 text-sm">
                   Reject
                 </button>
               </div>
@@ -58,12 +58,12 @@ export default function Admin() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-bold">Reports</h2>
+        <h2 className="text-2xl">Reports</h2>
         <div className="mt-4 space-y-3">
           {(reports.data ?? []).map((r: any) => (
             <Card key={r.id}>
               <div className="flex items-center justify-between">
-                <span className="font-semibold">{r.reason}</span>
+                <span className="font-medium">{r.reason}</span>
                 <Badge tone={r.status === 'open' ? 'primary' : 'default'}>{r.status}</Badge>
               </div>
               <p className="mt-1 text-sm text-text-muted">
@@ -72,10 +72,10 @@ export default function Admin() {
               {r.details ? <p className="mt-1 text-sm">{r.details}</p> : null}
               {r.status === 'open' || r.status === 'reviewing' ? (
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => resolveReport.mutate({ id: r.id, status: 'resolved' })} disabled={resolveReport.isPending} className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+                  <button onClick={() => resolveReport.mutate({ id: r.id, status: 'resolved' })} disabled={resolveReport.isPending} className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700 disabled:opacity-50">
                     Resolve
                   </button>
-                  <button onClick={() => resolveReport.mutate({ id: r.id, status: 'dismissed' })} disabled={resolveReport.isPending} className="rounded-xl border border-border px-4 py-2 text-sm">
+                  <button onClick={() => resolveReport.mutate({ id: r.id, status: 'dismissed' })} disabled={resolveReport.isPending} className="rounded border border-border px-4 py-2 text-sm">
                     Dismiss
                   </button>
                 </div>

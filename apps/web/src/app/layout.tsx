@@ -1,10 +1,28 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Cormorant_Garamond, Lora } from 'next/font/google';
+import { config } from '@fortawesome/fontawesome-svg-core';
+import '@fortawesome/fontawesome-svg-core/styles.css';
 
 import './globals.css';
-import { Container } from '@/components/ui';
-import { CATEGORY_LABEL, CATEGORY_SLUG_LIST } from '@/lib/catalog';
+import { SiteFooter } from '@/components/SiteFooter';
+import { SiteHeader } from '@/components/SiteHeader';
 import { SITE_NAME, SITE_URL } from '@/lib/env';
+
+// We import the Font Awesome CSS manually above; disable auto-injection so the
+// App Router SSR pass doesn't flash oversized icons before hydration.
+config.autoAddCss = false;
+
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-cormorant',
+});
+const lora = Lora({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  style: ['normal', 'italic'],
+  variable: '--font-lora',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -18,40 +36,17 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image' },
 };
 
+// Runs before paint so the correct theme is applied with no flash of the wrong one.
+const themeInit = `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning className={`${cormorant.variable} ${lora.variable}`}>
       <body>
-        <header className="sticky top-0 z-10 border-b border-border bg-card/90 backdrop-blur">
-          <Container className="flex h-16 items-center justify-between gap-4">
-            <Link href="/" className="text-xl font-extrabold tracking-tight">
-              💅 Smomo
-            </Link>
-            <nav className="hidden items-center gap-5 text-sm font-medium text-text-muted md:flex">
-              {CATEGORY_SLUG_LIST.map((c) => (
-                <Link key={c} href={`/${c}`} className="hover:text-text">
-                  {CATEGORY_LABEL[c]}
-                </Link>
-              ))}
-            </nav>
-            <Link
-              href="/how-it-works"
-              className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark"
-            >
-              How it works
-            </Link>
-          </Container>
-        </header>
-
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+        <SiteHeader />
         <main className="min-h-[70vh]">{children}</main>
-
-        <footer className="mt-16 border-t border-border bg-card">
-          <Container className="flex flex-col gap-2 py-10 text-sm text-text-muted">
-            <p className="font-semibold text-text">Smomo</p>
-            <p>Beauty, hair, nails, make-up & ink — booked to you or to their studio.</p>
-            <p className="mt-2 text-text-faint">© {new Date().getFullYear()} Smomo. South Africa.</p>
-          </Container>
-        </footer>
+        <SiteFooter />
       </body>
     </html>
   );

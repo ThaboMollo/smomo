@@ -43,22 +43,22 @@ export default async function CategoryHub({ params }: Params) {
 
   return (
     <Container className="py-10">
-      <h1 className="text-3xl font-extrabold tracking-tight">{label} in South Africa</h1>
+      <h1 className="text-4xl tracking-tight">{label} in South Africa</h1>
 
-      <h2 className="mt-8 text-lg font-bold">Browse {label.toLowerCase()} by city</h2>
+      <h2 className="mt-8 text-lg">Browse {label.toLowerCase()} by city</h2>
       <div className="mt-3 flex flex-wrap gap-2">
         {CITIES.map((city) => (
           <Link
             key={city}
             href={`/${category}/${city}`}
-            className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-card-muted"
+            className="rounded border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-card-muted"
           >
             {label} in {titleCase(city)}
           </Link>
         ))}
       </div>
 
-      <h2 className="mt-10 text-lg font-bold">Top {label.toLowerCase()}</h2>
+      <h2 className="mt-10 text-lg">Top {label.toLowerCase()}</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {items.map((p) => (
           <ProviderListCard key={p.id} p={p} />

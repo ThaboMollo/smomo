@@ -4,8 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
 
-import { categoryEmoji, categoryLabel, formatWhen, formatZar } from '@smomo/shared';
+import { categoryLabel, formatWhen, formatZar } from '@smomo/shared';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
 import { Avatar, Badge, Card } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useMe } from '@/lib/use-me';
@@ -40,14 +41,14 @@ export default function Schedule() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-bold">Schedule</h1>
+      <h1 className="text-2xl">Schedule</h1>
 
       <div className="flex gap-2">
         {(['upcoming', 'past'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`flex-1 rounded-xl border px-3 py-2 text-sm font-medium capitalize ${tab === t ? 'border-primary bg-primary text-white' : 'border-border bg-card'}`}
+            className={`flex-1 rounded border px-3 py-2 text-sm font-medium capitalize ${tab === t ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}
           >
             {t}
           </button>
@@ -57,15 +58,16 @@ export default function Schedule() {
       <div className="space-y-3">
         {filtered.map((b) => (
           <Link key={b.id} href={`/app/booking/${b.id}`}>
-            <Card className="flex items-center gap-4 transition-shadow hover:shadow-md">
+            <Card className="flex items-center gap-4 transition-colors hover:bg-primary-100">
               <Avatar name={b.client?.full_name ?? null} size={44} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="truncate font-semibold">{b.client?.full_name ?? 'Client'}</span>
+                  <span className="truncate font-medium">{b.client?.full_name ?? 'Client'}</span>
                   <Badge tone={TONE[b.status]}>{b.status.replace('_', ' ')}</Badge>
                 </div>
-                <p className="text-sm text-text-muted">
-                  {categoryEmoji(b.category)} {categoryLabel(b.category)} · {formatZar(b.final_price_zar)}
+                <p className="flex items-center gap-1.5 text-sm text-text-muted">
+                  <CategoryIcon category={b.category} size={14} />
+                  {categoryLabel(b.category)} · {formatZar(b.final_price_zar)}
                 </p>
                 <p className="text-xs text-text-faint">{formatWhen(b.scheduled_at)}</p>
               </div>

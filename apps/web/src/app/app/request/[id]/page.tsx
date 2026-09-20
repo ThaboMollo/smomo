@@ -3,8 +3,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 
-import { categoryEmoji, categoryLabel, formatBudget, formatWhen, formatZar, timeLeft } from '@smomo/shared';
+import { categoryLabel, formatBudget, formatWhen, formatZar, timeLeft } from '@smomo/shared';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
 import { Avatar, Badge, Card, Stars } from '@/components/ui';
 import { api } from '@/lib/api';
 
@@ -45,8 +46,9 @@ export default function RequestDetail() {
     <div className="mx-auto max-w-2xl">
       <Card>
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold">
-            {categoryEmoji(request.category)} {categoryLabel(request.category)}
+          <h1 className="flex items-center gap-2 text-xl">
+            <CategoryIcon category={request.category} size={18} />
+            {categoryLabel(request.category)}
           </h1>
           <Badge tone={isOpen ? 'primary' : 'default'}>
             {isOpen ? timeLeft(request.expires_at) : request.status}
@@ -61,7 +63,7 @@ export default function RequestDetail() {
         ) : null}
       </Card>
 
-      <h2 className="mt-8 text-lg font-bold">
+      <h2 className="mt-8 text-lg">
         Offers {data?.offers.length ? `(${data.offers.length})` : ''}
       </h2>
       {isOpen && data?.offers.length === 0 ? (
@@ -75,7 +77,7 @@ export default function RequestDetail() {
               <Avatar name={o.practitioner?.business_name ?? o.provider?.full_name ?? null} size={48} />
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold">
+                  <span className="font-medium">
                     {o.practitioner?.business_name ?? o.provider?.full_name ?? 'Pro'}
                   </span>
                   {o.practitioner?.verification_status === 'verified' ? (
@@ -87,12 +89,12 @@ export default function RequestDetail() {
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between">
-              <span className="text-xl font-bold text-primary">{formatZar(o.offered_price_zar)}</span>
+              <span className="tnum text-xl text-primary-700">{formatZar(o.offered_price_zar)}</span>
               {isOpen && o.status === 'pending' ? (
                 <button
                   onClick={() => accept.mutate(o.id)}
                   disabled={accept.isPending}
-                  className="rounded-xl bg-primary px-5 py-2 font-semibold text-white hover:bg-primary-dark disabled:opacity-50"
+                  className="rounded border border-primary hover:bg-primary-100 px-5 py-2 font-medium text-primary-700 active:bg-primary-200 disabled:opacity-50"
                 >
                   Accept
                 </button>
@@ -110,7 +112,7 @@ export default function RequestDetail() {
             if (confirm('Stop receiving offers for this request?')) cancel.mutate();
           }}
           disabled={cancel.isPending}
-          className="mt-6 w-full rounded-xl border border-border py-3 text-sm font-semibold text-text-muted hover:bg-card-muted disabled:opacity-50"
+          className="mt-6 w-full rounded border border-border py-3 text-sm font-medium text-text-muted hover:bg-card-muted disabled:opacity-50"
         >
           {cancel.isPending ? 'Cancelling…' : 'Cancel request'}
         </button>

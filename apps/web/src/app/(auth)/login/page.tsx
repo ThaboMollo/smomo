@@ -33,13 +33,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6">
-      <h1 className="text-2xl font-bold">Log in</h1>
+    <div className="rounded border border-border bg-card p-6">
+      <h1 className="text-2xl">Log in</h1>
       <form onSubmit={onSubmit} className="mt-5 space-y-4">
         <input
           type="email"
           placeholder="Email"
-          className="w-full rounded-xl border border-border bg-card px-4 py-3"
+          className="w-full rounded border border-border bg-card px-4 py-3"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           autoComplete="email"
@@ -47,7 +47,7 @@ export default function LoginPage() {
         <input
           type="password"
           placeholder="Password"
-          className="w-full rounded-xl border border-border bg-card px-4 py-3"
+          className="w-full rounded border border-border bg-card px-4 py-3"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
@@ -56,7 +56,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-primary py-3 font-semibold text-white hover:bg-primary-dark disabled:opacity-50"
+          className="w-full rounded border border-primary hover:bg-primary-100 py-3 font-medium text-primary-700 active:bg-primary-200 disabled:opacity-50"
         >
           {loading ? 'Logging in…' : 'Log in'}
         </button>
@@ -65,7 +65,7 @@ export default function LoginPage() {
         New here?{' '}
         <Link
           href={next ? `/register?next=${encodeURIComponent(next)}` : '/register'}
-          className="font-semibold text-primary"
+          className="font-medium text-primary-700"
         >
           Create an account
         </Link>

@@ -1,5 +1,6 @@
 'use client';
 
+import { faBriefcase } from '@fortawesome/free-solid-svg-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -7,13 +8,14 @@ import { useEffect, useState } from 'react';
 
 import { toE164 } from '@smomo/shared';
 
+import { Icon } from '@/components/Icon';
 import { Avatar, Card, Stars } from '@/components/ui';
 import { api } from '@/lib/api';
 import { createClient } from '@/lib/supabase/client';
 import { uploadImage } from '@/lib/upload';
 import { useMe } from '@/lib/use-me';
 
-const inputCls = 'w-full rounded-xl border border-border bg-card px-4 py-3';
+const inputCls = 'w-full rounded border border-border bg-card px-4 py-3';
 
 export default function Profile() {
   const me = useMe();
@@ -99,11 +101,11 @@ export default function Profile() {
               e.target.value = '';
             }}
           />
-          <span className="absolute -bottom-1 -right-1 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-white">
+          <span className="absolute -bottom-1 -right-1 rounded border border-primary-300 bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700">
             {uploadAvatar.isPending ? '…' : 'Edit'}
           </span>
         </label>
-        <h1 className="text-xl font-bold">{profile?.full_name ?? 'Your profile'}</h1>
+        <h1 className="text-xl">{profile?.full_name ?? 'Your profile'}</h1>
         {profile?.client_rating != null ? (
           <Stars rating={profile.client_rating} count={profile.client_rating_count ?? undefined} />
         ) : null}
@@ -111,20 +113,20 @@ export default function Profile() {
 
       {/* Become / switch to provider */}
       <Link href="/app/studio">
-        <Card className="flex items-center justify-between bg-primary-soft transition-shadow hover:shadow-md">
+        <Card className="flex items-center justify-between border-primary-300 bg-primary-100 transition-colors hover:bg-primary-200">
           <div>
-            <p className="font-bold text-primary">{isPractitioner ? 'Your studio' : 'Become a provider'}</p>
+            <p className="font-medium text-primary-700">{isPractitioner ? 'Your studio' : 'Become a provider'}</p>
             <p className="text-sm text-text-muted">
               {isPractitioner ? 'Manage services, portfolio & availability.' : 'Offer your services and earn on Smomo.'}
             </p>
           </div>
-          <span className="text-2xl">💼</span>
+          <Icon icon={faBriefcase} size={22} />
         </Card>
       </Link>
 
       {/* Edit details */}
       <Card className="space-y-3">
-        <p className="font-semibold">Your details</p>
+        <p className="font-medium">Your details</p>
         <div className="grid grid-cols-2 gap-3">
           <input placeholder="First name" className={inputCls} value={firstName} onChange={(e) => setFirstName(e.target.value)} />
           <input placeholder="Last name" className={inputCls} value={lastName} onChange={(e) => setLastName(e.target.value)} />
@@ -136,21 +138,21 @@ export default function Profile() {
         <button
           onClick={() => save.mutate()}
           disabled={save.isPending}
-          className="w-full rounded-xl bg-primary py-3 font-semibold text-white hover:bg-primary-dark disabled:opacity-50"
+          className="w-full rounded border border-primary hover:bg-primary-100 py-3 font-medium text-primary-700 active:bg-primary-200 disabled:opacity-50"
         >
           {save.isPending ? 'Saving…' : saved ? 'Saved ✓' : 'Save changes'}
         </button>
       </Card>
 
       {isAdmin ? (
-        <Link href="/app/admin" className="block text-center font-semibold text-primary">
+        <Link href="/app/admin" className="block text-center font-medium text-primary-700">
           Admin dashboard →
         </Link>
       ) : null}
 
       <button
         onClick={signOut}
-        className="w-full rounded-xl border border-border py-3 text-sm font-semibold text-text-muted hover:bg-card-muted"
+        className="w-full rounded border border-border py-3 text-sm font-medium text-text-muted hover:bg-card-muted"
       >
         Sign out
       </button>

@@ -1,12 +1,15 @@
 'use client';
 
+import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
 
 import { CATEGORIES, type BookingMode, type ServiceCategory } from '@smomo/shared';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
 import { DiscoverProviderCard } from '@/components/DiscoverProviderCard';
+import { Icon } from '@/components/Icon';
 import { Card } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useCoords } from '@/lib/use-coords';
@@ -38,18 +41,18 @@ export default function Discover() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Discover</h1>
+        <h1 className="text-2xl">Discover</h1>
         <p className="text-text-muted">Find beauty &amp; body-service pros around you.</p>
       </div>
 
       {/* Broadcast CTA */}
       <Link href="/app/request/new">
-        <Card className="flex items-center justify-between bg-primary text-white transition-shadow hover:shadow-md">
+        <Card className="flex items-center justify-between border-primary bg-primary-100 text-primary-700 transition-colors hover:bg-primary-200">
           <div>
-            <p className="text-lg font-bold">Post a request</p>
-            <p className="text-sm text-white/90">Tell pros what you need — they&apos;ll send you offers.</p>
+            <p className="text-lg">Post a request</p>
+            <p className="text-sm text-primary-700/80">Tell pros what you need — they&apos;ll send you offers.</p>
           </div>
-          <span className="text-2xl">📣</span>
+          <Icon icon={faBullhorn} size={24} className="text-primary-700" />
         </Card>
       </Link>
 
@@ -57,7 +60,7 @@ export default function Discover() {
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setCategory(null)}
-          className={`rounded-full border px-4 py-2 text-sm font-medium ${category === null ? 'border-primary bg-primary text-white' : 'border-border bg-card'}`}
+          className={`rounded border px-4 py-2 text-sm font-medium ${category === null ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}
         >
           All
         </button>
@@ -65,9 +68,9 @@ export default function Discover() {
           <button
             key={c.value}
             onClick={() => setCategory((prev) => (prev === c.value ? null : c.value))}
-            className={`rounded-full border px-4 py-2 text-sm font-medium ${category === c.value ? 'border-primary bg-primary text-white' : 'border-border bg-card'}`}
+            className={`rounded border px-4 py-2 text-sm font-medium ${category === c.value ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}
           >
-            {c.emoji} {c.label}
+            <span className="inline-flex items-center gap-1.5"><CategoryIcon category={c.value} size={14} />{c.label}</span>
           </button>
         ))}
       </div>
@@ -78,7 +81,7 @@ export default function Discover() {
           <button
             key={m.value}
             onClick={() => setMode(m.value)}
-            className={`flex-1 rounded-xl border px-3 py-2 text-sm font-medium ${mode === m.value ? 'border-primary bg-primary text-white' : 'border-border bg-card'}`}
+            className={`flex-1 rounded border px-3 py-2 text-sm font-medium ${mode === m.value ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}
           >
             {m.label}
           </button>
@@ -93,10 +96,10 @@ export default function Discover() {
           providers.data.map((p) => <DiscoverProviderCard key={p.id} p={p} />)
         ) : (
           <Card className="text-center">
-            <p className="font-semibold">No providers online nearby</p>
+            <p className="font-medium">No providers online nearby</p>
             <p className="mt-1 text-sm text-text-muted">
               Try a different category, or{' '}
-              <Link href="/app/request/new" className="font-semibold text-primary">
+              <Link href="/app/request/new" className="font-medium text-primary-700">
                 post a request
               </Link>{' '}
               — pros will come to you.

@@ -3,8 +3,9 @@
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 
-import { categoryEmoji, categoryLabel, formatBudget, formatWhen, formatZar } from '@smomo/shared';
+import { categoryLabel, formatBudget, formatWhen, formatZar } from '@smomo/shared';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
 import { Badge, Button, Card } from '@/components/ui';
 import { api } from '@/lib/api';
 
@@ -22,19 +23,20 @@ export default function Dashboard() {
   return (
     <div className="space-y-10">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Your dashboard</h1>
+        <h1 className="text-2xl">Your dashboard</h1>
         <Button href="/app/request/new">Post a request</Button>
       </div>
 
       <section>
-        <h2 className="mb-4 text-lg font-bold">Your requests</h2>
+        <h2 className="mb-4 text-lg">Your requests</h2>
         <div className="grid gap-3">
           {(requests.data ?? []).map((r) => (
             <Link key={r.id} href={`/app/request/${r.id}`}>
-              <Card className="flex items-center justify-between transition-shadow hover:shadow-md">
+              <Card className="flex items-center justify-between transition-colors hover:bg-primary-100">
                 <div>
-                  <div className="font-semibold">
-                    {categoryEmoji(r.category)} {categoryLabel(r.category)}
+                  <div className="flex items-center gap-1.5 font-medium">
+                    <CategoryIcon category={r.category} size={16} />
+                    {categoryLabel(r.category)}
                   </div>
                   <div className="text-sm text-text-muted">
                     {formatWhen(r.scheduled_at)}
@@ -52,15 +54,16 @@ export default function Dashboard() {
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-bold">Your bookings</h2>
+        <h2 className="mb-4 text-lg">Your bookings</h2>
         <div className="grid gap-3">
           {(bookings.data ?? []).map((b) => (
             <Link key={b.id} href={`/app/booking/${b.id}`}>
-              <Card className="flex items-center justify-between transition-shadow hover:shadow-md">
+              <Card className="flex items-center justify-between transition-colors hover:bg-primary-100">
                 <div>
-                  <div className="font-semibold">{b.practitioner?.full_name ?? 'Provider'}</div>
-                  <div className="text-sm text-text-muted">
-                    {categoryEmoji(b.category)} {categoryLabel(b.category)} · {formatZar(b.final_price_zar)}
+                  <div className="font-medium">{b.practitioner?.full_name ?? 'Provider'}</div>
+                  <div className="flex items-center gap-1.5 text-sm text-text-muted">
+                    <CategoryIcon category={b.category} size={14} />
+                    {categoryLabel(b.category)} · {formatZar(b.final_price_zar)}
                   </div>
                 </div>
                 <Badge tone={b.status === 'completed' ? 'success' : 'primary'}>

@@ -1,24 +1,50 @@
 @import "tailwindcss";
 
-/* Smomo brand tokens (mirror @smomo/ui-tokens light palette) */
+/* ──────────────────────────────────────────────────────────────
+   Smomo × Classical — editorial tokens on the Smomo brand palette.
+   Token NAMES are unchanged from the previous globals.css, so every
+   existing page keeps working; only the values and the type change.
+   ────────────────────────────────────────────────────────────── */
 @theme {
+  /* Ground & ink */
   --color-bg: #faf9fc;
   --color-card: #ffffff;
-  --color-card-muted: #f3f1f8;
+  --color-card-muted: #f7f6fa;
   --color-text: #1a1523;
-  --color-text-muted: #6b6577;
+  --color-text-muted: #5c5568;
   --color-text-faint: #9a93a6;
-  --color-border: #e7e3ef;
+  --color-border: #e5e1ee;
+
+  /* Deep violet — the brand's primary */
   --color-primary: #6d28d9;
   --color-primary-dark: #5b21b6;
   --color-primary-soft: #ede9fe;
-  --color-accent: #db2777;
-  --color-star: #f5a623;
+  --color-primary-100: #f6f3fe;
+  --color-primary-200: #ede9fe;
+  --color-primary-300: #d9cdfb;
+  --color-primary-400: #b79cf3;
+  --color-primary-500: #8b5cf6;
+  --color-primary-600: #6d28d9;
+  --color-primary-700: #5b21b6;
+  --color-primary-800: #46199a;
+  --color-primary-900: #2e1065;
+
+  /* Rose gold — stroke and small marks only, never a fill */
+  --color-accent: #d4af7c;
+  --color-accent-deep: #a2783f;
+  --color-star: #bf945c;
+
   --color-success: #16a34a;
   --color-danger: #dc2626;
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --radius-brand: 16px;
+  /* Type — Cormorant Garamond headings over Lora body */
+  --font-heading: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-lora), Georgia, serif;
+  --font-mono: ui-monospace, Menlo, Consolas, monospace;
+  --font-sans: var(--font-lora), Georgia, serif;
+
+  /* Classical is tight-radius and near-flat */
+  --radius-brand: 4px;
 }
 
 html {
@@ -27,6 +53,105 @@ html {
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+  text-wrap: pretty;
 }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+}
+
+/* Display sizes set lighter, not heavier */
+h1 { font-weight: 400; }
+
+/* Figures set tabular wherever they stand as data */
+.tnum,
+th, td,
+time { font-variant-numeric: tabular-nums; }
+
+/* The kicker: small mono caps above a heading */
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-primary-700);
+}
+
+/* Hairline rule — the main structural device */
+.hr {
+  height: 1px;
+  border: 0;
+  background: var(--color-border);
+  margin: 0;
+}
+
+/* Plate: photographs sit matted, like a tipped-in book plate */
+.plate {
+  padding: 6px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+}
+.plate > img { display: block; width: 100%; height: auto; }
+
+/* Themed focus — never the browser default */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-primary-200);
+  color: var(--color-primary-900);
+}
+
+/* ── Dark theme ──────────────────────────────────────────────
+   Token names are unchanged so every component adapts for free.
+   The violet ramp is tuned by purpose, not inverted wholesale:
+   700 (accent text) reads light, while 900 stays deep so the
+   hero plate keeps its dark ground; 100/200 become quiet tints. */
+html[data-theme='dark'] {
+  --color-bg: #131019;
+  --color-card: #1b1725;
+  --color-card-muted: #241f31;
+  --color-text: #f3eefb;
+  --color-text-muted: #b4abc6;
+  --color-text-faint: #82798f;
+  --color-border: #332c46;
+
+  --color-primary: #a78bfa;        /* borders, focus, marks */
+  --color-primary-dark: #8b5cf6;
+  --color-primary-soft: #241a3a;
+  --color-primary-100: #201a33;    /* quiet tint background */
+  --color-primary-200: #2b2248;    /* pressed tint */
+  --color-primary-300: #4a3b73;    /* tint border */
+  --color-primary-400: #6d4bb0;
+  --color-primary-500: #8b5cf6;
+  --color-primary-600: #a78bfa;
+  --color-primary-700: #cbb8fb;    /* accent text — light on dark */
+  --color-primary-800: #ddd0fc;
+  --color-primary-900: #2e1065;    /* deep — keeps the hero plate dark */
+
+  --color-accent: #d8b98a;
+  --color-accent-deep: #c9a46a;
+  --color-star: #d9ad6e;
+
+  --color-success: #4ade80;
+  --color-danger: #f87171;
+
+  color-scheme: dark;
+}
+
+html[data-theme='dark'] ::selection {
+  background: var(--color-primary-300);
+  color: var(--color-text);
+}
+
+/* Theme-aware wordmark: show the ink that reads on the active ground. */
+.brand-logo-dark { display: none; }
+html[data-theme='dark'] .brand-logo-light { display: none; }
+html[data-theme='dark'] .brand-logo-dark { display: block; }

@@ -1,8 +1,10 @@
+import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { CATEGORY_LABEL, CATEGORY_SLUGS } from '@/lib/catalog';
-import { Avatar, Badge, Button, Card, Container, Stars } from '@/components/ui';
+import { Icon } from '@/components/Icon';
+import { Avatar, Badge, Button, Card, Container, Plate, Stars } from '@/components/ui';
 import { SITE_URL } from '@/lib/env';
 import { getProvider } from '@/lib/public-api';
 
@@ -61,7 +63,7 @@ export default async function ProviderPage({ params }: Params) {
       <div className="flex items-start gap-5">
         <Avatar name={p.business_name} size={80} />
         <div className="flex-1">
-          <h1 className="text-3xl font-extrabold tracking-tight">{p.business_name ?? 'Provider'}</h1>
+          <h1 className="text-4xl tracking-tight">{p.business_name ?? 'Provider'}</h1>
           <div className="mt-2">
             <Stars rating={p.rating} count={p.rating_count} />
           </div>
@@ -73,7 +75,11 @@ export default async function ProviderPage({ params }: Params) {
             ))}
             <Badge>{p.jobs_done} jobs</Badge>
           </div>
-          {p.base_address ? <p className="mt-2 text-text-muted">📍 {p.base_address}</p> : null}
+          {p.base_address ? (
+            <p className="mt-2 inline-flex items-center gap-1.5 text-text-muted">
+              <Icon icon={faLocationDot} size={14} className="text-primary-700" /> {p.base_address}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -81,17 +87,18 @@ export default async function ProviderPage({ params }: Params) {
 
       {p.portfolio.length > 0 ? (
         <section className="mt-10">
-          <h2 className="mb-4 text-xl font-bold">Portfolio</h2>
+          <h2 className="mb-4 text-xl">Portfolio</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {p.portfolio.map((item) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={item.id}
-                src={item.image_url}
-                alt={item.caption ?? p.business_name ?? 'Work'}
-                className="aspect-square w-full rounded-xl object-cover"
-                loading="lazy"
-              />
+              <Plate key={item.id}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={item.image_url}
+                  alt={item.caption ?? p.business_name ?? 'Work'}
+                  className="aspect-square w-full object-cover"
+                  loading="lazy"
+                />
+              </Plate>
             ))}
           </div>
         </section>
@@ -99,16 +106,16 @@ export default async function ProviderPage({ params }: Params) {
 
       {p.services.length > 0 ? (
         <section className="mt-10">
-          <h2 className="mb-4 text-xl font-bold">Services</h2>
+          <h2 className="mb-4 text-xl">Services</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {p.services.map((s) => (
               <Card key={s.id} className="flex items-center justify-between">
                 <div>
-                  <div className="font-semibold">{s.title}</div>
+                  <div className="font-medium">{s.title}</div>
                   {s.description ? <div className="text-sm text-text-muted">{s.description}</div> : null}
                 </div>
                 {formatZar(s.indicative_price_zar) ? (
-                  <div className="font-semibold text-primary">from {formatZar(s.indicative_price_zar)}</div>
+                  <div className="tnum font-medium text-primary-700">from {formatZar(s.indicative_price_zar)}</div>
                 ) : null}
               </Card>
             ))}
@@ -118,12 +125,12 @@ export default async function ProviderPage({ params }: Params) {
 
       {p.reviews.length > 0 ? (
         <section className="mt-10">
-          <h2 className="mb-4 text-xl font-bold">Reviews</h2>
+          <h2 className="mb-4 text-xl">Reviews</h2>
           <div className="grid gap-3">
             {p.reviews.map((r, i) => (
               <Card key={i}>
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold">{r.reviewer_name ?? 'Client'}</span>
+                  <span className="font-medium">{r.reviewer_name ?? 'Client'}</span>
                   <Stars rating={r.rating} />
                 </div>
                 {r.comment ? <p className="mt-2 text-text-muted">{r.comment}</p> : null}
@@ -133,8 +140,8 @@ export default async function ProviderPage({ params }: Params) {
         </section>
       ) : null}
 
-      <section className="mt-12 rounded-2xl bg-primary-soft p-8 text-center">
-        <h2 className="text-xl font-bold">Want to book {p.business_name ?? 'this pro'}?</h2>
+      <section className="mt-12 rounded border border-border p-8 text-center">
+        <h2 className="text-xl">Want to book {p.business_name ?? 'this pro'}?</h2>
         <p className="mt-1 text-text-muted">Send a request and get an offer — right here on the web.</p>
         <div className="mt-5 flex justify-center">
           <Button href={`/app/request/new?target=${p.id}&category=${p.categories[0] ?? ''}`}>

@@ -7,13 +7,13 @@ import { useEffect, useState } from 'react';
 
 import {
   BOOKING_MODE_LABEL,
-  categoryEmoji,
   categoryLabel,
   formatWhen,
   formatZar,
   type Payment,
 } from '@smomo/shared';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
 import { ChatPanel } from '@/components/ChatPanel';
 import { Badge, Card } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -52,8 +52,9 @@ export default function BookingDetail() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
-          {categoryEmoji(booking.category)} {categoryLabel(booking.category)}
+        <h1 className="flex items-center gap-2 text-2xl">
+          <CategoryIcon category={booking.category} size={20} />
+          {categoryLabel(booking.category)}
         </h1>
         <Badge tone={booking.status === 'completed' ? 'success' : 'primary'}>
           {booking.status.replace('_', ' ')}
@@ -63,13 +64,13 @@ export default function BookingDetail() {
       <Card>
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="font-semibold">{other?.full_name ?? (isClient ? 'Provider' : 'Client')}</p>
+            <p className="font-medium">{other?.full_name ?? (isClient ? 'Provider' : 'Client')}</p>
             <p className="text-sm text-text-muted">{isClient ? 'Your provider' : 'Your client'}</p>
           </div>
           {other?.phone ? (
             <a
               href={`tel:${other.phone}`}
-              className="rounded-xl border border-border px-3 py-2 text-sm font-semibold text-primary hover:bg-card-muted"
+              className="rounded border border-border px-3 py-2 text-sm font-medium text-primary-700 hover:bg-card-muted"
             >
               Call
             </a>
@@ -102,7 +103,7 @@ export default function BookingDetail() {
       ) : null}
 
       <section>
-        <h2 className="mb-3 text-lg font-bold">Payment (PayShap)</h2>
+        <h2 className="mb-3 text-lg">Payment (PayShap)</h2>
         <div className="space-y-3">
           {data?.payments.map((p) => (
             <PaymentCard key={p.id} payment={p} isClient={isClient} payshap={payshap} onDone={refetch} />
@@ -111,7 +112,7 @@ export default function BookingDetail() {
       </section>
 
       <section>
-        <h2 className="mb-3 text-lg font-bold">Chat</h2>
+        <h2 className="mb-3 text-lg">Chat</h2>
         {userId ? <ChatPanel bookingId={id} userId={userId} /> : null}
       </section>
 
@@ -152,7 +153,7 @@ function CancelBooking({
         if (confirm('Cancel this booking?')) cancel.mutate();
       }}
       disabled={cancel.isPending}
-      className="rounded-xl border border-border py-3 text-sm font-semibold text-text-muted hover:bg-card-muted disabled:opacity-50"
+      className="rounded border border-border py-3 text-sm font-medium text-text-muted hover:bg-card-muted disabled:opacity-50"
     >
       {cancel.isPending ? 'Cancelling…' : 'Cancel booking'}
     </button>
@@ -181,14 +182,14 @@ function ClientReview({
 
   return (
     <Card className="space-y-3">
-      <p className="font-semibold">Leave a review</p>
+      <p className="font-medium">Leave a review</p>
       <p className="text-sm text-text-muted">How was your experience with this provider?</p>
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}
             onClick={() => setRating(n)}
-            className={`text-3xl ${n <= rating ? 'text-primary' : 'text-text-faint'}`}
+            className={`text-3xl ${n <= rating ? 'text-star' : 'text-text-faint'}`}
           >
             ★
           </button>
@@ -196,7 +197,7 @@ function ClientReview({
       </div>
       <input
         placeholder="Tell others about your experience (optional)"
-        className="w-full rounded-xl border border-border bg-card px-3 py-2 text-sm"
+        className="w-full rounded border border-border bg-card px-3 py-2 text-sm"
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       />
@@ -204,7 +205,7 @@ function ClientReview({
       <button
         onClick={() => submit.mutate()}
         disabled={submit.isPending}
-        className="w-full rounded-xl bg-primary py-3 font-semibold text-white disabled:opacity-50"
+        className="w-full rounded border border-primary hover:bg-primary-100 py-3 font-medium text-primary-700 disabled:opacity-50"
       >
         {submit.isPending ? 'Submitting…' : 'Submit review'}
       </button>
@@ -255,10 +256,10 @@ function PractitionerActions({
     return (
       <Card className="flex items-center justify-between">
         <div>
-          <p className="font-semibold">Ready to begin?</p>
+          <p className="font-medium">Ready to begin?</p>
           <p className="text-sm text-text-muted">Mark the job as started when you begin.</p>
         </div>
-        <button onClick={() => start.mutate()} disabled={start.isPending} className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+        <button onClick={() => start.mutate()} disabled={start.isPending} className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700 disabled:opacity-50">
           Start job
         </button>
       </Card>
@@ -267,7 +268,7 @@ function PractitionerActions({
 
   return (
     <Card className="space-y-3">
-      <p className="font-semibold">Complete job</p>
+      <p className="font-medium">Complete job</p>
       <p className="text-sm text-text-muted">
         Upload a photo of the finished work.{' '}
         {consent
@@ -276,7 +277,7 @@ function PractitionerActions({
       </p>
       {proofUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={proofUrl} alt="Proof of work" className="h-40 w-full rounded-xl object-cover" />
+        <img src={proofUrl} alt="Proof of work" className="h-40 w-full rounded object-cover" />
       ) : null}
       <input
         type="file"
@@ -293,18 +294,18 @@ function PractitionerActions({
       {upload.isPending ? <p className="text-sm text-text-muted">Uploading…</p> : null}
 
       <div>
-        <p className="text-sm font-semibold text-text-muted">Rate the client</p>
+        <p className="text-sm font-medium text-text-muted">Rate the client</p>
         <div className="mt-1 flex gap-1">
           {[1, 2, 3, 4, 5].map((n) => (
-            <button key={n} onClick={() => setRating(n)} className={`text-2xl ${n <= rating ? 'text-primary' : 'text-text-faint'}`}>
+            <button key={n} onClick={() => setRating(n)} className={`text-2xl ${n <= rating ? 'text-star' : 'text-text-faint'}`}>
               ★
             </button>
           ))}
         </div>
       </div>
-      <input placeholder="Comment (optional)" className="w-full rounded-xl border border-border bg-card px-3 py-2 text-sm" value={comment} onChange={(e) => setComment(e.target.value)} />
+      <input placeholder="Comment (optional)" className="w-full rounded border border-border bg-card px-3 py-2 text-sm" value={comment} onChange={(e) => setComment(e.target.value)} />
       {error ? <p className="text-sm text-danger">{error}</p> : null}
-      <button onClick={() => complete.mutate()} disabled={!proofUrl || complete.isPending} className="w-full rounded-xl bg-primary py-3 font-semibold text-white disabled:opacity-50">
+      <button onClick={() => complete.mutate()} disabled={!proofUrl || complete.isPending} className="w-full rounded border border-primary hover:bg-primary-100 py-3 font-medium text-primary-700 disabled:opacity-50">
         {complete.isPending ? 'Completing…' : 'Complete & rate'}
       </button>
     </Card>
@@ -342,7 +343,7 @@ function PaymentCard({
   return (
     <Card>
       <div className="flex items-center justify-between">
-        <span className="font-semibold">
+        <span className="font-medium">
           {payment.payment_type === 'deposit' ? 'Deposit' : payment.payment_type === 'balance' ? 'Balance' : 'Payment'} ·{' '}
           {formatZar(payment.amount_zar)}
         </span>
@@ -354,17 +355,17 @@ function PaymentCard({
           <p className="text-sm text-text-muted">
             Pay {formatZar(payment.amount_zar)} via your banking app's PayShap to:
           </p>
-          <p className="text-lg font-bold text-primary">{payshap ?? '—'}</p>
+          <p className="text-lg text-primary-700">{payshap ?? '—'}</p>
           <input
             placeholder="PayShap reference"
-            className="w-full rounded-xl border border-border bg-card px-3 py-2 text-sm"
+            className="w-full rounded border border-border bg-card px-3 py-2 text-sm"
             value={reference}
             onChange={(e) => setReference(e.target.value)}
           />
           <button
             onClick={() => markPaid.mutate()}
             disabled={markPaid.isPending}
-            className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700 disabled:opacity-50"
           >
             I've paid
           </button>
@@ -377,10 +378,10 @@ function PaymentCard({
 
       {!isClient && payment.status === 'pending' && payment.marked_paid_at ? (
         <div className="mt-3 flex gap-2">
-          <button onClick={() => verify.mutate(true)} className="flex-1 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white">
+          <button onClick={() => verify.mutate(true)} className="flex-1 rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700">
             Verify
           </button>
-          <button onClick={() => verify.mutate(false)} className="flex-1 rounded-xl bg-danger px-4 py-2 text-sm font-semibold text-white">
+          <button onClick={() => verify.mutate(false)} className="flex-1 rounded bg-danger px-4 py-2 text-sm font-medium text-white">
             Not received
           </button>
         </div>

@@ -6,7 +6,6 @@ import { useParams } from 'next/navigation';
 
 import {
   SERVICE_MODE_LABEL,
-  categoryEmoji,
   categoryLabel,
   formatTimeAgo,
   formatZar,
@@ -39,7 +38,7 @@ export default function ProviderProfile() {
           ) : null}
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="truncate text-2xl font-bold">
+          <h1 className="truncate text-2xl">
             {practitioner.business_name ?? profile.full_name}
           </h1>
           <div className="mt-1">
@@ -66,7 +65,7 @@ export default function ProviderProfile() {
       <div className="flex flex-wrap gap-2">
         {practitioner.categories.map((c) => (
           <Badge key={c} tone="primary">
-            {categoryEmoji(c)} {categoryLabel(c)}
+            {categoryLabel(c)}
           </Badge>
         ))}
       </div>
@@ -76,7 +75,7 @@ export default function ProviderProfile() {
       {/* Portfolio */}
       {portfolio.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-lg font-bold">Portfolio</h2>
+          <h2 className="mb-3 text-lg">Portfolio</h2>
           <div className="grid grid-cols-3 gap-2">
             {portfolio.map((p) => (
               // eslint-disable-next-line @next/next/no-img-element
@@ -84,7 +83,7 @@ export default function ProviderProfile() {
                 key={p.id}
                 src={p.image_url}
                 alt={p.caption ?? 'Portfolio item'}
-                className="aspect-square w-full rounded-xl border border-border object-cover"
+                className="aspect-square w-full rounded border border-border object-cover"
               />
             ))}
           </div>
@@ -94,16 +93,16 @@ export default function ProviderProfile() {
       {/* Services */}
       {services.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-lg font-bold">Services</h2>
+          <h2 className="mb-3 text-lg">Services</h2>
           <Card className="divide-y divide-border p-0">
             {services.map((s) => (
               <div key={s.id} className="flex items-center justify-between gap-4 p-4">
                 <div>
-                  <p className="font-semibold">{s.title}</p>
+                  <p className="font-medium">{s.title}</p>
                   {s.description ? <p className="text-sm text-text-muted">{s.description}</p> : null}
                 </div>
                 {s.indicative_price_zar != null ? (
-                  <span className="whitespace-nowrap font-semibold text-primary">
+                  <span className="tnum whitespace-nowrap font-medium text-primary-700">
                     from {formatZar(s.indicative_price_zar)}
                   </span>
                 ) : null}
@@ -116,14 +115,14 @@ export default function ProviderProfile() {
       {/* Reviews */}
       {reviews.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-lg font-bold">Reviews</h2>
+          <h2 className="mb-3 text-lg">Reviews</h2>
           <div className="space-y-3">
             {reviews.map((r) => (
               <Card key={r.id}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Avatar name={r.reviewer?.full_name ?? null} size={32} />
-                    <span className="font-semibold">{r.reviewer?.full_name ?? 'Client'}</span>
+                    <span className="font-medium">{r.reviewer?.full_name ?? 'Client'}</span>
                   </div>
                   <Stars rating={r.rating} />
                 </div>
@@ -140,7 +139,7 @@ export default function ProviderProfile() {
         <div className="mx-auto max-w-2xl">
           <Link
             href={requestHref}
-            className="block w-full rounded-xl bg-primary py-3 text-center font-semibold text-white hover:bg-primary-dark"
+            className="block w-full rounded border border-primary hover:bg-primary-100 py-3 text-center font-medium text-primary-700 active:bg-primary-200"
           >
             Request a booking
           </Link>

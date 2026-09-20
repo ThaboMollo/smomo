@@ -1,9 +1,11 @@
 'use client';
 
+import { faHand } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useRef, useState } from 'react';
 
 import type { Message } from '@smomo/shared';
 
+import { Icon } from '@/components/Icon';
 import { createClient } from '@/lib/supabase/client';
 
 export function ChatPanel({ bookingId, userId }: { bookingId: string; userId: string }) {
@@ -54,17 +56,19 @@ export function ChatPanel({ bookingId, userId }: { bookingId: string; userId: st
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card">
+    <div className="rounded border border-border bg-card">
       <div className="max-h-80 space-y-2 overflow-y-auto p-4">
         {messages.length === 0 ? (
-          <p className="text-center text-sm text-text-faint">Say hi 👋 — coordinate your booking here.</p>
+          <p className="inline-flex w-full items-center justify-center gap-1.5 text-center text-sm text-text-faint">
+            Say hi <Icon icon={faHand} size={14} className="text-star" /> — coordinate your booking here.
+          </p>
         ) : null}
         {messages.map((m) => {
           const mine = m.sender_id === userId;
           return (
             <div
               key={m.id}
-              className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${mine ? 'ml-auto bg-primary text-white' : 'bg-card-muted'}`}
+              className={`max-w-[80%] rounded px-3 py-2 text-sm ${mine ? 'ml-auto border border-primary-300 bg-primary-100 text-text' : 'border border-border bg-card'}`}
             >
               {m.body}
             </div>
@@ -78,9 +82,9 @@ export function ChatPanel({ bookingId, userId }: { bookingId: string; userId: st
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && send()}
           placeholder="Message…"
-          className="flex-1 rounded-xl border border-border bg-card px-3 py-2 text-sm"
+          className="flex-1 rounded border border-border bg-card px-3 py-2 text-sm"
         />
-        <button onClick={send} className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white">
+        <button onClick={send} className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700">
           Send
         </button>
       </div>

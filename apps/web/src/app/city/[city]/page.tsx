@@ -32,14 +32,14 @@ export default async function CityHub({ params }: Params) {
 
   return (
     <Container className="py-10">
-      <h1 className="text-3xl font-extrabold tracking-tight">Pros in {cityName}</h1>
+      <h1 className="text-4xl tracking-tight">Pros in {cityName}</h1>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {CATEGORY_SLUG_LIST.map((c) => (
           <Link
             key={c}
             href={`/${c}/${city}`}
-            className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-card-muted"
+            className="rounded border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-card-muted"
           >
             {CATEGORY_LABEL[c]} in {cityName}
           </Link>

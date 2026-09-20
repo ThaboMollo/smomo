@@ -9,7 +9,7 @@ import { toE164, validatePassport, validateSaId } from '@smomo/shared';
 import { api } from '@/lib/api';
 import { createClient } from '@/lib/supabase/client';
 
-const inputCls = 'w-full rounded-xl border border-border bg-card px-4 py-3';
+const inputCls = 'w-full rounded border border-border bg-card px-4 py-3';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -81,18 +81,18 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6">
-      <h1 className="text-2xl font-bold">Create your account</h1>
+    <div className="rounded border border-border bg-card p-6">
+      <h1 className="text-2xl">Create your account</h1>
       <form onSubmit={onSubmit} className="mt-5 space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <input placeholder="First name" className={inputCls} value={firstName} onChange={(e) => setFirstName(e.target.value)} />
           <input placeholder="Last name" className={inputCls} value={lastName} onChange={(e) => setLastName(e.target.value)} />
         </div>
         <div className="flex gap-2">
-          <button type="button" onClick={() => setNationality('sa')} className={`flex-1 rounded-xl border px-3 py-2 text-sm font-medium ${nationality === 'sa' ? 'border-primary bg-primary text-white' : 'border-border bg-card'}`}>
+          <button type="button" onClick={() => setNationality('sa')} className={`flex-1 rounded border px-3 py-2 text-sm font-medium ${nationality === 'sa' ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}>
             South African
           </button>
-          <button type="button" onClick={() => setNationality('foreign')} className={`flex-1 rounded-xl border px-3 py-2 text-sm font-medium ${nationality === 'foreign' ? 'border-primary bg-primary text-white' : 'border-border bg-card'}`}>
+          <button type="button" onClick={() => setNationality('foreign')} className={`flex-1 rounded border px-3 py-2 text-sm font-medium ${nationality === 'foreign' ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}>
             Foreign national
           </button>
         </div>
@@ -107,7 +107,7 @@ export default function RegisterPage() {
         <input type="email" placeholder="Email" className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
         <input type="password" placeholder="Password" className={inputCls} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
         {error ? <p className="text-sm text-danger">{error}</p> : null}
-        <button type="submit" disabled={loading} className="w-full rounded-xl bg-primary py-3 font-semibold text-white hover:bg-primary-dark disabled:opacity-50">
+        <button type="submit" disabled={loading} className="w-full rounded border border-primary hover:bg-primary-100 py-3 font-medium text-primary-700 active:bg-primary-200 disabled:opacity-50">
           {loading ? 'Creating account…' : 'Create account'}
         </button>
       </form>
@@ -115,7 +115,7 @@ export default function RegisterPage() {
         Already have an account?{' '}
         <Link
           href={next ? `/login?next=${encodeURIComponent(next)}` : '/login'}
-          className="font-semibold text-primary"
+          className="font-medium text-primary-700"
         >
           Log in
         </Link>

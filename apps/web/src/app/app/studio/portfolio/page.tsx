@@ -43,11 +43,11 @@ export default function Portfolio() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-bold">Portfolio</h1>
+      <h1 className="text-2xl">Portfolio</h1>
 
       <Card className="space-y-3">
-        <p className="font-semibold">Add a photo</p>
-        <input placeholder="Caption (optional)" className="w-full rounded-xl border border-border bg-card px-3 py-2 text-sm" value={caption} onChange={(e) => setCaption(e.target.value)} />
+        <p className="font-medium">Add a photo</p>
+        <input placeholder="Caption (optional)" className="w-full rounded border border-border bg-card px-3 py-2 text-sm" value={caption} onChange={(e) => setCaption(e.target.value)} />
         <input
           type="file"
           accept="image/*"
@@ -67,7 +67,7 @@ export default function Portfolio() {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {(items.data ?? []).map((it) => (
           // eslint-disable-next-line @next/next/no-img-element
-          <div key={it.id} className="group relative overflow-hidden rounded-xl border border-border">
+          <div key={it.id} className="group relative overflow-hidden rounded border border-border">
             <img src={it.image_url} alt={it.caption ?? 'Portfolio item'} className="aspect-square w-full object-cover" />
             <button
               onClick={() => del.mutate(it.id)}
