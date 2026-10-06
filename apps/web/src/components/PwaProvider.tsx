@@ -84,7 +84,7 @@ export function PwaProvider() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-      <div className="mx-auto flex max-w-md items-center gap-3 rounded border border-border bg-card p-3 shadow-lg">
+      <div className="mx-auto flex max-w-md items-center gap-3 rounded-[22px] border border-border bg-card p-3 shadow-lg">
         <img src="/icons/icon-192.png" alt="" className="h-10 w-10 rounded" />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm text-text">Install Smomo</p>
@@ -97,7 +97,7 @@ export function PwaProvider() {
         {deferredPrompt ? (
           <button
             onClick={install}
-            className="shrink-0 rounded border border-primary px-3 py-2 text-sm text-primary-700 transition-colors hover:bg-primary-100"
+            className="btn btn-primary shrink-0"
           >
             Install
           </button>
@@ -105,7 +105,7 @@ export function PwaProvider() {
         <button
           onClick={dismiss}
           aria-label="Dismiss"
-          className="shrink-0 rounded px-2 py-2 text-text-faint transition-colors hover:bg-card-muted"
+          className="shrink-0 rounded-full px-3 py-2 text-text-faint transition-colors hover:bg-card-muted"
         >
           ✕
         </button>

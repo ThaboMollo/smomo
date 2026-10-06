@@ -15,7 +15,7 @@ import { CategoryIcon } from '@/components/CategoryIcon';
 import { api } from '@/lib/api';
 import { useMe } from '@/lib/use-me';
 
-const inputCls = 'w-full rounded border border-border bg-card px-4 py-3';
+const inputCls = 'input';
 
 export default function EditStudioProfile() {
   const me = useMe();
@@ -79,7 +79,7 @@ function Form({ onSaved }: { onSaved: () => void }) {
   return (
     <div className="mx-auto max-w-xl">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl">Edit studio profile</h1>
+        <h1 className="text-4xl sm:text-5xl">Edit studio profile</h1>
         <Link href="/app/studio" className="text-sm text-text-muted hover:text-text">
           ← Back
         </Link>
@@ -92,7 +92,7 @@ function Form({ onSaved }: { onSaved: () => void }) {
         <p className="pt-1 text-sm font-medium text-text-muted">Services you offer</p>
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((c) => (
-            <button key={c.value} onClick={() => toggleCat(c.value)} className={`rounded border px-3 py-1.5 text-sm ${categories.includes(c.value) ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}>
+            <button key={c.value} onClick={() => toggleCat(c.value)} className={`min-h-[40px] rounded-full border px-4 py-1.5 text-sm ${categories.includes(c.value) ? 'border-primary bg-primary text-white' : 'border-border bg-card hover:border-primary-300'}`}>
               <span className="inline-flex items-center gap-1.5"><CategoryIcon category={c.value} size={14} />{c.label}</span>
             </button>
           ))}
@@ -100,7 +100,7 @@ function Form({ onSaved }: { onSaved: () => void }) {
 
         <div className="flex gap-2">
           {(['studio', 'mobile', 'both'] as ServiceMode[]).map((m) => (
-            <button key={m} onClick={() => setServiceMode(m)} className={`flex-1 rounded border px-3 py-2 text-sm capitalize ${serviceMode === m ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}>
+            <button key={m} onClick={() => setServiceMode(m)} className={`flex-1 rounded-full border px-3 py-2 text-sm capitalize ${serviceMode === m ? 'border-primary bg-primary text-white' : 'border-border bg-card hover:border-primary-300'}`}>
               {m}
             </button>
           ))}
@@ -124,7 +124,7 @@ function Form({ onSaved }: { onSaved: () => void }) {
         {SOCIAL_PLATFORMS.map((platform) => (
           <div key={platform.key} className="flex items-center gap-2">
             <span className="w-24 shrink-0 text-sm text-text-muted">{platform.label}</span>
-            <div className="flex flex-1 items-center rounded border border-border bg-card">
+            <div className="flex flex-1 items-center rounded-[20px] border border-border bg-card">
               <span className="pl-3 text-sm text-text-faint">@</span>
               <input
                 placeholder={platform.placeholder}
@@ -141,7 +141,7 @@ function Form({ onSaved }: { onSaved: () => void }) {
 
         {error ? <p className="text-sm text-danger">{error}</p> : null}
         {saved ? <p className="text-sm text-success">Saved.</p> : null}
-        <button onClick={() => save.mutate()} disabled={save.isPending} className="w-full rounded border border-primary py-3 font-medium text-primary-700 hover:bg-primary-100 disabled:opacity-50">
+        <button onClick={() => save.mutate()} disabled={save.isPending} className="btn btn-primary w-full">
           {save.isPending ? 'Saving…' : 'Save changes'}
         </button>
       </div>

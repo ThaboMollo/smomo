@@ -27,13 +27,13 @@ export default function Error({
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <button
           onClick={reset}
-          className="inline-flex items-center justify-center rounded border border-primary px-5 py-3 text-sm text-primary-700 transition-colors hover:bg-primary-100"
+          className="btn btn-primary"
         >
           Try again
         </button>
         <a
           href="/"
-          className="inline-flex items-center justify-center rounded border border-border px-5 py-3 text-sm text-text transition-colors hover:bg-card-muted"
+          className="btn btn-outline"
         >
           Back to home
         </a>

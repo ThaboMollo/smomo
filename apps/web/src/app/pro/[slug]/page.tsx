@@ -1,12 +1,14 @@
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { SOCIAL_PLATFORMS, socialUrl } from '@smomo/shared';
 
 import { CATEGORY_LABEL, CATEGORY_SLUGS } from '@/lib/catalog';
 import { Icon } from '@/components/Icon';
-import { Avatar, Badge, Button, Card, Container, Plate, Stars } from '@/components/ui';
+import { Avatar, Container, Plate, Stars } from '@/components/ui';
+import { cardPhoto } from '@/lib/images';
 import { SITE_URL } from '@/lib/env';
 import { getProvider } from '@/lib/public-api';
 
@@ -64,62 +66,102 @@ export default async function ProviderPage({ params }: Params) {
     url: `${SITE_URL}/pro/${p.slug}`,
   };
 
+  const requestHref = `/app/request/new?target=${p.id}&category=${p.categories[0] ?? ''}`;
+  const photo = cardPhoto(p.avatar_url, 800);
+  const name = p.business_name ?? 'Provider';
+
   return (
-    <Container className="py-10">
+    <Container className="flex flex-col gap-5 pb-24 pt-3 sm:pb-0">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <div className="flex items-start gap-5">
-        <Avatar name={p.business_name} size={80} />
-        <div className="flex-1">
-          <h1 className="text-4xl tracking-tight">{p.business_name ?? 'Provider'}</h1>
-          <div className="mt-2">
-            <Stars rating={p.rating} count={p.rating_count} />
+      <section className="grid gap-5 lg:grid-cols-12">
+        <div className="relative min-h-[360px] overflow-hidden rounded-[32px] bg-primary-200 lg:col-span-5 lg:min-h-[520px]">
+          {photo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={photo} alt={name} className="absolute inset-0 h-full w-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Avatar name={name} size={140} />
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col justify-between gap-8 rounded-[32px] bg-primary-950 p-7 text-white sm:p-12 lg:col-span-7">
+          <div>
+            <div className="flex flex-wrap gap-2">
+              {p.categories.map((c) => (
+                <span key={c} className="rounded-full border border-primary-400 px-3 py-1 text-sm text-primary-200">
+                  {CATEGORY_LABEL[CATEGORY_SLUGS[c]]}
+                </span>
+              ))}
+            </div>
+            <h1 className="mt-5 text-5xl sm:text-6xl">{name}</h1>
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-primary-200">
+              <span className="tnum">
+                <span className="text-accent">★</span>{' '}
+                {p.rating != null ? `${p.rating.toFixed(1)} · ${p.rating_count} reviews` : 'New on Smomo'}
+              </span>
+              <span className="tnum">{p.jobs_done} jobs done</span>
+              {p.base_address ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <Icon icon={faLocationDot} size={13} className="text-accent" /> {p.base_address}
+                </span>
+              ) : null}
+            </div>
+            {p.bio ? <p className="mt-6 max-w-xl text-lg leading-relaxed text-primary-100">{p.bio}</p> : null}
           </div>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {p.categories.map((c) => (
-              <Badge key={c} tone="primary">
-                {CATEGORY_LABEL[CATEGORY_SLUGS[c]]}
-              </Badge>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap gap-2">
+              <Link href={requestHref} className="btn btn-light">
+                Request a booking
+              </Link>
+              {socials.map(({ platform, url }) => (
+                <a
+                  key={platform.key}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="btn border border-primary-400 text-white hover:bg-primary-900"
+                >
+                  {platform.label} <span aria-hidden>↗</span>
+                </a>
+              ))}
+            </div>
+            <p className="text-sm text-primary-300">Free to request. You&apos;ll get a price before you commit.</p>
+          </div>
+        </div>
+      </section>
+
+      {p.services.length > 0 ? (
+        <section className="rounded-[32px] bg-card p-6 sm:p-10" aria-labelledby="services">
+          <h2 id="services" className="text-3xl sm:text-4xl">Services</h2>
+          <ul className="mt-5 divide-y divide-border">
+            {p.services.map((s) => (
+              <li key={s.id} className="flex items-center justify-between gap-4 py-4">
+                <div>
+                  <div className="font-medium">{s.title}</div>
+                  {s.description ? <div className="text-sm text-text-muted">{s.description}</div> : null}
+                </div>
+                {formatZar(s.indicative_price_zar) ? (
+                  <div className="tnum whitespace-nowrap rounded-full bg-primary-100 px-3 py-1 font-medium text-primary-700">
+                    from {formatZar(s.indicative_price_zar)}
+                  </div>
+                ) : null}
+              </li>
             ))}
-            <Badge>{p.jobs_done} jobs</Badge>
-          </div>
-          {p.base_address ? (
-            <p className="mt-2 inline-flex items-center gap-1.5 text-text-muted">
-              <Icon icon={faLocationDot} size={14} className="text-primary-700" /> {p.base_address}
-            </p>
-          ) : null}
-        </div>
-      </div>
-
-      {p.bio ? <p className="mt-6 max-w-2xl text-text-muted">{p.bio}</p> : null}
-
-      {socials.length > 0 ? (
-        <div className="mt-5 flex flex-wrap items-center gap-2">
-          {socials.map(({ platform, url }) => (
-            <a
-              key={platform.key}
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-              className="inline-flex items-center gap-1.5 rounded border border-border px-3 py-1.5 text-sm text-text-muted transition-colors hover:border-primary hover:text-primary-700"
-            >
-              {platform.label}
-              <span aria-hidden className="text-text-faint">↗</span>
-            </a>
-          ))}
-        </div>
+          </ul>
+        </section>
       ) : null}
 
       {p.portfolio.length > 0 ? (
-        <section className="mt-10">
-          <h2 className="mb-4 text-xl">Portfolio</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+        <section className="rounded-[32px] bg-card p-6 sm:p-10" aria-labelledby="work">
+          <h2 id="work" className="text-3xl sm:text-4xl">Portfolio</h2>
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {p.portfolio.map((item) => (
               <Plate key={item.id}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.image_url}
-                  alt={item.caption ?? p.business_name ?? 'Work'}
+                  alt={item.caption ?? `Work by ${name}`}
                   className="aspect-square w-full object-cover"
                   loading="lazy"
                 />
@@ -129,54 +171,37 @@ export default async function ProviderPage({ params }: Params) {
         </section>
       ) : null}
 
-      {p.services.length > 0 ? (
-        <section className="mt-10">
-          <h2 className="mb-4 text-xl">Services</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {p.services.map((s) => (
-              <Card key={s.id} className="flex items-center justify-between">
-                <div>
-                  <div className="font-medium">{s.title}</div>
-                  {s.description ? <div className="text-sm text-text-muted">{s.description}</div> : null}
-                </div>
-                {formatZar(s.indicative_price_zar) ? (
-                  <div className="tnum font-medium text-primary-700">from {formatZar(s.indicative_price_zar)}</div>
-                ) : null}
-              </Card>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
       {p.reviews.length > 0 ? (
-        <section className="mt-10">
-          <h2 className="mb-4 text-xl">Reviews</h2>
-          <div className="grid gap-3">
+        <section className="rounded-[32px] bg-card p-6 sm:p-10" aria-labelledby="reviews">
+          <h2 id="reviews" className="text-3xl sm:text-4xl">What clients say</h2>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
             {p.reviews.map((r, i) => (
-              <Card key={i}>
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">{r.reviewer_name ?? 'Client'}</span>
-                  <Stars rating={r.rating} />
-                </div>
-                {r.comment ? <p className="mt-2 text-text-muted">{r.comment}</p> : null}
-              </Card>
+              <figure key={i} className="rounded-[22px] bg-card-muted p-5">
+                <Stars rating={r.rating} />
+                {r.comment ? <blockquote className="mt-3 text-lg leading-relaxed">“{r.comment}”</blockquote> : null}
+                <figcaption className="mt-3 text-sm text-text-muted">{r.reviewer_name ?? 'Client'}</figcaption>
+              </figure>
             ))}
           </div>
         </section>
       ) : null}
 
-      <section className="mt-12 rounded border border-border p-8 text-center">
-        <h2 className="text-xl">Want to book {p.business_name ?? 'this pro'}?</h2>
-        <p className="mt-1 text-text-muted">Send a request and get an offer — right here on the web.</p>
-        <div className="mt-5 flex justify-center">
-          <Button href={`/app/request/new?target=${p.id}&category=${p.categories[0] ?? ''}`}>
-            Request a booking
-          </Button>
+      <section className="flex flex-col items-start justify-between gap-5 rounded-[32px] bg-primary p-7 text-white sm:flex-row sm:items-center sm:p-10">
+        <div>
+          <h2 className="text-3xl sm:text-4xl">Want to book {name}?</h2>
+          <p className="mt-2 text-primary-100">Send a request and get an offer. You&apos;ll sign in or create a free account first.</p>
         </div>
-        <p className="mt-3 text-sm text-text-faint">
-          You&apos;ll sign in (or create a free account) to send your request.
-        </p>
+        <Link href={requestHref} className="btn btn-light">
+          Request a booking
+        </Link>
       </section>
+
+      {/* Sticky mobile CTA */}
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card/95 p-3 backdrop-blur sm:hidden">
+        <Link href={requestHref} className="btn btn-primary btn-block">
+          Request a booking
+        </Link>
+      </div>
     </Container>
   );
 }

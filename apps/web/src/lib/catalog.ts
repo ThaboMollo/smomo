@@ -65,3 +65,26 @@ export function titleCase(slug: string): string {
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 }
+
+/** One-line note shown under each category tile. */
+export const CATEGORY_NOTE: Record<CategorySlug, string> = {
+  hairdressers: 'Braids, silk presses, cuts and colour',
+  'nail-technicians': 'Gel, BIAB and structured manicures',
+  'makeup-artists': 'Bridal, editorial and event looks',
+  beauticians: 'Facials, lashes and skin treatments',
+  'tattoo-artists': 'Fine-line, blackwork and cover-ups',
+};
+
+/** Representative photo per category (from /public/samples). */
+export const CATEGORY_IMAGE: Record<CategorySlug, string> = {
+  hairdressers: '/samples/hair_dresser.jpg',
+  'nail-technicians': '/samples/nail_tech6.jpg',
+  'makeup-artists': '/samples/makeup1.jpg',
+  beauticians: '/samples/beautician9.jpg',
+  'tattoo-artists': '/samples/tattoo3.jpg',
+};
+
+/** Category image keyed by the shared `service_category` enum value. */
+export function categoryImage(c: Enums<'service_category'>): string {
+  return CATEGORY_IMAGE[CATEGORY_SLUGS[c]];
+}

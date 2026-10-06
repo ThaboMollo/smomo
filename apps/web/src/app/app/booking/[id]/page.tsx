@@ -52,7 +52,7 @@ export default function BookingDetail() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="flex items-center gap-2 text-2xl">
+        <h1 className="flex items-center gap-2 text-4xl sm:text-5xl">
           <CategoryIcon category={booking.category} size={20} />
           {categoryLabel(booking.category)}
         </h1>
@@ -70,7 +70,7 @@ export default function BookingDetail() {
           {other?.phone ? (
             <a
               href={`tel:${other.phone}`}
-              className="rounded border border-border px-3 py-2 text-sm font-medium text-primary-700 hover:bg-card-muted"
+              className="btn btn-outline text-primary-700"
             >
               Call
             </a>
@@ -103,7 +103,7 @@ export default function BookingDetail() {
       ) : null}
 
       <section>
-        <h2 className="mb-3 text-lg">Payment (PayShap)</h2>
+        <h2 className="mb-3 text-2xl">Payment (PayShap)</h2>
         <div className="space-y-3">
           {data?.payments.map((p) => (
             <PaymentCard key={p.id} payment={p} isClient={isClient} payshap={payshap} onDone={refetch} />
@@ -112,7 +112,7 @@ export default function BookingDetail() {
       </section>
 
       <section>
-        <h2 className="mb-3 text-lg">Chat</h2>
+        <h2 className="mb-3 text-2xl">Chat</h2>
         {userId ? <ChatPanel bookingId={id} userId={userId} /> : null}
       </section>
 
@@ -153,7 +153,7 @@ function CancelBooking({
         if (confirm('Cancel this booking?')) cancel.mutate();
       }}
       disabled={cancel.isPending}
-      className="rounded border border-border py-3 text-sm font-medium text-text-muted hover:bg-card-muted disabled:opacity-50"
+      className="btn btn-danger"
     >
       {cancel.isPending ? 'Cancelling…' : 'Cancel booking'}
     </button>
@@ -197,7 +197,7 @@ function ClientReview({
       </div>
       <input
         placeholder="Tell others about your experience (optional)"
-        className="w-full rounded border border-border bg-card px-3 py-2 text-sm"
+        className="input w-full"
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       />
@@ -205,7 +205,7 @@ function ClientReview({
       <button
         onClick={() => submit.mutate()}
         disabled={submit.isPending}
-        className="w-full rounded border border-primary hover:bg-primary-100 py-3 font-medium text-primary-700 disabled:opacity-50"
+        className="btn btn-primary w-full"
       >
         {submit.isPending ? 'Submitting…' : 'Submit review'}
       </button>
@@ -259,7 +259,7 @@ function PractitionerActions({
           <p className="font-medium">Ready to begin?</p>
           <p className="text-sm text-text-muted">Mark the job as started when you begin.</p>
         </div>
-        <button onClick={() => start.mutate()} disabled={start.isPending} className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700 disabled:opacity-50">
+        <button onClick={() => start.mutate()} disabled={start.isPending} className="btn btn-primary">
           Start job
         </button>
       </Card>
@@ -277,7 +277,7 @@ function PractitionerActions({
       </p>
       {proofUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={proofUrl} alt="Proof of work" className="h-40 w-full rounded object-cover" />
+        <img src={proofUrl} alt="Proof of work" className="h-40 w-full rounded-[20px] object-cover" />
       ) : null}
       <input
         type="file"
@@ -303,9 +303,9 @@ function PractitionerActions({
           ))}
         </div>
       </div>
-      <input placeholder="Comment (optional)" className="w-full rounded border border-border bg-card px-3 py-2 text-sm" value={comment} onChange={(e) => setComment(e.target.value)} />
+      <input placeholder="Comment (optional)" className="input w-full" value={comment} onChange={(e) => setComment(e.target.value)} />
       {error ? <p className="text-sm text-danger">{error}</p> : null}
-      <button onClick={() => complete.mutate()} disabled={!proofUrl || complete.isPending} className="w-full rounded border border-primary hover:bg-primary-100 py-3 font-medium text-primary-700 disabled:opacity-50">
+      <button onClick={() => complete.mutate()} disabled={!proofUrl || complete.isPending} className="btn btn-primary w-full">
         {complete.isPending ? 'Completing…' : 'Complete & rate'}
       </button>
     </Card>
@@ -358,14 +358,14 @@ function PaymentCard({
           <p className="text-lg text-primary-700">{payshap ?? '—'}</p>
           <input
             placeholder="PayShap reference"
-            className="w-full rounded border border-border bg-card px-3 py-2 text-sm"
+            className="input w-full"
             value={reference}
             onChange={(e) => setReference(e.target.value)}
           />
           <button
             onClick={() => markPaid.mutate()}
             disabled={markPaid.isPending}
-            className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700 disabled:opacity-50"
+            className="btn btn-primary"
           >
             I've paid
           </button>
@@ -378,10 +378,10 @@ function PaymentCard({
 
       {!isClient && payment.status === 'pending' && payment.marked_paid_at ? (
         <div className="mt-3 flex gap-2">
-          <button onClick={() => verify.mutate(true)} className="flex-1 rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700">
+          <button onClick={() => verify.mutate(true)} className="btn btn-primary flex-1">
             Verify
           </button>
-          <button onClick={() => verify.mutate(false)} className="flex-1 rounded bg-danger px-4 py-2 text-sm font-medium text-white">
+          <button onClick={() => verify.mutate(false)} className="btn bg-danger text-white hover:opacity-90 flex-1">
             Not received
           </button>
         </div>

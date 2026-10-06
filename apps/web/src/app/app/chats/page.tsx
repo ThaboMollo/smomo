@@ -36,7 +36,7 @@ export default function Chats() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl">Chats</h1>
+      <h1 className="text-4xl sm:text-5xl">Chats</h1>
       <div className="space-y-3">
         {conversations.map(({ booking: b, asClient: iAmClient }) => {
           const other = iAmClient ? b.practitioner : b.client;

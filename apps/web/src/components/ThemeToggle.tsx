@@ -39,7 +39,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
       onClick={toggle}
       aria-label={label}
       title={label}
-      className={`inline-flex h-8 w-8 items-center justify-center rounded border border-border text-text-muted transition-colors hover:bg-primary-100 hover:text-text ${className}`}
+      className={`inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-text-muted transition-colors hover:bg-primary-100 hover:text-text ${className}`}
     >
       <Icon icon={icon} size={15} className="text-current" />
     </button>

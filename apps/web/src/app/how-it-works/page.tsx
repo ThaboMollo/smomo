@@ -1,53 +1,62 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
-import { Button, Card, Container } from '@/components/ui';
+import { HowItWorksPanel } from '@/components/HowItWorksPanel';
+import { PageHero } from '@/components/PageHero';
+import { Container } from '@/components/ui';
 
 export const metadata: Metadata = {
   title: 'How it works',
   description:
-    'How Smomo connects clients with beauty, hair, nails, make-up and tattoo professionals in South Africa — post a request, get offers, book and pay via PayShap.',
+    'How Smomo connects clients with beauty, hair, nails, make-up and tattoo professionals in South Africa: post a request, get offers, book and pay via PayShap.',
 };
+
+const FAQ = [
+  ['Is it free to post a request?', 'Yes. You only pay the pro you choose, directly, by PayShap.'],
+  ['How are pros verified?', 'Pros confirm their SA ID (checked with the Luhn rule) or passport before they can accept bookings.'],
+  ['What if something goes wrong with a payment?', 'Payments are recorded in the app. If a pro disputes one, it goes to the Smomo admin team.'],
+  ['Can the pro come to me?', 'Many do. Choose "They come to me" or "At their studio" when you post a request or browse.'],
+];
 
 export default function HowItWorks() {
   return (
-    <Container className="py-14">
-      <h1 className="text-4xl tracking-tight">How Smomo works</h1>
-
-      <section className="mt-8">
-        <h2 className="text-xl">For clients</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          {[
-            ['Post or browse', 'Post what you need with an optional photo and budget range, or browse verified pros near you.'],
-            ['Get offers', 'Matching pros nearby send offers. Compare ratings, prices and portfolios, then accept one.'],
-            ['Book & pay', 'Coordinate in chat, then pay the pro directly via PayShap. Verified proof of work included.'],
-          ].map(([t, d]) => (
-            <Card key={t}>
-              <div className="font-[family-name:var(--font-heading)] text-lg text-primary-700">{t}</div>
-              <p className="mt-1 text-text-muted">{d}</p>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="text-xl">For professionals</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          {[
-            ['Set up your studio', 'Create your profile, list services and upload a portfolio of your work.'],
-            ['Go online & get requests', 'Get verified, go online, and receive nearby client requests in real time.'],
-            ['Deliver & get paid', 'Send offers, complete the job, capture proof, and get paid directly via PayShap.'],
-          ].map(([t, d]) => (
-            <Card key={t}>
-              <div className="font-[family-name:var(--font-heading)] text-lg text-primary-700">{t}</div>
-              <p className="mt-1 text-text-muted">{d}</p>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <div className="mt-10">
-        <Button href="/tattoo-artists">Find a pro near you</Button>
+    <Container className="flex flex-col gap-5 pt-3">
+      <PageHero
+        crumbs={[{ href: '/', label: 'Home' }, { label: 'How it works' }]}
+        title="How Smomo works"
+        subtitle="One place to find, compare and book beauty and body-art pros, whether you want to browse or let offers come to you."
+        image="/samples/nail_tech6.jpg"
+      />
+      <HowItWorksPanel initial="clients" />
+      <div id="pros" className="scroll-mt-24">
+        <HowItWorksPanel initial="pros" />
       </div>
+      <section className="rounded-[32px] bg-card p-6 sm:p-10" aria-labelledby="faq">
+        <h2 id="faq" className="text-3xl sm:text-4xl">
+          Good to know
+        </h2>
+        <div className="mt-5 divide-y divide-border">
+          {FAQ.map(([q, a]) => (
+            <details key={q} className="group py-4">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium">
+                {q}
+                <span aria-hidden className="text-2xl text-primary-700 transition-transform group-open:rotate-45">
+                  +
+                </span>
+              </summary>
+              <p className="mt-2 max-w-2xl text-text-muted">{a}</p>
+            </details>
+          ))}
+        </div>
+        <div className="mt-6 flex flex-wrap gap-2">
+          <Link href="/app/request/new" className="btn btn-primary">
+            Post a request
+          </Link>
+          <Link href="/hairdressers" className="btn btn-outline">
+            Browse pros
+          </Link>
+        </div>
+      </section>
     </Container>
   );
 }

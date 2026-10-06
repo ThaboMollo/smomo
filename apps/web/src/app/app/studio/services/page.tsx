@@ -10,7 +10,7 @@ import { Card } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useMe } from '@/lib/use-me';
 
-const inputCls = 'w-full rounded border border-border bg-card px-3 py-2 text-sm';
+const inputCls = 'input';
 
 export default function Services() {
   const me = useMe();
@@ -61,7 +61,7 @@ export default function Services() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl">Services</h1>
+      <h1 className="text-4xl sm:text-5xl">Services</h1>
 
       <Card className="space-y-3">
         <p className="font-medium">Add a service</p>
@@ -78,7 +78,7 @@ export default function Services() {
           <input placeholder="From price (R)" inputMode="numeric" className={inputCls} value={price} onChange={(e) => setPrice(e.target.value)} />
           <input placeholder="Duration (min)" inputMode="numeric" className={inputCls} value={duration} onChange={(e) => setDuration(e.target.value)} />
         </div>
-        <button onClick={() => save.mutate()} disabled={title.trim().length < 2 || save.isPending} className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700 disabled:opacity-50">
+        <button onClick={() => save.mutate()} disabled={title.trim().length < 2 || save.isPending} className="btn btn-primary">
           {save.isPending ? 'Saving…' : 'Add service'}
         </button>
       </Card>

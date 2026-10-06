@@ -9,7 +9,7 @@ import { Icon } from '@/components/Icon';
 import { api } from '@/lib/api';
 
 const REASONS = ['No-show', 'Inappropriate behaviour', 'Payment issue', 'Poor service', 'Other'];
-const inputCls = 'w-full rounded border border-border bg-card px-4 py-3';
+const inputCls = 'input';
 
 export default function Report() {
   const router = useRouter();
@@ -52,7 +52,7 @@ export default function Report() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="text-2xl">Report a problem</h1>
+      <h1 className="text-4xl sm:text-5xl">Report a problem</h1>
       {!userId ? (
         <p className="mt-4 text-text-muted">Nothing to report — open this from a booking.</p>
       ) : (
@@ -63,7 +63,7 @@ export default function Report() {
               <button
                 key={r}
                 onClick={() => setReason(r)}
-                className={`rounded border px-4 py-2 text-sm font-medium ${reason === r ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}
+                className={`rounded-full border px-4 py-2 text-sm font-medium min-h-[40px] ${reason === r ? 'border-primary bg-primary text-white' : 'border-border bg-card hover:border-primary-300'}`}
               >
                 {r}
               </button>
@@ -80,7 +80,7 @@ export default function Report() {
           <button
             onClick={() => submit.mutate()}
             disabled={submit.isPending}
-            className="mt-4 w-full rounded bg-danger py-3 font-medium text-white disabled:opacity-50"
+            className="btn bg-danger text-white hover:opacity-90 mt-4 w-full"
           >
             {submit.isPending ? 'Submitting…' : 'Submit report'}
           </button>

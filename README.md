@@ -1,4 +1,13 @@
-# Smomo
+# Smomo (redesign)
+
+This repo is the **UX-led redesign** of the Smomo web app (`apps/web`), forked from `smomo-main`.
+Bento layout (large rounded panels, deep-violet feature panels, pill actions, giant wordmark footer),
+brand colours only (Deep Violet #6D28D9, Soft Lilac #EDE9FE, Rose Gold #D4AF7C), no orange.
+Cormorant Garamond display type over DM Sans. UX changes: hero service + city finder, photo-first
+provider cards, split-screen auth with a 2-step register and inline validation, a 3-step request
+wizard with a review screen, a mobile bottom tab bar, honest location fallback, and real empty states.
+The API, Supabase project and data contracts are unchanged.
+
 
 An **inDrive-style marketplace for beauty & body services** in South Africa — connecting clients
 with hairdressers, nail technicians, make-up artists, beauticians and tattoo artists.

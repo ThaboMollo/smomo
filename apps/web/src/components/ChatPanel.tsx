@@ -56,11 +56,11 @@ export function ChatPanel({ bookingId, userId }: { bookingId: string; userId: st
   };
 
   return (
-    <div className="rounded border border-border bg-card">
-      <div className="max-h-80 space-y-2 overflow-y-auto p-4">
+    <div className="rounded-[20px] border border-border bg-card">
+      <div className="max-h-[420px] min-h-[200px] space-y-2 overflow-y-auto p-4">
         {messages.length === 0 ? (
           <p className="inline-flex w-full items-center justify-center gap-1.5 text-center text-sm text-text-faint">
-            Say hi <Icon icon={faHand} size={14} className="text-star" /> — coordinate your booking here.
+            Say hi <Icon icon={faHand} size={14} className="text-star" /> and sort out the details here.
           </p>
         ) : null}
         {messages.map((m) => {
@@ -68,7 +68,7 @@ export function ChatPanel({ bookingId, userId }: { bookingId: string; userId: st
           return (
             <div
               key={m.id}
-              className={`max-w-[80%] rounded px-3 py-2 text-sm ${mine ? 'ml-auto border border-primary-300 bg-primary-100 text-text' : 'border border-border bg-card'}`}
+              className={`max-w-[80%] px-4 py-2.5 text-[15px] ${mine ? 'ml-auto rounded-[20px] rounded-br-md bg-primary text-white' : 'rounded-[20px] rounded-bl-md bg-card-muted text-text'}`}
             >
               {m.body}
             </div>
@@ -82,9 +82,10 @@ export function ChatPanel({ bookingId, userId }: { bookingId: string; userId: st
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && send()}
           placeholder="Message…"
-          className="flex-1 rounded border border-border bg-card px-3 py-2 text-sm"
+          aria-label="Message"
+          className="input flex-1"
         />
-        <button onClick={send} className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700">
+        <button onClick={send} className="btn btn-primary">
           Send
         </button>
       </div>

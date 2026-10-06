@@ -51,7 +51,7 @@ export default function Feed() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl">Client requests</h1>
+      <h1 className="text-4xl sm:text-5xl">Client requests</h1>
       {!verified ? (
         <Card className="mt-4 border-primary-300 bg-primary-100">You can appear in search, but you must be verified to accept bookings.</Card>
       ) : null}
@@ -81,19 +81,19 @@ export default function Feed() {
                 <Badge tone="success">Offer sent</Badge>
               ) : openId === r.request_id ? (
                 <div className="mt-3 space-y-2">
-                  <input placeholder="Your price (R)" inputMode="numeric" className="w-full rounded border border-border bg-card px-3 py-2 text-sm" value={price} onChange={(e) => setPrice(e.target.value)} />
-                  <input placeholder="Message (optional)" className="w-full rounded border border-border bg-card px-3 py-2 text-sm" value={message} onChange={(e) => setMessage(e.target.value)} />
+                  <input placeholder="Your price (R)" inputMode="numeric" className="input w-full" value={price} onChange={(e) => setPrice(e.target.value)} />
+                  <input placeholder="Message (optional)" className="input w-full" value={message} onChange={(e) => setMessage(e.target.value)} />
                   <div className="flex gap-2">
-                    <button onClick={() => makeOffer.mutate(r.request_id)} disabled={!price || makeOffer.isPending} className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700 disabled:opacity-50">
+                    <button onClick={() => makeOffer.mutate(r.request_id)} disabled={!price || makeOffer.isPending} className="btn btn-primary">
                       Send offer
                     </button>
-                    <button onClick={() => setOpenId(null)} className="rounded border border-border px-4 py-2 text-sm">
+                    <button onClick={() => setOpenId(null)} className="btn btn-outline">
                       Cancel
                     </button>
                   </div>
                 </div>
               ) : (
-                <button onClick={() => setOpenId(r.request_id)} className="mt-3 rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700">
+                <button onClick={() => setOpenId(r.request_id)} className="btn btn-primary mt-3">
                   Make an offer
                 </button>
               )}

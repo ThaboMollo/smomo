@@ -2,13 +2,17 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { PageHero } from '@/components/PageHero';
 import { ProviderListCard } from '@/components/ProviderListCard';
-import { Container } from '@/components/ui';
+import { Container, EmptyState, Kicker } from '@/components/ui';
 import {
+  CATEGORY_IMAGE,
   CATEGORY_LABEL,
+  CATEGORY_NOTE,
   CATEGORY_SLUG_LIST,
   CITIES,
   isCategorySlug,
+  SLUG_TO_CATEGORY,
   titleCase,
   type CategorySlug,
 } from '@/lib/catalog';
@@ -42,31 +46,55 @@ export default async function CategoryHub({ params }: Params) {
   const items = data?.items ?? [];
 
   return (
-    <Container className="py-10">
-      <h1 className="text-4xl tracking-tight">{label} in South Africa</h1>
-
-      <h2 className="mt-8 text-lg">Browse {label.toLowerCase()} by city</h2>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {CITIES.map((city) => (
-          <Link
-            key={city}
-            href={`/${category}/${city}`}
-            className="rounded border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-card-muted"
-          >
-            {label} in {titleCase(city)}
+    <Container className="flex flex-col gap-5 pt-3">
+      <PageHero
+        crumbs={[{ href: '/', label: 'Home' }, { label }]}
+        title={`${label} in South Africa`}
+        subtitle={CATEGORY_NOTE[cat]}
+        image={CATEGORY_IMAGE[cat]}
+      >
+        <div className="flex flex-wrap gap-2 pt-2">
+          <Link href={`/app/request/new?category=${SLUG_TO_CATEGORY[cat]}`} className="btn btn-light">
+            Post a request
           </Link>
-        ))}
-      </div>
+        </div>
+      </PageHero>
 
-      <h2 className="mt-10 text-lg">Top {label.toLowerCase()}</h2>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        {items.map((p) => (
-          <ProviderListCard key={p.id} p={p} />
-        ))}
-      </div>
-      {items.length === 0 ? (
-        <p className="mt-6 text-text-muted">No {label.toLowerCase()} listed yet — check back soon.</p>
-      ) : null}
+      <section className="rounded-[32px] bg-card p-6 sm:p-10">
+        <Kicker>By city</Kicker>
+        <div className="no-scrollbar -mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap">
+          {CITIES.map((city) => (
+            <Link key={city} href={`/${category}/${city}`} className="chip">
+              {titleCase(city)}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-[32px] bg-card p-6 sm:p-10" aria-labelledby="top">
+        <h2 id="top" className="text-3xl sm:text-4xl">
+          Top {label.toLowerCase()}
+        </h2>
+        {items.length > 0 ? (
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {items.map((p) => (
+              <ProviderListCard key={p.id} p={p} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6">
+            <EmptyState
+              title={`No ${label.toLowerCase()} listed yet`}
+              body="Post a request and we'll notify pros as they join near you."
+              action={
+                <Link href="/app/request/new" className="btn btn-primary">
+                  Post a request
+                </Link>
+              }
+            />
+          </div>
+        )}
+      </section>
     </Container>
   );
 }
