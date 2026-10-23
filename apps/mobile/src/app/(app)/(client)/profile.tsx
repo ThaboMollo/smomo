@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { spacing, useTheme } from '@/lib/theme';
 import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
@@ -89,6 +90,13 @@ export default function ClientProfile() {
                 </Row>
               </Card>
             ) : null}
+
+            <View style={{ marginTop: spacing.lg, gap: spacing.sm }}>
+              <AppText variant="kicker" color="textMuted">
+                Appearance
+              </AppText>
+              <ThemeToggle />
+            </View>
 
             <Button title="Sign out" variant="ghost" onPress={onSignOut} style={{ marginTop: spacing.xl }} />
           </>

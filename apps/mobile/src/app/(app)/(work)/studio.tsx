@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { ScrollView, Switch, View } from 'react-native';
 
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { spacing, useTheme } from '@/lib/theme';
 import { useToggleOnline } from '@/data/practitioner';
 import { useAuth } from '@/providers/AuthProvider';
@@ -82,7 +83,14 @@ export default function Studio() {
             router.replace('/(app)');
           }}
         />
-        <Button title="Sign out" variant="ghost" onPress={onSignOut} style={{ marginTop: spacing.sm }} />
+        <View style={{ marginTop: spacing.lg, gap: spacing.sm }}>
+          <AppText variant="kicker" color="textMuted">
+            Appearance
+          </AppText>
+          <ThemeToggle />
+        </View>
+
+        <Button title="Sign out" variant="ghost" onPress={onSignOut} style={{ marginTop: spacing.lg }} />
       </ScrollView>
     </Screen>
   );

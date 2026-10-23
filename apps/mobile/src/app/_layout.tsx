@@ -1,6 +1,15 @@
-import '@/global.css';
-
+import {
+  DMSans_400Regular,
+  DMSans_500Medium,
+  DMSans_600SemiBold,
+  DMSans_700Bold,
+} from '@expo-google-fonts/dm-sans';
+import {
+  SpaceGrotesk_500Medium,
+  SpaceGrotesk_700Bold,
+} from '@expo-google-fonts/space-grotesk';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -14,6 +23,7 @@ import { useTheme } from '@/lib/theme';
 import { AuthProvider, useAuth } from '@/providers/AuthProvider';
 import { ModeProvider } from '@/providers/ModeProvider';
 import { PendingRequestProvider } from '@/providers/PendingRequestProvider';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,11 +32,23 @@ function RootNavigator() {
   const { colors, scheme } = useTheme();
   usePushNotifications(userId);
 
-  useEffect(() => {
-    if (ready) SplashScreen.hideAsync().catch(() => {});
-  }, [ready]);
+  // Space Grotesk carries the display type, DM Sans the body — the same pairing as the web.
+  // On failure we still render: the components fall back to the system face.
+  const [fontsLoaded, fontError] = useFonts({
+    SpaceGrotesk_500Medium,
+    SpaceGrotesk_700Bold,
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_600SemiBold,
+    DMSans_700Bold,
+  });
+  const fontsSettled = fontsLoaded || !!fontError;
 
-  if (!ready) return null;
+  useEffect(() => {
+    if (ready && fontsSettled) SplashScreen.hideAsync().catch(() => {});
+  }, [ready, fontsSettled]);
+
+  if (!ready || !fontsSettled) return null;
 
   return (
     <>
@@ -48,17 +70,19 @@ function RootNavigator() {
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <ModeProvider>
-              <PendingRequestProvider>
-                <RootNavigator />
-              </PendingRequestProvider>
-            </ModeProvider>
-          </AuthProvider>
-        </QueryClientProvider>
-      </SafeAreaProvider>
+      <ThemeProvider>
+        <SafeAreaProvider>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <ModeProvider>
+                <PendingRequestProvider>
+                  <RootNavigator />
+                </PendingRequestProvider>
+              </ModeProvider>
+            </AuthProvider>
+          </QueryClientProvider>
+        </SafeAreaProvider>
+      </ThemeProvider>
     </GestureHandlerRootView>
   );
 }

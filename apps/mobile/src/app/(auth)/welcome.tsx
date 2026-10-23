@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { View } from 'react-native';
 
+import { SmomoLockup } from '@/components/SmomoMark';
 import { spacing, useTheme } from '@/lib/theme';
 import { useMode } from '@/providers/ModeProvider';
 import { AppText, Card, Ionicons, Row, Screen } from '@/ui';
@@ -17,9 +18,9 @@ export default function Welcome() {
   return (
     <Screen padded>
       <View style={{ flex: 1, justifyContent: 'center' }}>
-        <AppText style={{ fontSize: 44 }}>💅✨</AppText>
-        <AppText variant="display" weight="700" style={{ marginTop: spacing.sm }}>
-          Welcome to Smomo
+        <SmomoLockup height={38} color={colors.primary} />
+        <AppText variant="display" weight="700" style={{ marginTop: spacing.lg }}>
+          Your look. Your people.
         </AppText>
         <AppText variant="body" color="textMuted" style={{ marginBottom: spacing.xl }}>
           Beauty, hair, nails, make-up & ink — what brings you here?

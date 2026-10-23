@@ -1,11 +1,18 @@
+import { Image } from 'expo-image';
 import { View } from 'react-native';
 
-import { categoryEmoji, categoryLabel } from '@/lib/categories';
+import { categoryLabel } from '@/lib/categories';
+import { categoryImage } from '@/lib/catalog';
 import { formatDistance, formatZar } from '@/lib/format';
-import { spacing, useTheme } from '@/lib/theme';
+import { radius, spacing, useTheme } from '@/lib/theme';
 import type { ProviderCard } from '@/data/discovery';
-import { AppText, Avatar, Badge, Card, Row, StarRating } from '@/ui';
+import { AppText, Card, Row, StarRating } from '@/ui';
 
+/**
+ * Mirrors the web's `DiscoverProviderCard`: a square editorial photo beside the name,
+ * crafts and distance, with the rating and starting price on the baseline. The photo
+ * falls back to the craft's editorial image, so a card is never a blank tile.
+ */
 export function ProviderCardView({
   provider,
   onPress,
@@ -14,58 +21,70 @@ export function ProviderCardView({
   onPress?: () => void;
 }) {
   const { colors } = useTheme();
+  const photo = provider.avatar_url ?? (provider.categories[0] ? categoryImage(provider.categories[0]) : null);
+  const crafts = provider.categories.map((c) => categoryLabel(c)).join(' · ');
+
   return (
-    <Card onPress={onPress} style={{ marginBottom: spacing.md }}>
-      <Row style={{ gap: spacing.md, alignItems: 'flex-start' }}>
-        <View>
-          <Avatar uri={provider.avatar_url} name={provider.business_name} size={56} />
-          {provider.is_online ? (
-            <View
-              style={{
-                position: 'absolute',
-                right: 0,
-                bottom: 0,
-                width: 14,
-                height: 14,
-                borderRadius: 7,
-                backgroundColor: colors.online,
-                borderWidth: 2,
-                borderColor: colors.card,
-              }}
+    <Card onPress={onPress} style={{ marginBottom: spacing.md, padding: spacing.sm }}>
+      <Row style={{ gap: spacing.md, alignItems: 'stretch' }}>
+        <View
+          style={{
+            width: 96,
+            height: 96,
+            borderRadius: radius.lg,
+            overflow: 'hidden',
+            backgroundColor: colors.primarySoft,
+          }}
+        >
+          {photo ? (
+            <Image
+              source={{ uri: photo }}
+              style={{ width: '100%', height: '100%' }}
+              contentFit="cover"
+              transition={150}
             />
           ) : null}
         </View>
 
-        <View style={{ flex: 1, gap: 4 }}>
-          <Row style={{ justifyContent: 'space-between' }}>
-            <AppText variant="heading" numberOfLines={1} style={{ flex: 1 }}>
+        <View style={{ flex: 1, justifyContent: 'center', gap: 4, paddingRight: spacing.xs }}>
+          <Row style={{ gap: spacing.sm }}>
+            <AppText weight="500" numberOfLines={1} style={{ flexShrink: 1 }}>
               {provider.business_name ?? 'Provider'}
             </AppText>
+            {provider.is_online ? (
+              <View
+                accessibilityLabel="Online now"
+                style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.online }}
+              />
+            ) : null}
             {provider.verification_status === 'verified' ? (
-              <Badge label="Verified" tone="success" icon="shield-checkmark" />
+              <View
+                style={{
+                  marginLeft: 'auto',
+                  borderRadius: radius.pill,
+                  backgroundColor: colors.primarySoft,
+                  paddingHorizontal: 8,
+                  paddingVertical: 2,
+                }}
+              >
+                <AppText variant="caption" color="primaryStrong">
+                  Verified
+                </AppText>
+              </View>
             ) : null}
           </Row>
 
-          <Row style={{ gap: 6, flexWrap: 'wrap' }}>
-            {provider.categories.slice(0, 3).map((c) => (
-              <AppText key={c} variant="small" color="textMuted">
-                {categoryEmoji(c)} {categoryLabel(c)}
-              </AppText>
-            ))}
-          </Row>
+          <AppText variant="small" color="textMuted" numberOfLines={1}>
+            {crafts} · {formatDistance(provider.distance_km)} away
+          </AppText>
 
-          <Row style={{ justifyContent: 'space-between', marginTop: 2 }}>
+          <Row style={{ justifyContent: 'space-between' }}>
             <StarRating value={provider.rating} count={provider.rating_count} />
-            <Row style={{ gap: spacing.md }}>
-              {provider.min_price != null ? (
-                <AppText variant="small" color="textMuted">
-                  from {formatZar(provider.min_price)}
-                </AppText>
-              ) : null}
-              <AppText variant="small" color="primary" weight="600">
-                {formatDistance(provider.distance_km)}
+            {provider.min_price != null ? (
+              <AppText variant="small" color="primaryStrong" weight="500">
+                from {formatZar(provider.min_price)}
               </AppText>
-            </Row>
+            ) : null}
           </Row>
         </View>
       </Row>

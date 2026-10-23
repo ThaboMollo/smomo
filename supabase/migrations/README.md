@@ -36,7 +36,11 @@ after any one of them.
 | 06 | `derived_column_integrity` | **yes — backfills first/last name** | no |
 | 07 | `reconcile_rating_caches` | **yes — clears 3 fabricated ratings** | no |
 | 09 | `complete_booking_rpc` | no (function) | no |
+| 11 | `reharden_trigger_function_grants` | no (grants only) | no |
 | 10 | `contract_drop_legacy_columns` | **yes — drops columns** | **YES — must be last** |
+
+Note: 11 sorts before 10 by timestamp, which is intentional — the contract
+phase stays last.
 
 Filename order is also the correct apply order, so `supabase db push` does the
 right thing: 10 is the contract phase and deliberately sorts last.
@@ -50,7 +54,7 @@ and the mirror triggers.
 
 So the sequence is:
 
-1. apply 01–09
+1. apply 01–09 and 11
 2. deploy the API / web / mobile changes in this commit
 3. verify the app against production
 4. apply 10
@@ -79,6 +83,10 @@ when the columns move.
   enforcing agreement.
 - **07** Three providers carried ratings with zero backing reviews.
 - **09** Completing a booking was two non-atomic writes.
+- **11** Migrations 02/04/05/06 added five trigger functions without repeating
+  the `revoke execute` hardening the original schema applies to its own trigger
+  functions, leaving them callable via `/rest/v1/rpc`. Caught by the Supabase
+  security advisor after 01–09 were applied.
 
 ## Rollback
 

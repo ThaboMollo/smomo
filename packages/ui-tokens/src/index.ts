@@ -1,29 +1,55 @@
 /**
  * Smomo brand tokens — framework-agnostic values shared by mobile (React Native) and
  * web (Tailwind). No React Native imports here so any consumer can use them.
+ *
+ * These are the SMOMO 2.0 values, kept in step with the `@theme` block in
+ * `apps/web/src/app/globals.css` (light) and its `html[data-theme='dark']` block (dark):
+ * Midnight Ink #251719, Warm Canvas #F4EFE7, Signature Pink #E64D74,
+ * Soft Lilac #C7B1F3, Electric Lime #CCF36D.
+ *
+ * When a web token changes, change it here too — the two are not generated from one source.
  */
 export const palette = {
-  plum: '#6D28D9',
-  plumDark: '#5B21B6',
-  plumSoft: '#EDE9FE',
-  berry: '#DB2777',
-  gold: '#E0A400',
-  star: '#F5A623',
-  success: '#16A34A',
-  successSoft: '#DCFCE7',
-  warning: '#D97706',
-  warningSoft: '#FEF3C7',
-  danger: '#DC2626',
-  dangerSoft: '#FEE2E2',
-  online: '#22C55E',
+  /** Midnight Ink: body copy on canvas, and the ground of dark feature panels. */
+  ink: '#251719',
+  /** Warm Canvas: the default page ground. */
+  canvas: '#F4EFE7',
+  /** Signature Pink: fills. Carries ink text, never white — see `onPink`. */
+  pink: '#E64D74',
+  /** Deep pink: the accessible pink. Passes AA with white text and on canvas. */
+  pinkDeep: '#AA204A',
+  pinkDarker: '#8C1A3D',
+  /** Soft Lilac: quiet accent, selection highlight. */
+  lilac: '#C7B1F3',
+  /** Electric Lime: accent on dark panels only — it has no contrast on canvas. */
+  lime: '#CCF36D',
+  line: '#D9D0C9',
+  star: '#AA204A',
+  success: '#15803D',
+  successSoft: '#E6F4E9',
+  warning: '#B45309',
+  warningSoft: '#FBF0DC',
+  danger: '#C0261D',
+  dangerSoft: '#FBE9E6',
 } as const;
 
 export type AppColors = {
+  /** The accessible deep pink. Text, icons and accents on canvas. */
   primary: string;
   primaryDark: string;
+  /** web `primary-100` — tinted ground for soft badges and tiles. */
   primarySoft: string;
-  accent: string;
+  /** web `primary-200` — active nav pills, avatar fallbacks. */
+  primaryMuted: string;
+  /** web `primary-700` — text sitting on `primarySoft` / `primaryMuted`. */
+  primaryStrong: string;
+  /** Signature Pink. Button and fill surfaces only. */
+  pink: string;
+  /** Ink text for use on `pink`; white on Signature Pink fails AA at button size. */
+  onPink: string;
+  /** Text colour that passes on a `primary` fill. */
   onPrimary: string;
+  accent: string;
   bg: string;
   card: string;
   cardMuted: string;
@@ -40,21 +66,30 @@ export type AppColors = {
   dangerSoft: string;
   online: string;
   overlay: string;
+  /** Brand directs, for the places that need the raw colour regardless of theme. */
+  ink: string;
+  canvas: string;
+  lilac: string;
+  lime: string;
 };
 
 export const lightColors: AppColors = {
-  primary: palette.plum,
-  primaryDark: palette.plumDark,
-  primarySoft: palette.plumSoft,
-  accent: palette.berry,
+  primary: palette.pinkDeep,
+  primaryDark: palette.pinkDarker,
+  primarySoft: '#FCEBF0',
+  primaryMuted: '#F9D6DF',
+  primaryStrong: '#8C1A3D',
+  pink: palette.pink,
+  onPink: palette.ink,
   onPrimary: '#FFFFFF',
-  bg: '#FAF9FC',
+  accent: palette.lime,
+  bg: palette.canvas,
   card: '#FFFFFF',
-  cardMuted: '#F3F1F8',
-  text: '#1A1523',
-  textMuted: '#6B6577',
-  textFaint: '#9A93A6',
-  border: '#E7E3EF',
+  cardMuted: '#FAF6F0',
+  text: palette.ink,
+  textMuted: '#5F5053',
+  textFaint: '#6F6062',
+  border: palette.line,
   star: palette.star,
   success: palette.success,
   successSoft: palette.successSoft,
@@ -62,36 +97,64 @@ export const lightColors: AppColors = {
   warningSoft: palette.warningSoft,
   danger: palette.danger,
   dangerSoft: palette.dangerSoft,
-  online: palette.online,
-  overlay: 'rgba(26,21,35,0.5)',
+  // Web's online dot is `bg-success`; keep them identical.
+  online: palette.success,
+  overlay: 'rgba(37,23,25,0.5)',
+  ink: palette.ink,
+  canvas: palette.canvas,
+  lilac: palette.lilac,
+  lime: palette.lime,
 };
 
 export const darkColors: AppColors = {
-  primary: '#A78BFA',
-  primaryDark: '#8B5CF6',
-  primarySoft: '#2A2140',
-  accent: '#F472B6',
-  onPrimary: '#1A1523',
-  bg: '#131019',
-  card: '#1D1926',
-  cardMuted: '#251F33',
-  text: '#F5F3F9',
-  textMuted: '#B3ACC2',
-  textFaint: '#7E768F',
-  border: '#302A40',
-  star: palette.star,
+  // #C93A63 keeps white text above 4.5:1, which the Signature Pink does not.
+  primary: '#C93A63',
+  primaryDark: palette.pinkDeep,
+  primarySoft: '#2E1D21',
+  primaryMuted: '#3D262C',
+  primaryStrong: '#F5B3C3',
+  pink: palette.pink,
+  onPink: palette.ink,
+  onPrimary: '#FFFFFF',
+  accent: palette.lime,
+  bg: '#170F11',
+  card: '#231719',
+  cardMuted: '#2B1D20',
+  text: palette.canvas,
+  textMuted: '#C6B8BB',
+  textFaint: '#A0919A',
+  border: '#3D2D31',
+  star: '#F5B3C3',
   success: '#4ADE80',
-  successSoft: '#14331F',
+  successSoft: '#152C1C',
   warning: '#FBBF24',
-  warningSoft: '#3A2C0A',
-  danger: '#F87171',
-  dangerSoft: '#3A1414',
-  online: palette.online,
+  warningSoft: '#33250C',
+  danger: '#FF8A80',
+  dangerSoft: '#3A1A18',
+  online: '#4ADE80',
   overlay: 'rgba(0,0,0,0.6)',
+  ink: palette.ink,
+  canvas: palette.canvas,
+  lilac: palette.lilac,
+  lime: palette.lime,
 };
 
-export const radius = { sm: 8, md: 12, lg: 16, xl: 24, pill: 999 } as const;
+/**
+ * Shapes, matched to the web's actual radii: inputs 14, thumbnails 18, plates 20,
+ * cards 24, the brand radius 28, and pill for anything fully rounded.
+ */
+export const radius = {
+  sm: 10,
+  md: 14,
+  lg: 18,
+  plate: 20,
+  xl: 24,
+  brand: 28,
+  pill: 999,
+} as const;
+
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
+
 export const fontSize = {
   xs: 12,
   sm: 14,
@@ -100,4 +163,29 @@ export const fontSize = {
   xl: 22,
   xxl: 28,
   display: 34,
+} as const;
+
+/**
+ * The two brand faces. `heading` is Space Grotesk (display), `body` is DM Sans.
+ * The names are the keys registered with `useFonts` in the mobile root layout.
+ */
+export const fontFamily = {
+  heading: 'SpaceGrotesk_700Bold',
+  headingMedium: 'SpaceGrotesk_500Medium',
+  body: 'DMSans_400Regular',
+  bodyMedium: 'DMSans_500Medium',
+  bodySemiBold: 'DMSans_600SemiBold',
+  bodyBold: 'DMSans_700Bold',
+} as const;
+
+/**
+ * Display tracking. The web sets this in em (-0.035 to -0.04 on headings, -0.06 on the
+ * wordmark); React Native needs absolute px, so multiply by the font size at the call site
+ * or use these pre-computed values.
+ */
+export const tracking = {
+  display: -0.04,
+  heading: -0.035,
+  wordmark: -0.06,
+  kicker: 0.14,
 } as const;
