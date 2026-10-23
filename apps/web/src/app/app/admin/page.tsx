@@ -30,7 +30,7 @@ export default function Admin() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <section>
-        <h1 className="text-2xl">Payment disputes</h1>
+        <h1 className="text-4xl sm:text-5xl">Payment disputes</h1>
         <div className="mt-4 space-y-3">
           {(disputes.data ?? []).map((d: any) => (
             <Card key={d.id}>
@@ -44,10 +44,10 @@ export default function Admin() {
               </p>
               {d.dispute_reason ? <p className="mt-1 text-sm">Reason: {d.dispute_reason}</p> : null}
               <div className="mt-3 flex gap-2">
-                <button onClick={() => resolveDispute.mutate({ id: d.id, resolveAs: 'verified' })} disabled={resolveDispute.isPending} className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700 disabled:opacity-50">
+                <button onClick={() => resolveDispute.mutate({ id: d.id, resolveAs: 'verified' })} disabled={resolveDispute.isPending} className="btn btn-primary">
                   Mark verified
                 </button>
-                <button onClick={() => resolveDispute.mutate({ id: d.id, resolveAs: 'rejected' })} disabled={resolveDispute.isPending} className="rounded border border-border px-4 py-2 text-sm">
+                <button onClick={() => resolveDispute.mutate({ id: d.id, resolveAs: 'rejected' })} disabled={resolveDispute.isPending} className="btn btn-outline">
                   Reject
                 </button>
               </div>
@@ -72,10 +72,10 @@ export default function Admin() {
               {r.details ? <p className="mt-1 text-sm">{r.details}</p> : null}
               {r.status === 'open' || r.status === 'reviewing' ? (
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => resolveReport.mutate({ id: r.id, status: 'resolved' })} disabled={resolveReport.isPending} className="rounded border border-primary hover:bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700 disabled:opacity-50">
+                  <button onClick={() => resolveReport.mutate({ id: r.id, status: 'resolved' })} disabled={resolveReport.isPending} className="btn btn-primary">
                     Resolve
                   </button>
-                  <button onClick={() => resolveReport.mutate({ id: r.id, status: 'dismissed' })} disabled={resolveReport.isPending} className="rounded border border-border px-4 py-2 text-sm">
+                  <button onClick={() => resolveReport.mutate({ id: r.id, status: 'dismissed' })} disabled={resolveReport.isPending} className="btn btn-outline">
                     Dismiss
                   </button>
                 </div>

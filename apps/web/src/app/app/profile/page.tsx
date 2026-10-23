@@ -15,7 +15,7 @@ import { createClient } from '@/lib/supabase/client';
 import { uploadImage } from '@/lib/upload';
 import { useMe } from '@/lib/use-me';
 
-const inputCls = 'w-full rounded border border-border bg-card px-4 py-3';
+const inputCls = 'input';
 
 export default function Profile() {
   const me = useMe();
@@ -101,7 +101,7 @@ export default function Profile() {
               e.target.value = '';
             }}
           />
-          <span className="absolute -bottom-1 -right-1 rounded border border-primary-300 bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700">
+          <span className="absolute -bottom-1 -right-1 rounded-[20px] border border-primary-300 bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700">
             {uploadAvatar.isPending ? '…' : 'Edit'}
           </span>
         </label>
@@ -138,7 +138,7 @@ export default function Profile() {
         <button
           onClick={() => save.mutate()}
           disabled={save.isPending}
-          className="w-full rounded border border-primary hover:bg-primary-100 py-3 font-medium text-primary-700 active:bg-primary-200 disabled:opacity-50"
+          className="btn btn-primary w-full"
         >
           {save.isPending ? 'Saving…' : saved ? 'Saved ✓' : 'Save changes'}
         </button>
@@ -152,7 +152,7 @@ export default function Profile() {
 
       <button
         onClick={signOut}
-        className="w-full rounded border border-border py-3 text-sm font-medium text-text-muted hover:bg-card-muted"
+        className="btn btn-outline w-full"
       >
         Sign out
       </button>

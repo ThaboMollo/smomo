@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, Lora } from 'next/font/google';
+import { Cormorant_Garamond, DM_Mono, DM_Sans } from 'next/font/google';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 
@@ -15,14 +15,19 @@ config.autoAddCss = false;
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
+  weight: ['500', '600'],
+  style: ['normal', 'italic'],
   variable: '--font-cormorant',
 });
-const lora = Lora({
+const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  style: ['normal', 'italic'],
-  variable: '--font-lora',
+  variable: '--font-dmsans',
+});
+const dmMono = DM_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-dmmono',
 });
 
 export const metadata: Metadata = {
@@ -67,11 +72,14 @@ const themeInit = `(function(){try{var t=localStorage.getItem('theme');if(t!=='l
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${cormorant.variable} ${lora.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}>
       <body>
+        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-card focus:px-4 focus:py-2">
+          Skip to content
+        </a>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
         <SiteHeader />
-        <main className="min-h-[70vh]">{children}</main>
+        <main id="main" className="min-h-[70vh]">{children}</main>
         <SiteFooter />
         <PwaProvider />
       </body>

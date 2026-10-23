@@ -1,21 +1,27 @@
 @import "tailwindcss";
 
+/* dark: follows the data-theme toggle, not only the OS setting */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 /* ──────────────────────────────────────────────────────────────
-   Smomo × Classical — editorial tokens on the Smomo brand palette.
-   Token NAMES are unchanged from the previous globals.css, so every
-   existing page keeps working; only the values and the type change.
+   Smomo, bento edition.
+   Layout language from the bento references (big rounded panels,
+   deep feature panels, pill actions, giant wordmark footer), colour
+   only from the Smomo brand board: Deep Violet #6D28D9, Soft Lilac
+   #EDE9FE, Rose Gold #D4AF7C. No orange anywhere.
+   Token NAMES are unchanged so every page keeps compiling.
    ────────────────────────────────────────────────────────────── */
 @theme {
   /* Ground & ink */
-  --color-bg: #faf9fc;
+  --color-bg: #f4f1fa;
   --color-card: #ffffff;
-  --color-card-muted: #f7f6fa;
+  --color-card-muted: #f8f6fc;
   --color-text: #1a1523;
   --color-text-muted: #5c5568;
-  --color-text-faint: #9a93a6;
+  --color-text-faint: #857d92;
   --color-border: #e5e1ee;
 
-  /* Deep violet — the brand's primary */
+  /* Deep violet: the brand primary. Fills are allowed for primary actions. */
   --color-primary: #6d28d9;
   --color-primary-dark: #5b21b6;
   --color-primary-soft: #ede9fe;
@@ -28,28 +34,30 @@
   --color-primary-700: #5b21b6;
   --color-primary-800: #46199a;
   --color-primary-900: #2e1065;
+  --color-primary-950: #1e0b45;
 
-  /* Rose gold — stroke and small marks only, never a fill */
+  /* Rose gold: stars, sparkles and small marks */
   --color-accent: #d4af7c;
   --color-accent-deep: #a2783f;
-  --color-star: #bf945c;
+  --color-star: #a2783f;
 
-  --color-success: #16a34a;
+  --color-success: #15803d;
   --color-danger: #dc2626;
 
-  /* Type — Cormorant Garamond headings over Lora body */
+  /* Type: Cormorant Garamond display over DM Sans UI text */
   --font-heading: var(--font-cormorant), Georgia, "Times New Roman", serif;
-  --font-body: var(--font-lora), Georgia, serif;
-  --font-mono: ui-monospace, Menlo, Consolas, monospace;
-  --font-sans: var(--font-lora), Georgia, serif;
+  --font-body: var(--font-dmsans), system-ui, sans-serif;
+  --font-mono: var(--font-dmmono), ui-monospace, Menlo, monospace;
+  --font-sans: var(--font-dmsans), system-ui, sans-serif;
 
-  /* Classical is tight-radius and near-flat */
-  --radius-brand: 4px;
+  --radius-brand: 28px;
 }
 
+@layer base {
 html {
   background: var(--color-bg);
   color: var(--color-text);
+  scroll-behavior: smooth;
 }
 
 body {
@@ -58,86 +66,137 @@ body {
   text-wrap: pretty;
 }
 
-h1, h2, h3, h4 {
+h1, h2, h3 {
   font-family: var(--font-heading);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.12;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+}
+h4 { font-weight: 600; }
+
 }
 
-/* Display sizes set lighter, not heavier */
-h1 { font-weight: 400; }
+@layer components {
+.tnum, th, td, time { font-variant-numeric: tabular-nums; }
 
-/* Figures set tabular wherever they stand as data */
-.tnum,
-th, td,
-time { font-variant-numeric: tabular-nums; }
-
-/* The kicker: small mono caps above a heading */
+/* Small mono caps above a heading, with a dot like the references */
 .kicker {
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
+  font-size: 11px;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-primary-700);
 }
 
-/* Hairline rule — the main structural device */
-.hr {
-  height: 1px;
-  border: 0;
-  background: var(--color-border);
-  margin: 0;
-}
+.hr { height: 1px; border: 0; background: var(--color-border); margin: 0; }
 
-/* Plate: photographs sit matted, like a tipped-in book plate */
-.plate {
-  padding: 6px;
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
-}
+/* Photos sit in rounded frames */
+.plate { overflow: hidden; border-radius: 20px; background: var(--color-card-muted); }
 .plate > img { display: block; width: 100%; height: auto; }
 
-/* Themed focus — never the browser default */
+/* Big display wordmark in the footer */
+.wordmark {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 0.8;
+}
+
+/* ── Shared controls (used across app pages) ───────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  min-height: 44px; padding: 0.7rem 1.4rem; border-radius: 999px;
+  font-size: 0.95rem; font-weight: 500; line-height: 1.2;
+  transition: background-color .15s, border-color .15s, color .15s, transform .1s;
+  cursor: pointer; text-align: center;
+}
+.btn:active { transform: translateY(1px); }
+.btn:disabled, .btn[aria-disabled='true'] { opacity: .5; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary:hover { background: var(--color-primary-dark); }
+.btn-outline { border: 1px solid var(--color-border); background: var(--color-card); color: var(--color-text); }
+.btn-outline:hover { border-color: var(--color-primary-400); background: var(--color-primary-100); }
+.btn-light { background: #fff; color: var(--color-primary-950); }
+.btn-light:hover { background: var(--color-primary-200); }
+.btn-danger { border: 1px solid var(--color-border); background: var(--color-card); color: var(--color-danger); }
+.btn-danger:hover { border-color: var(--color-danger); }
+.btn-block { width: 100%; }
+
+.field { display: flex; flex-direction: column; gap: .4rem; font-size: .875rem; color: var(--color-text-muted); }
+.input {
+  width: 100%; min-height: 48px; padding: .75rem 1rem; border-radius: 14px;
+  border: 1px solid var(--color-border); background: var(--color-card); color: var(--color-text);
+  font-size: 1rem; transition: border-color .15s, box-shadow .15s;
+}
+.input::placeholder { color: var(--color-text-faint); }
+.input:hover { border-color: var(--color-primary-300); }
+.input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-200); }
+.input[aria-invalid='true'] { border-color: var(--color-danger); }
+textarea.input { min-height: 110px; resize: vertical; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: .45rem; flex-shrink: 0;
+  min-height: 40px; padding: .5rem 1rem; border-radius: 999px;
+  border: 1px solid var(--color-border); background: var(--color-card); color: var(--color-text);
+  font-size: .875rem; transition: background-color .15s, border-color .15s, color .15s; cursor: pointer;
+}
+.chip:hover { border-color: var(--color-primary-400); }
+.chip[aria-pressed='true'], .chip[aria-checked='true'], .chip-on {
+  border-color: var(--color-primary); background: var(--color-primary); color: #fff;
+}
+
+.segmented { display: flex; gap: 4px; padding: 4px; border-radius: 999px; border: 1px solid var(--color-border); background: var(--color-card); }
+.segmented > button { flex: 1; min-height: 40px; border-radius: 999px; padding: .5rem .75rem; font-size: .875rem; color: var(--color-text-muted); transition: background-color .15s, color .15s; }
+.segmented > button[aria-checked='true'] { background: var(--color-primary-200); color: var(--color-primary-700); font-weight: 500; }
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+@keyframes pulse-ring { 0% { transform: scale(.8); opacity: .7 } 100% { transform: scale(2.2); opacity: 0 } }
+.pulse-ring { animation: pulse-ring 1.6s ease-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .pulse-ring { animation: none; }
+  * { transition: none !important; }
+}
+
+}
+
+/* Themed focus, never the browser default */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-::selection {
-  background: var(--color-primary-200);
-  color: var(--color-primary-900);
-}
+::selection { background: var(--color-primary-200); color: var(--color-primary-900); }
 
-/* ── Dark theme ──────────────────────────────────────────────
-   Token names are unchanged so every component adapts for free.
-   The violet ramp is tuned by purpose, not inverted wholesale:
-   700 (accent text) reads light, while 900 stays deep so the
-   hero plate keeps its dark ground; 100/200 become quiet tints. */
+/* ── Dark theme ────────────────────────────────────────────── */
 html[data-theme='dark'] {
-  --color-bg: #131019;
-  --color-card: #1b1725;
-  --color-card-muted: #241f31;
+  --color-bg: #110d18;
+  --color-card: #1b1626;
+  --color-card-muted: #231d31;
   --color-text: #f3eefb;
   --color-text-muted: #b4abc6;
-  --color-text-faint: #82798f;
+  --color-text-faint: #8e859c;
   --color-border: #332c46;
 
-  --color-primary: #a78bfa;        /* borders, focus, marks */
-  --color-primary-dark: #8b5cf6;
+  --color-primary: #7c3aed;        /* fills keep white text at > 4.5:1 */
+  --color-primary-dark: #6d28d9;
   --color-primary-soft: #241a3a;
-  --color-primary-100: #201a33;    /* quiet tint background */
-  --color-primary-200: #2b2248;    /* pressed tint */
-  --color-primary-300: #4a3b73;    /* tint border */
+  --color-primary-100: #201a33;
+  --color-primary-200: #2b2248;
+  --color-primary-300: #4a3b73;
   --color-primary-400: #6d4bb0;
   --color-primary-500: #8b5cf6;
   --color-primary-600: #a78bfa;
-  --color-primary-700: #cbb8fb;    /* accent text — light on dark */
+  --color-primary-700: #cbb8fb;    /* accent text, light on dark */
   --color-primary-800: #ddd0fc;
-  --color-primary-900: #2e1065;    /* deep — keeps the hero plate dark */
+  --color-primary-900: #2e1065;
+  --color-primary-950: #1e0b45;
 
   --color-accent: #d8b98a;
-  --color-accent-deep: #c9a46a;
+  --color-accent-deep: #d8b98a;
   --color-star: #d9ad6e;
 
   --color-success: #4ade80;
@@ -146,12 +205,9 @@ html[data-theme='dark'] {
   color-scheme: dark;
 }
 
-html[data-theme='dark'] ::selection {
-  background: var(--color-primary-300);
-  color: var(--color-text);
-}
+html[data-theme='dark'] ::selection { background: var(--color-primary-300); color: var(--color-text); }
 
-/* Theme-aware wordmark: show the ink that reads on the active ground. */
+/* Theme-aware wordmark */
 .brand-logo-dark { display: none; }
 html[data-theme='dark'] .brand-logo-light { display: none; }
 html[data-theme='dark'] .brand-logo-dark { display: block; }

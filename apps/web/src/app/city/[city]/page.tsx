@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { ProviderListCard } from '@/components/ProviderListCard';
-import { Container } from '@/components/ui';
-import { CATEGORY_LABEL, CATEGORY_SLUG_LIST, CITIES, titleCase } from '@/lib/catalog';
+import { PageHero } from '@/components/PageHero';
+import { Container, EmptyState } from '@/components/ui';
+import { CATEGORY_IMAGE, CATEGORY_LABEL, CATEGORY_SLUG_LIST, CITIES, titleCase } from '@/lib/catalog';
 import { getCityHub } from '@/lib/public-api';
 
 export const revalidate = 3600;
@@ -31,29 +33,43 @@ export default async function CityHub({ params }: Params) {
   const items = data?.items ?? [];
 
   return (
-    <Container className="py-10">
-      <h1 className="text-4xl tracking-tight">Pros in {cityName}</h1>
+    <Container className="flex flex-col gap-5 pt-3">
+      <PageHero
+        crumbs={[{ href: '/', label: 'Home' }, { label: cityName }]}
+        title={`Pros in ${cityName}`}
+        subtitle={`Hair, nails, make-up, beauty and tattoo pros around ${cityName}.`}
+        image="/samples/hair_dresser2.jpg"
+      />
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {CATEGORY_SLUG_LIST.map((c) => (
-          <Link
-            key={c}
-            href={`/${c}/${city}`}
-            className="rounded border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-card-muted"
-          >
-            {CATEGORY_LABEL[c]} in {cityName}
-          </Link>
-        ))}
-      </div>
-
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        {items.map((p) => (
-          <ProviderListCard key={p.id} p={p} />
-        ))}
-      </div>
-      {items.length === 0 ? (
-        <p className="mt-6 text-text-muted">No pros listed in {cityName} yet — check back soon.</p>
-      ) : null}
+      <section className="rounded-[32px] bg-card p-6 sm:p-10">
+        <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap">
+          {CATEGORY_SLUG_LIST.map((c) => (
+            <Link key={c} href={`/${c}/${city}`} className="chip">
+              <Image src={CATEGORY_IMAGE[c]} alt="" width={24} height={24} className="h-6 w-6 rounded-full object-cover" />
+              {CATEGORY_LABEL[c]}
+            </Link>
+          ))}
+        </div>
+        {items.length > 0 ? (
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {items.map((p) => (
+              <ProviderListCard key={p.id} p={p} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6">
+            <EmptyState
+              title={`No pros listed in ${cityName} yet`}
+              body="Post a request and pros nearby will see it as they come online."
+              action={
+                <Link href="/app/request/new" className="btn btn-primary">
+                  Post a request
+                </Link>
+              }
+            />
+          </div>
+        )}
+      </section>
     </Container>
   );
 }

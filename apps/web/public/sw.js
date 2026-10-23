@@ -6,7 +6,7 @@
  *  - Everything else (API, Supabase, POST/auth): passes straight through to the network.
  * Bump CACHE_VERSION whenever the precache list or strategy changes.
  */
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const STATIC_CACHE = `smomo-static-${CACHE_VERSION}`;
 const PAGES_CACHE = `smomo-pages-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline';

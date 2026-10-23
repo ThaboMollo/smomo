@@ -3,12 +3,15 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { ProviderListCard } from '@/components/ProviderListCard';
-import { Container } from '@/components/ui';
+import { PageHero } from '@/components/PageHero';
+import { Container, EmptyState } from '@/components/ui';
 import {
+  CATEGORY_IMAGE,
   CATEGORY_LABEL,
   CATEGORY_SLUG_LIST,
   CITIES,
   isCategorySlug,
+  SLUG_TO_CATEGORY,
   titleCase,
   type CategorySlug,
 } from '@/lib/catalog';
@@ -61,40 +64,51 @@ export default async function ListingPage({ params }: Params) {
   };
 
   return (
-    <Container className="py-10">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <nav className="text-sm text-text-muted">
-        <Link href="/" className="hover:text-text">
-          Home
-        </Link>{' '}
-        / <Link href={`/${category}`} className="hover:text-text">{label}</Link> / {cityName}
-      </nav>
-
-      <h1 className="mt-2 text-4xl tracking-tight">
-        {label} in {cityName}
-      </h1>
-      <p className="mt-1 text-text-muted">
-        {data?.total ?? 0} {label.toLowerCase()} available near {cityName}.
-      </p>
-
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        {items.map((p) => (
-          <ProviderListCard key={p.id} p={p} />
-        ))}
-      </div>
-
-      {items.length === 0 ? (
-        <p className="mt-10 text-text-muted">
-          No {label.toLowerCase()} listed in {cityName} yet — check back soon, or{' '}
-          <Link href={`/${category}`} className="text-primary-700">
-            browse all {label.toLowerCase()}
+    <Container className="flex flex-col gap-5 pt-3">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <PageHero
+        crumbs={[{ href: '/', label: 'Home' }, { href: `/${category}`, label }, { label: cityName }]}
+        title={`${label} in ${cityName}`}
+        subtitle={`${data?.total ?? 0} ${label.toLowerCase()} available near ${cityName}.`}
+        image={CATEGORY_IMAGE[cat]}
+      >
+        <div className="flex flex-wrap gap-2 pt-2">
+          <Link href={`/app/request/new?category=${SLUG_TO_CATEGORY[cat]}`} className="btn btn-light">
+            Post a request
           </Link>
-          .
-        </p>
-      ) : null}
+          <Link href={`/city/${city}`} className="btn border border-primary-400 text-white hover:bg-primary-900">
+            All pros in {cityName}
+          </Link>
+        </div>
+      </PageHero>
+
+      <section className="rounded-[32px] bg-card p-6 sm:p-10">
+        {items.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {items.map((p) => (
+              <ProviderListCard key={p.id} p={p} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title={`No ${label.toLowerCase()} in ${cityName} yet`}
+            body={
+              <>
+                Post a request so pros can find you, or{' '}
+                <Link href={`/${category}`} className="text-primary-700 underline underline-offset-4">
+                  browse all {label.toLowerCase()}
+                </Link>
+                .
+              </>
+            }
+            action={
+              <Link href={`/app/request/new?category=${SLUG_TO_CATEGORY[cat]}`} className="btn btn-primary">
+                Post a request
+              </Link>
+            }
+          />
+        )}
+      </section>
     </Container>
   );
 }

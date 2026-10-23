@@ -11,7 +11,7 @@ import { Badge, Card } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useMe } from '@/lib/use-me';
 
-const inputCls = 'w-full rounded border border-border bg-card px-4 py-3';
+const inputCls = 'input';
 const CAPE_TOWN = { latitude: -33.9249, longitude: 18.4241 };
 
 export default function Studio() {
@@ -36,7 +36,7 @@ function StudioOverview({ onChange }: { onChange: () => void }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl">{p?.business_name ?? 'Your studio'}</h1>
+        <h1 className="text-4xl sm:text-5xl">{p?.business_name ?? 'Your studio'}</h1>
         <div className="flex gap-2">
           <Badge tone={p?.verification_status === 'verified' ? 'success' : 'default'}>
             {p?.verification_status ?? 'unverified'}
@@ -53,7 +53,7 @@ function StudioOverview({ onChange }: { onChange: () => void }) {
         <button
           onClick={() => toggle.mutate(!p?.is_online)}
           disabled={!subActive || toggle.isPending}
-          className={`rounded px-4 py-2 text-sm font-medium ${p?.is_online ? 'bg-card-muted text-text' : 'border border-primary hover:bg-primary-100 text-primary-700'} disabled:opacity-50`}
+          className={`btn ${p?.is_online ? 'btn-outline' : 'btn-primary'}`}
         >
           {p?.is_online ? 'Go offline' : 'Go online'}
         </button>
@@ -128,21 +128,21 @@ function BecomeProvider({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="text-2xl">Become a provider</h1>
+      <h1 className="text-4xl sm:text-5xl">Become a provider</h1>
       <div className="mt-6 space-y-3">
         <input placeholder="Business / display name" className={inputCls} value={businessName} onChange={(e) => setBusinessName(e.target.value)} />
         <textarea placeholder="Bio" className={`${inputCls} min-h-20`} value={bio} onChange={(e) => setBio(e.target.value)} />
         <p className="text-sm font-medium text-text-muted">Services you offer</p>
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((c) => (
-            <button key={c.value} onClick={() => toggleCat(c.value)} className={`rounded border px-3 py-1.5 text-sm ${categories.includes(c.value) ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}>
+            <button key={c.value} onClick={() => toggleCat(c.value)} className={`min-h-[40px] rounded-full border px-4 py-1.5 text-sm ${categories.includes(c.value) ? 'border-primary bg-primary text-white' : 'border-border bg-card hover:border-primary-300'}`}>
               <span className="inline-flex items-center gap-1.5"><CategoryIcon category={c.value} size={14} />{c.label}</span>
             </button>
           ))}
         </div>
         <div className="flex gap-2">
           {(['studio', 'mobile', 'both'] as ServiceMode[]).map((m) => (
-            <button key={m} onClick={() => setServiceMode(m)} className={`flex-1 rounded border px-3 py-2 text-sm capitalize ${serviceMode === m ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}>
+            <button key={m} onClick={() => setServiceMode(m)} className={`flex-1 rounded-full border px-3 py-2 text-sm capitalize ${serviceMode === m ? 'border-primary bg-primary text-white' : 'border-border bg-card hover:border-primary-300'}`}>
               {m}
             </button>
           ))}
@@ -160,7 +160,7 @@ function BecomeProvider({ onDone }: { onDone: () => void }) {
           <input placeholder="Deposit %" inputMode="numeric" className={inputCls} value={depositPct} onChange={(e) => setDepositPct(e.target.value)} />
         ) : null}
         {error ? <p className="text-sm text-danger">{error}</p> : null}
-        <button onClick={() => submit.mutate()} disabled={submit.isPending} className="w-full rounded border border-primary hover:bg-primary-100 py-3 font-medium text-primary-700 disabled:opacity-50">
+        <button onClick={() => submit.mutate()} disabled={submit.isPending} className="btn btn-primary w-full">
           {submit.isPending ? 'Saving…' : 'Save & go live'}
         </button>
         <p className="text-center text-xs text-text-faint">First 30 days free. Add services & portfolio next.</p>

@@ -15,7 +15,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <QueryProvider>
       <AppNav />
-      <Container className="py-8">{children}</Container>
+      <Container className="pb-28 pt-6 md:pb-16 md:pt-8">{children}</Container>
     </QueryProvider>
   );
 }

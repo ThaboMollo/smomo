@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { Field, Sparkle } from '@/components/ui';
+import { PasswordInput } from '@/components/PasswordInput';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
@@ -25,7 +27,9 @@ export default function LoginPage() {
     const { error: err } = await createClient().auth.signInWithPassword({ email, password });
     setLoading(false);
     if (err) {
-      setError(err.message);
+      setError(
+        /invalid/i.test(err.message) ? 'That email and password don’t match. Check them and try again.' : err.message,
+      );
       return;
     }
     router.push(next || '/app');
@@ -33,39 +37,45 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="rounded border border-border bg-card p-6">
-      <h1 className="text-2xl">Log in</h1>
-      <form onSubmit={onSubmit} className="mt-5 space-y-4">
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full rounded border border-border bg-card px-4 py-3"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full rounded border border-border bg-card px-4 py-3"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-        />
-        {error ? <p className="text-sm text-danger">{error}</p> : null}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded border border-primary hover:bg-primary-100 py-3 font-medium text-primary-700 active:bg-primary-200 disabled:opacity-50"
-        >
+    <div>
+      <Sparkle size={36} className="text-primary" />
+      <h1 className="mt-5 text-5xl">Welcome back</h1>
+      <p className="mt-3 text-text-muted">
+        {next?.startsWith('/app/request/new')
+          ? 'Log in to send your request. We’ll bring you straight back to it.'
+          : 'Log in to see your requests, offers and bookings.'}
+      </p>
+      <hr className="hr my-7" />
+      <form onSubmit={onSubmit} className="space-y-5" noValidate>
+        <Field label="Email">
+          <input
+            type="email"
+            required
+            className="input"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            inputMode="email"
+            placeholder="you@example.com"
+          />
+        </Field>
+        <Field label="Password">
+          <PasswordInput value={password} onChange={setPassword} autoComplete="current-password" />
+        </Field>
+        {error ? (
+          <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-danger dark:bg-red-950" role="alert">
+            {error}
+          </p>
+        ) : null}
+        <button type="submit" disabled={loading || !email || !password} className="btn btn-primary btn-block min-h-[52px]">
           {loading ? 'Logging in…' : 'Log in'}
         </button>
       </form>
-      <p className="mt-4 text-center text-sm text-text-muted">
-        New here?{' '}
+      <p className="mt-6 text-center text-sm text-text-muted">
+        New to Smomo?{' '}
         <Link
           href={next ? `/register?next=${encodeURIComponent(next)}` : '/register'}
-          className="font-medium text-primary-700"
+          className="font-medium text-primary-700 underline-offset-4 hover:underline"
         >
           Create an account
         </Link>

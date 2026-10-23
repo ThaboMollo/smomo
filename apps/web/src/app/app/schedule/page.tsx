@@ -41,14 +41,14 @@ export default function Schedule() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl">Schedule</h1>
+      <h1 className="text-4xl sm:text-5xl">Schedule</h1>
 
       <div className="flex gap-2">
         {(['upcoming', 'past'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`flex-1 rounded border px-3 py-2 text-sm font-medium capitalize ${tab === t ? 'border-primary bg-primary-100 text-primary-700' : 'border-border bg-card'}`}
+            className={`flex-1 rounded-full border px-3 py-2 text-sm font-medium capitalize ${tab === t ? 'border-primary bg-primary text-white' : 'border-border bg-card hover:border-primary-300'}`}
           >
             {t}
           </button>

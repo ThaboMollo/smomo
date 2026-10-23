@@ -34,13 +34,13 @@ export default function ProviderProfile() {
       {/* Header */}
       <div className="flex items-start gap-4">
         <div className="relative">
-          <Avatar name={practitioner.business_name ?? profile.full_name} size={72} />
+          <Avatar name={practitioner.business_name ?? profile.full_name} src={profile.avatar_url} size={88} />
           {practitioner.is_online ? (
             <span className="absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-card bg-success" />
           ) : null}
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="truncate text-2xl">
+          <h1 className="truncate text-4xl sm:text-5xl">
             {practitioner.business_name ?? profile.full_name}
           </h1>
           <div className="mt-1">
@@ -88,7 +88,7 @@ export default function ProviderProfile() {
                 href={url!}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
-                className="inline-flex items-center gap-1.5 rounded border border-border px-3 py-1.5 text-sm text-text-muted transition-colors hover:border-primary hover:text-primary-700"
+                className="btn btn-outline gap-1.5 py-1.5 hover:border-primary hover:text-primary-700"
               >
                 {platform.label}
                 <span aria-hidden className="text-text-faint">↗</span>
@@ -101,7 +101,7 @@ export default function ProviderProfile() {
       {/* Portfolio */}
       {portfolio.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-lg">Portfolio</h2>
+          <h2 className="mb-3 text-2xl">Portfolio</h2>
           <div className="grid grid-cols-3 gap-2">
             {portfolio.map((p) => (
               // eslint-disable-next-line @next/next/no-img-element
@@ -109,7 +109,7 @@ export default function ProviderProfile() {
                 key={p.id}
                 src={p.image_url}
                 alt={p.caption ?? 'Portfolio item'}
-                className="aspect-square w-full rounded border border-border object-cover"
+                className="aspect-square w-full rounded-[20px] border border-border object-cover"
               />
             ))}
           </div>
@@ -119,7 +119,7 @@ export default function ProviderProfile() {
       {/* Services */}
       {services.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-lg">Services</h2>
+          <h2 className="mb-3 text-2xl">Services</h2>
           <Card className="divide-y divide-border p-0">
             {services.map((s) => (
               <div key={s.id} className="flex items-center justify-between gap-4 p-4">
@@ -141,13 +141,13 @@ export default function ProviderProfile() {
       {/* Reviews */}
       {reviews.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-lg">Reviews</h2>
+          <h2 className="mb-3 text-2xl">Reviews</h2>
           <div className="space-y-3">
             {reviews.map((r) => (
               <Card key={r.id}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Avatar name={r.reviewer?.full_name ?? null} size={32} />
+                    <Avatar name={r.reviewer?.full_name ?? null} src={r.reviewer?.avatar_url} size={32} />
                     <span className="font-medium">{r.reviewer?.full_name ?? 'Client'}</span>
                   </div>
                   <Stars rating={r.rating} />
@@ -161,11 +161,11 @@ export default function ProviderProfile() {
       ) : null}
 
       {/* Sticky request CTA */}
-      <div className="fixed inset-x-0 bottom-0 border-t border-border bg-card p-4">
+      <div className="fixed inset-x-0 bottom-[68px] z-20 border-t border-border bg-card/95 p-3 backdrop-blur md:bottom-0">
         <div className="mx-auto max-w-2xl">
           <Link
             href={requestHref}
-            className="block w-full rounded border border-primary hover:bg-primary-100 py-3 text-center font-medium text-primary-700 active:bg-primary-200"
+            className="btn btn-primary w-full"
           >
             Request a booking
           </Link>

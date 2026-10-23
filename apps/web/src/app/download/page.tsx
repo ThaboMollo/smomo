@@ -40,7 +40,7 @@ export default function DownloadPage() {
               <a
                 href={url}
                 download
-                className="inline-flex w-fit items-center justify-center gap-2 rounded border border-primary bg-primary-100 px-6 py-3.5 text-sm text-primary-700 transition-colors hover:bg-primary-200 active:bg-primary-300"
+                className="btn btn-primary w-fit"
               >
                 ⬇ Download APK
                 <span className="tnum text-xs text-text-muted">

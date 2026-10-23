@@ -1,24 +1,12 @@
 import Image from 'next/image';
 
-import { CATEGORY_SLUGS, SLUG_TO_CATEGORY, type CategorySlug } from '@/lib/catalog';
+import { CATEGORY_IMAGE, CATEGORY_SLUGS, SLUG_TO_CATEGORY, type CategorySlug } from '@/lib/catalog';
 
 /**
- * Brand category mark. Replaces the old category emoji.
- * The source art is a gradient-violet illustration on a soft ground, so it is
- * matted in a small bordered "plate" (bg-card-muted) — consistent with the
- * editorial plate motif and safe on any surface.
- *
+ * Category mark: a small round crop of the category's photo.
  * Accepts either a marketing slug ('nail-technicians') or the shared
  * `service_category` enum value ('nail_technician').
  */
-const ICON: Record<CategorySlug, string> = {
-  hairdressers: '/assets/hair_icon.png',
-  'nail-technicians': '/assets/nail_icon.png',
-  'makeup-artists': '/assets/make_up_icon.png',
-  beauticians: '/assets/beauty_icon.png',
-  'tattoo-artists': '/assets/tattoo_icon.png',
-};
-
 function toSlug(c: string): CategorySlug | null {
   if (c in SLUG_TO_CATEGORY) return c as CategorySlug;
   if (c in CATEGORY_SLUGS) return CATEGORY_SLUGS[c as keyof typeof CATEGORY_SLUGS];
@@ -36,12 +24,16 @@ export function CategoryIcon({
 }) {
   const slug = toSlug(category);
   if (!slug) return null;
+  const px = Math.max(size + 8, 20);
   return (
-    <span
-      className={`inline-flex shrink-0 items-center justify-center rounded border border-border bg-card-muted p-0.5 ${className}`}
+    <Image
+      src={CATEGORY_IMAGE[slug]}
+      alt=""
       aria-hidden
-    >
-      <Image src={ICON[slug]} alt="" width={size} height={size} className="h-auto w-auto" />
-    </span>
+      width={px}
+      height={px}
+      className={`inline-block shrink-0 rounded-full object-cover ${className}`}
+      style={{ width: px, height: px }}
+    />
   );
 }

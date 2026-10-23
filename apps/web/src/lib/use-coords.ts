@@ -14,6 +14,8 @@ export const CAPE_TOWN: Coords = { latitude: -33.9249, longitude: 18.4241 };
 export function useCoords() {
   const [coords, setCoords] = useState<Coords>(CAPE_TOWN);
   const [ready, setReady] = useState(false);
+  /** Where the coordinates came from, so the UI can be honest about a fallback. */
+  const [source, setSource] = useState<'device' | 'fallback'>('fallback');
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -23,6 +25,7 @@ export function useCoords() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+        setSource('device');
         setReady(true);
       },
       () => setReady(true),
@@ -30,5 +33,5 @@ export function useCoords() {
     );
   }, []);
 
-  return { coords, ready };
+  return { coords, ready, source };
 }
