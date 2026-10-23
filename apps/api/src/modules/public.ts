@@ -63,11 +63,13 @@ function toListItem(row: any): PublicProviderListItem {
 class PublicController {
   @Get('providers/:slug')
   async provider(@Db() db: SupaClient, @Param('slug') slug: string): Promise<PublicProvider> {
-    const { data: pp } = await db
+    const { data: pp, error } = await db
       .from('practitioner_directory')
       .select(DETAIL_SELECT)
       .eq('slug', slug)
       .maybeSingle();
+    // Check the error first, so a query failure is not reported as a 404.
+    if (error) throw error;
     if (!pp) throw new NotFoundException('Provider not found');
 
     const [svc, pf, rv] = await Promise.all([
@@ -127,13 +129,16 @@ class PublicController {
     @Param('city') city: string,
     @Query(new ZodValidationPipe(zPagination)) page: { limit: number; offset: number },
   ): Promise<Paginated<PublicProviderListItem>> {
-    const { data, count } = await db
+    const { data, count, error } = await db
       .from('practitioner_directory')
       .select(LIST_SELECT, { count: 'exact' })
       .eq('verification_status', 'verified')
       .ilike('base_address', `%${cityFromSlug(city)}%`)
       .order('rating', { ascending: false, nullsFirst: false })
       .range(page.offset, page.offset + page.limit - 1);
+    // Without this a database failure renders as "no providers in this city"
+    // rather than an error — these are the public SEO pages.
+    if (error) throw error;
     return { items: (data ?? []).map(toListItem), total: count ?? 0, limit: page.limit, offset: page.offset };
   }
 
@@ -146,7 +151,7 @@ class PublicController {
   ): Promise<Paginated<PublicProviderListItem>> {
     const cat = SLUG_TO_CATEGORY[category];
     if (!cat) throw new NotFoundException('Unknown category');
-    const { data, count } = await db
+    const { data, count, error } = await db
       .from('practitioner_directory')
       .select(LIST_SELECT, { count: 'exact' })
       .eq('verification_status', 'verified')
@@ -154,6 +159,9 @@ class PublicController {
       .ilike('base_address', `%${cityFromSlug(city)}%`)
       .order('rating', { ascending: false, nullsFirst: false })
       .range(page.offset, page.offset + page.limit - 1);
+    // Without this a database failure renders as "no providers in this city"
+    // rather than an error — these are the public SEO pages.
+    if (error) throw error;
     return { items: (data ?? []).map(toListItem), total: count ?? 0, limit: page.limit, offset: page.offset };
   }
 
@@ -165,13 +173,16 @@ class PublicController {
   ): Promise<Paginated<PublicProviderListItem>> {
     const cat = SLUG_TO_CATEGORY[category];
     if (!cat) throw new NotFoundException('Unknown category');
-    const { data, count } = await db
+    const { data, count, error } = await db
       .from('practitioner_directory')
       .select(LIST_SELECT, { count: 'exact' })
       .eq('verification_status', 'verified')
       .contains('categories', [cat])
       .order('rating', { ascending: false, nullsFirst: false })
       .range(page.offset, page.offset + page.limit - 1);
+    // Without this a database failure renders as "no providers in this category"
+    // rather than an error — these are the public SEO pages.
+    if (error) throw error;
     return { items: (data ?? []).map(toListItem), total: count ?? 0, limit: page.limit, offset: page.offset };
   }
 }
