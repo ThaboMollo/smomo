@@ -6,13 +6,15 @@ import { ProviderListCard } from '@/components/ProviderListCard';
 import { PageHero } from '@/components/PageHero';
 import { Container, EmptyState } from '@/components/ui';
 import {
+  CATEGORY_HERO,
   CATEGORY_IMAGE,
   CATEGORY_LABEL,
   CATEGORY_SLUG_LIST,
   CITIES,
+  cityLabel,
+  cityWithCountry,
   isCategorySlug,
   SLUG_TO_CATEGORY,
-  titleCase,
   type CategorySlug,
 } from '@/lib/catalog';
 import { SITE_URL } from '@/lib/env';
@@ -30,14 +32,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { category, city } = await params;
   if (!isCategorySlug(category)) return {};
   const label = CATEGORY_LABEL[category];
-  const cityName = titleCase(city);
+  const cityName = cityLabel(city);
   const title = `${label} in ${cityName}`;
-  const description = `Find and book trusted ${label.toLowerCase()} in ${cityName}. Compare ratings, portfolios and prices on Smomo, then book — to you or at their studio.`;
+  const description = `Find and book trusted ${label.toLowerCase()} in ${cityWithCountry(city)}. Compare portfolios and prices on SMOMO, then book — to you or at their studio.`;
   return {
     title,
     description,
     alternates: { canonical: `/${category}/${city}` },
-    openGraph: { title: `${title} · Smomo`, description },
+    openGraph: { title: `${title} · SMOMO`, description },
   };
 }
 
@@ -46,7 +48,7 @@ export default async function ListingPage({ params }: Params) {
   if (!isCategorySlug(category)) notFound();
   const cat = category as CategorySlug;
   const label = CATEGORY_LABEL[cat];
-  const cityName = titleCase(city);
+  const cityName = cityLabel(city);
 
   const data = await getListing(category, city);
   const items = data?.items ?? [];
@@ -70,7 +72,7 @@ export default async function ListingPage({ params }: Params) {
         crumbs={[{ href: '/', label: 'Home' }, { href: `/${category}`, label }, { label: cityName }]}
         title={`${label} in ${cityName}`}
         subtitle={`${data?.total ?? 0} ${label.toLowerCase()} available near ${cityName}.`}
-        image={CATEGORY_IMAGE[cat]}
+        image={CATEGORY_HERO[cat]}
       >
         <div className="flex flex-wrap gap-2 pt-2">
           <Link href={`/app/request/new?category=${SLUG_TO_CATEGORY[cat]}`} className="btn btn-light">

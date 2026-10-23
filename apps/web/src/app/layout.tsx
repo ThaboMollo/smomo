@@ -1,43 +1,34 @@
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, DM_Mono, DM_Sans } from 'next/font/google';
+import { DM_Sans } from 'next/font/google';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 
 import './globals.css';
+import './landing.css';
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader';
 import { PwaProvider } from '@/components/PwaProvider';
 import { SITE_NAME, SITE_URL } from '@/lib/env';
+import { grotesk } from '@/lib/fonts';
 
 // We import the Font Awesome CSS manually above; disable auto-injection so the
 // App Router SSR pass doesn't flash oversized icons before hydration.
 config.autoAddCss = false;
 
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['500', '600'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
-});
 const dmSans = DM_Sans({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-dmsans',
-});
-const dmMono = DM_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-dmmono',
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Smomo — Beauty, hair, nails, make-up & tattoo pros near you',
-    template: '%s · Smomo',
+    default: 'SMOMO: Your look. Your people.',
+    template: '%s · SMOMO',
   },
   description:
-    'Find and book trusted hairdressers, nail technicians, make-up artists, beauticians and tattoo artists near you in South Africa. Post a request and get offers.',
+    'Find independent hair, nail, make-up, beauty and tattoo professionals near you across South Africa, Lesotho, Eswatini, Botswana, Zimbabwe and Namibia. See their work, post your look and compare offers.',
   applicationName: SITE_NAME,
   icons: {
     icon: [
@@ -58,8 +49,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#6d28d9' },
-    { media: '(prefers-color-scheme: dark)', color: '#2e1065' },
+    { media: '(prefers-color-scheme: light)', color: '#F4EFE7' },
+    { media: '(prefers-color-scheme: dark)', color: '#251719' },
   ],
   colorScheme: 'light dark',
   width: 'device-width',
@@ -68,11 +59,13 @@ export const viewport: Viewport = {
 };
 
 // Runs before paint so the correct theme is applied with no flash of the wrong one.
-const themeInit = `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
+// The signed-in app (/app) follows the saved or OS preference; the public pages and the
+// sign-in screens are always the light SMOMO look.
+const themeInit = `(function(){try{var t='light';if(location.pathname.indexOf('/app')===0){t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${grotesk.variable} ${dmSans.variable}`}>
       <body>
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-card focus:px-4 focus:py-2">
           Skip to content

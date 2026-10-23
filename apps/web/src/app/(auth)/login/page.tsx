@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { Field, Sparkle } from '@/components/ui';
+import { Field } from '@/components/ui';
 import { PasswordInput } from '@/components/PasswordInput';
 import { createClient } from '@/lib/supabase/client';
 
@@ -28,7 +28,13 @@ export default function LoginPage() {
     setLoading(false);
     if (err) {
       setError(
-        /invalid/i.test(err.message) ? 'That email and password don’t match. Check them and try again.' : err.message,
+        /invalid/i.test(err.message)
+          ? 'That email and password don’t match. Check them and try again.'
+          : /rate limit|too many/i.test(err.message)
+            ? 'Too many attempts just now. Please wait a minute and try again.'
+            : /confirm/i.test(err.message)
+              ? 'Please confirm your email first. Check your inbox for the link.'
+              : err.message,
       );
       return;
     }
@@ -38,8 +44,8 @@ export default function LoginPage() {
 
   return (
     <div>
-      <Sparkle size={36} className="text-primary" />
-      <h1 className="mt-5 text-5xl">Welcome back</h1>
+      <p className="kicker">Log in</p>
+      <h1 className="mt-3 text-5xl">Welcome back</h1>
       <p className="mt-3 text-text-muted">
         {next?.startsWith('/app/request/new')
           ? 'Log in to send your request. We’ll bring you straight back to it.'
@@ -63,7 +69,7 @@ export default function LoginPage() {
           <PasswordInput value={password} onChange={setPassword} autoComplete="current-password" />
         </Field>
         {error ? (
-          <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-danger dark:bg-red-950" role="alert">
+          <p className="rounded-2xl bg-danger/10 px-4 py-3 text-sm text-danger" role="alert">
             {error}
           </p>
         ) : null}
@@ -72,7 +78,7 @@ export default function LoginPage() {
         </button>
       </form>
       <p className="mt-6 text-center text-sm text-text-muted">
-        New to Smomo?{' '}
+        New to SMOMO?{' '}
         <Link
           href={next ? `/register?next=${encodeURIComponent(next)}` : '/register'}
           className="font-medium text-primary-700 underline-offset-4 hover:underline"

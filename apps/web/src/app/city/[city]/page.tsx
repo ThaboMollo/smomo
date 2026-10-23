@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ProviderListCard } from '@/components/ProviderListCard';
 import { PageHero } from '@/components/PageHero';
 import { Container, EmptyState } from '@/components/ui';
-import { CATEGORY_IMAGE, CATEGORY_LABEL, CATEGORY_SLUG_LIST, CITIES, titleCase } from '@/lib/catalog';
+import { CATEGORY_IMAGE, CATEGORY_LABEL, CATEGORY_SLUG_LIST, CITIES, cityLabel, cityWithCountry } from '@/lib/catalog';
 import { getCityHub } from '@/lib/public-api';
 
 export const revalidate = 3600;
@@ -18,17 +18,17 @@ type Params = { params: Promise<{ city: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { city } = await params;
-  const cityName = titleCase(city);
+  const cityName = cityLabel(city);
   return {
     title: `Beauty, hair, nails & tattoo pros in ${cityName}`,
-    description: `Find and book beauty, hair, nail, make-up and tattoo professionals in ${cityName} on Smomo.`,
+    description: `Find and book beauty, hair, nail, make-up and tattoo professionals in ${cityWithCountry(city)} on SMOMO.`,
     alternates: { canonical: `/city/${city}` },
   };
 }
 
 export default async function CityHub({ params }: Params) {
   const { city } = await params;
-  const cityName = titleCase(city);
+  const cityName = cityLabel(city);
   const data = await getCityHub(city);
   const items = data?.items ?? [];
 
@@ -38,7 +38,7 @@ export default async function CityHub({ params }: Params) {
         crumbs={[{ href: '/', label: 'Home' }, { label: cityName }]}
         title={`Pros in ${cityName}`}
         subtitle={`Hair, nails, make-up, beauty and tattoo pros around ${cityName}.`}
-        image="/samples/hair_dresser2.jpg"
+        image="/editorial/community-walk.webp"
       />
 
       <section className="rounded-[32px] bg-card p-6 sm:p-10">

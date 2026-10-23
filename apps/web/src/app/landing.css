@@ -1,0 +1,363 @@
+/* ──────────────────────────────────────────────────────────────
+   SMOMO 2.0 landing page.
+   Everything here is scoped under .smomo-landing so the app pages and the
+   category/pro pages are untouched. Colour comes from the @theme tokens in
+   globals.css (ink / canvas / pink / lilac / lime); nothing is hard-coded twice.
+   ────────────────────────────────────────────────────────────── */
+
+/* Scope: carried by the header, the page and the footer. It sets no colours, so the
+   Tailwind utilities on each of them (bg-ink, text-canvas…) still win. */
+.smomo-landing {
+  font-family: var(--font-body);
+  /* Re-declared here (not only in @theme) because --font-grotesk exists only on this
+     wrapper; a :root declaration would resolve it to nothing and fall back to DM Sans. */
+  --font-display: var(--font-grotesk), Arial, sans-serif;
+  /* The app's dark theme must not leak into the form controls on this page. */
+  color-scheme: light;
+}
+
+/* The page body between header and footer. */
+.smomo-page {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  overflow-x: clip;
+}
+
+/* The app's base styles give h1–h3 the Cormorant serif; the rebrand uses Space Grotesk. */
+.smomo-landing :is(h1, h2, h3, h4) {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+
+/* ── Type scale (clamp so mobile is composed, not just shrunk) ── */
+.d-hero {
+  font-size: clamp(2.25rem, 11.4vw, 5.25rem);
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+@media (min-width: 1024px) {
+  .d-hero {
+    font-size: clamp(3.5rem, 5.4vw, 5.5rem);
+  }
+}
+.d-xl {
+  font-size: clamp(2.25rem, 7.2vw, 4.75rem);
+}
+.d-lg {
+  font-size: clamp(2rem, 5.2vw, 3.75rem);
+}
+.d-md {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  line-height: 1.05;
+}
+.lead {
+  font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+  line-height: 1.55;
+  max-width: 38rem;
+}
+.label {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ── The official symbol: the approved artwork used as an alpha mask, so it can
+      take any flat brand colour without being redrawn or altered. ── */
+.smomo-mark {
+  display: inline-block;
+  flex: none;
+  aspect-ratio: 734 / 665;
+  background-color: currentColor;
+  -webkit-mask: url('/brand/smomo-symbol-256.webp') center / contain no-repeat;
+  mask: url('/brand/smomo-symbol-256.webp') center / contain no-repeat;
+}
+.smomo-mark--md {
+  -webkit-mask-image: url('/brand/smomo-symbol-640.webp');
+  mask-image: url('/brand/smomo-symbol-640.webp');
+}
+.smomo-mark--lg {
+  -webkit-mask-image: url('/brand/smomo-symbol-1280.webp');
+  mask-image: url('/brand/smomo-symbol-1280.webp');
+}
+
+.smomo-wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  text-transform: lowercase;
+}
+
+/* ── Buttons ── */
+.sm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.25rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+.sm-btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+/* Ink text on Signature Pink (4.7:1). White text would not pass at this size. */
+.sm-btn--pink {
+  background: var(--color-pink);
+  color: var(--color-ink);
+}
+.sm-btn--pink:hover {
+  background: var(--color-ink);
+  color: var(--color-canvas);
+}
+.on-ink .sm-btn--pink:hover {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+.sm-btn--ink {
+  background: var(--color-ink);
+  color: var(--color-canvas);
+}
+.sm-btn--ink:hover {
+  background: var(--color-pink-deep);
+  color: #fff;
+}
+.sm-btn--line {
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+}
+.sm-btn--line:hover {
+  background: var(--color-ink);
+  color: var(--color-canvas);
+}
+.on-ink .sm-btn--line {
+  border-color: var(--color-canvas);
+  color: var(--color-canvas);
+}
+.on-ink .sm-btn--line:hover {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+.sm-btn .arrow {
+  transition: transform 160ms ease;
+}
+.sm-btn:hover .arrow {
+  transform: translate(2px, -2px);
+}
+
+/* Underline that draws in on hover/focus */
+.u-link {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat;
+  transition: background-size 220ms ease;
+}
+.u-link:hover,
+.u-link:focus-visible {
+  background-size: 100% 2px;
+}
+
+/* ── Focus: always visible, never the browser default ── */
+.smomo-landing :where(a, button, select, input, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--color-pink-deep);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+.smomo-landing .on-ink :where(a, button, select, input, summary, [tabindex]):focus-visible,
+.smomo-landing .on-ink:where(a, button):focus-visible {
+  outline-color: var(--color-lime);
+}
+
+/* ── Placeholder imagery (clearly labelled until real photography is supplied) ── */
+.ph {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  container-type: size; /* lets the decorative mark size itself from the slot's height too */
+}
+.ph[data-tone='ink'] {
+  background: var(--color-ink);
+  color: var(--color-pink);
+}
+.ph[data-tone='pink'] {
+  background: var(--color-pink);
+  color: var(--color-ink);
+}
+.ph[data-tone='lilac'] {
+  background: var(--color-lilac);
+  color: var(--color-ink);
+}
+.ph[data-tone='lime'] {
+  background: var(--color-lime);
+  color: var(--color-ink);
+}
+.ph[data-tone='sand'] {
+  background: #e6ddcf;
+  color: var(--color-ink);
+}
+.ph .ph-mark {
+  position: absolute;
+  right: -14%;
+  bottom: -12%;
+  width: min(78cqw, 100cqh);
+  opacity: 0.9;
+  z-index: -1;
+  transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.ph[data-tone='ink'] .ph-mark {
+  opacity: 1;
+}
+.ph[data-tone='pink'] .ph-mark,
+.ph[data-tone='lilac'] .ph-mark,
+.ph[data-tone='lime'] .ph-mark,
+.ph[data-tone='sand'] .ph-mark {
+  color: rgb(255 255 255 / 0.5);
+}
+.ph-chip {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  max-width: calc(100% - 1.5rem);
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.tile:hover .ph .ph-mark,
+.tile:focus-visible .ph .ph-mark {
+  transform: scale(1.05) rotate(-3deg);
+}
+.tile img {
+  transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.tile:hover img {
+  transform: scale(1.04);
+}
+
+/* ── Motion (all of it off under prefers-reduced-motion) ── */
+@media (prefers-reduced-motion: no-preference) {
+  /* Headline lines rise out of a mask. Transform only, so text paints immediately (LCP-safe). */
+  .rise-mask {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.06em;
+    margin-bottom: -0.06em;
+  }
+  .rise-mask > span {
+    display: block;
+    animation: rise 760ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: var(--d, 0ms);
+  }
+  .fade-in {
+    animation: fade 700ms ease both;
+    animation-delay: var(--d, 0ms);
+  }
+  @keyframes rise {
+    from {
+      transform: translateY(105%);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  /* Scroll reveal: only applied to below-the-fold blocks by <Reveal>, so no-JS never hides content. */
+  [data-reveal='pending'] {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  [data-reveal='in'] {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 640ms ease,
+      transform 640ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: var(--d, 0ms);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .smomo-landing * {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+  .smomo-landing {
+    scroll-behavior: auto;
+  }
+}
+
+/* ── Form controls in the hero finder ── */
+.finder-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.7rem 1rem;
+  border: 2px solid var(--color-ink);
+  border-radius: 1.1rem;
+  background: #fff;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.finder-field:focus-within {
+  border-color: var(--color-pink-deep);
+  box-shadow: 0 0 0 3px rgb(170 32 74 / 0.25);
+}
+.finder-field select {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0 1.5rem 0 0;
+  width: 100%;
+  min-height: 2rem;
+  font: inherit;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+.finder-field select:focus-visible {
+  outline: none; /* the wrapper shows the focus ring via :focus-within */
+}
+
+/* Mobile menu sheet */
+.sheet-link {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid rgb(244 239 231 / 0.18);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 8vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}

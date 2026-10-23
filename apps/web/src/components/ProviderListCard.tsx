@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { PublicProviderListItem } from '@smomo/shared';
 
 import { ArrowUpRight, Stars } from '@/components/ui';
+import { SHOW_PUBLIC_RATINGS } from '@/lib/flags';
 import { CATEGORY_LABEL, CATEGORY_SLUGS, categoryImage } from '@/lib/catalog';
 import { cardPhoto } from '@/lib/images';
 
@@ -33,10 +34,12 @@ export function ProviderListCard({ p }: { p: PublicProviderListItem }) {
         <div className="truncate text-[17px] font-medium">{p.business_name ?? 'Provider'}</div>
         <div className="mt-0.5 truncate text-sm text-text-muted">{cats}</div>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-sm">
-          <Stars rating={p.rating} count={p.rating_count} />
-          <span className="tnum whitespace-nowrap text-xs text-text-muted sm:text-sm">
-            {p.min_price != null ? `from R${Number(p.min_price).toLocaleString('en-ZA')}` : `${p.jobs_done} jobs`}
-          </span>
+          {SHOW_PUBLIC_RATINGS ? <Stars rating={p.rating} count={p.rating_count} /> : <span className="font-bold text-primary-700">View work ↗</span>}
+          {p.min_price != null ? (
+            <span className="tnum whitespace-nowrap text-xs text-text-muted sm:text-sm">from R{Number(p.min_price).toLocaleString('en-ZA')}</span>
+          ) : SHOW_PUBLIC_RATINGS ? (
+            <span className="tnum whitespace-nowrap text-xs text-text-muted sm:text-sm">{p.jobs_done} jobs</span>
+          ) : null}
         </div>
       </div>
     </Link>

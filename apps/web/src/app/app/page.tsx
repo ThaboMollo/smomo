@@ -63,7 +63,7 @@ export default function Dashboard() {
           href="/app/discover"
           className="group relative hidden min-h-[280px] overflow-hidden rounded-[32px] lg:col-span-4 lg:block"
         >
-          <Image src="/samples/nail_tech6.jpg" alt="" fill sizes="33vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+          <Image src="/editorial/look-nails-chrome.webp" alt="" fill sizes="33vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
           <span className="absolute inset-x-4 bottom-4 flex items-center justify-between rounded-[20px] bg-card p-4 text-text">
             <span>
               <span className="block font-medium">Pros online near you</span>

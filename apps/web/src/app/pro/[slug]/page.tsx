@@ -3,11 +3,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { SOCIAL_PLATFORMS, socialUrl } from '@smomo/shared';
+import { SOCIAL_PLATFORMS, socialUrl, detectCountry } from '@smomo/shared';
 
 import { CATEGORY_LABEL, CATEGORY_SLUGS } from '@/lib/catalog';
 import { Icon } from '@/components/Icon';
 import { Avatar, Container, Plate, Stars } from '@/components/ui';
+import { SHOW_PUBLIC_RATINGS } from '@/lib/flags';
 import { cardPhoto } from '@/lib/images';
 import { SITE_URL } from '@/lib/env';
 import { getProvider } from '@/lib/public-api';
@@ -30,10 +31,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     title: `${p.business_name ?? 'Provider'} — ${cats}${where}`,
     description:
       p.bio?.slice(0, 155) ??
-      `Book ${p.business_name ?? 'this pro'} on Smomo — ${cats}${where}. See portfolio, ratings and prices.`,
+      `Book ${p.business_name ?? 'this pro'} on SMOMO — ${cats}${where}. See their portfolio and services.`,
     alternates: { canonical: `/pro/${p.slug}` },
     openGraph: {
-      title: `${p.business_name ?? 'Provider'} · Smomo`,
+      title: `${p.business_name ?? 'Provider'} · SMOMO`,
       images: p.portfolio[0]?.image_url ? [{ url: p.portfolio[0].image_url }] : undefined,
     },
   };
@@ -56,10 +57,10 @@ export default async function ProviderPage({ params }: Params) {
     description: p.bio ?? undefined,
     image: p.portfolio.map((x) => x.image_url).slice(0, 5),
     address: p.base_address
-      ? { '@type': 'PostalAddress', addressLocality: p.base_address, addressCountry: 'ZA' }
+      ? { '@type': 'PostalAddress', addressLocality: p.base_address, ...(detectCountry(p.base_address) ? { addressCountry: detectCountry(p.base_address) } : {}) }
       : undefined,
     aggregateRating:
-      p.rating != null && p.rating_count > 0
+      SHOW_PUBLIC_RATINGS && p.rating != null && p.rating_count > 0
         ? { '@type': 'AggregateRating', ratingValue: p.rating, reviewCount: p.rating_count }
         : undefined,
     sameAs: socials.length ? socials.map((s) => s.url) : undefined,
@@ -96,11 +97,15 @@ export default async function ProviderPage({ params }: Params) {
             </div>
             <h1 className="mt-5 text-5xl sm:text-6xl">{name}</h1>
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-primary-200">
-              <span className="tnum">
-                <span className="text-accent">★</span>{' '}
-                {p.rating != null ? `${p.rating.toFixed(1)} · ${p.rating_count} reviews` : 'New on Smomo'}
-              </span>
-              <span className="tnum">{p.jobs_done} jobs done</span>
+              {SHOW_PUBLIC_RATINGS ? (
+                <>
+                  <span className="tnum">
+                    <span className="text-accent">★</span>{' '}
+                    {p.rating != null ? `${p.rating.toFixed(1)} · ${p.rating_count} reviews` : 'New on SMOMO'}
+                  </span>
+                  <span className="tnum">{p.jobs_done} jobs done</span>
+                </>
+              ) : null}
               {p.base_address ? (
                 <span className="inline-flex items-center gap-1.5">
                   <Icon icon={faLocationDot} size={13} className="text-accent" /> {p.base_address}
@@ -171,7 +176,7 @@ export default async function ProviderPage({ params }: Params) {
         </section>
       ) : null}
 
-      {p.reviews.length > 0 ? (
+      {SHOW_PUBLIC_RATINGS && p.reviews.length > 0 ? (
         <section className="rounded-[32px] bg-card p-6 sm:p-10" aria-labelledby="reviews">
           <h2 id="reviews" className="text-3xl sm:text-4xl">What clients say</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
@@ -189,7 +194,7 @@ export default async function ProviderPage({ params }: Params) {
       <section className="flex flex-col items-start justify-between gap-5 rounded-[32px] bg-primary p-7 text-white sm:flex-row sm:items-center sm:p-10">
         <div>
           <h2 className="text-3xl sm:text-4xl">Want to book {name}?</h2>
-          <p className="mt-2 text-primary-100">Send a request and get an offer. You&apos;ll sign in or create a free account first.</p>
+          <p className="mt-2 text-primary-100">Send a request and get an offer. You&apos;ll sign in or create an account first.</p>
         </div>
         <Link href={requestHref} className="btn btn-light">
           Request a booking

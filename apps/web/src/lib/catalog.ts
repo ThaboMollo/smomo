@@ -1,4 +1,4 @@
-import type { Enums } from '@smomo/shared';
+import { ALL_CITIES, COUNTRIES, cityBySlug, type Enums } from '@smomo/shared';
 
 export type CategorySlug =
   | 'tattoo-artists'
@@ -45,20 +45,22 @@ export function isCategorySlug(v: string): v is CategorySlug {
   return v in SLUG_TO_CATEGORY;
 }
 
-/** Curated SA metros that get pre-generated pages; others render on-demand (ISR). */
-export const CITIES = [
-  'cape-town',
-  'johannesburg',
-  'durban',
-  'pretoria',
-  'gqeberha',
-  'bloemfontein',
-  'east-london',
-  'polokwane',
-  'nelspruit',
-  'kimberley',
-];
+/** South African metros: these get pre-generated pages; every other city renders on demand (ISR). */
+export const CITIES = COUNTRIES.ZA.cities.map((c) => c.slug);
 
+/** Every city SMOMO publishes a page for, across all six countries. */
+export const ALL_CITY_SLUGS = ALL_CITIES.map((c) => c.slug);
+
+/** Display name for a city slug ("windhoek" → "Windhoek"), falling back to title case for unknown slugs. */
+export function cityLabel(slug: string): string {
+  return cityBySlug(slug)?.name ?? titleCase(slug);
+}
+
+/** "Maseru, Lesotho" for known cities, otherwise just the name. */
+export function cityWithCountry(slug: string): string {
+  const c = cityBySlug(slug);
+  return c ? `${c.name}, ${COUNTRIES[c.country].name}` : titleCase(slug);
+}
 export function titleCase(slug: string): string {
   return slug
     .split('-')
@@ -75,13 +77,22 @@ export const CATEGORY_NOTE: Record<CategorySlug, string> = {
   'tattoo-artists': 'Fine-line, blackwork and cover-ups',
 };
 
-/** Representative photo per category (from /public/samples). */
+/** Portrait editorial photo per category: thumbnails, cards and fallbacks (from /public/editorial). */
 export const CATEGORY_IMAGE: Record<CategorySlug, string> = {
-  hairdressers: '/samples/hair_dresser.jpg',
-  'nail-technicians': '/samples/nail_tech6.jpg',
-  'makeup-artists': '/samples/makeup1.jpg',
-  beauticians: '/samples/beautician9.jpg',
-  'tattoo-artists': '/samples/tattoo3.jpg',
+  hairdressers: '/editorial/look-hair-braids.webp',
+  'nail-technicians': '/editorial/look-nails-chrome.webp',
+  'makeup-artists': '/editorial/look-makeup-portrait.webp',
+  beauticians: '/editorial/craft-facial.webp',
+  'tattoo-artists': '/editorial/look-tattoo-floral.webp',
+};
+
+/** Landscape "at work" photo per category, used in page headers. */
+export const CATEGORY_HERO: Record<CategorySlug, string> = {
+  hairdressers: '/editorial/craft-hair-salon.webp',
+  'nail-technicians': '/editorial/craft-nails-work.webp',
+  'makeup-artists': '/editorial/craft-makeup-work.webp',
+  beauticians: '/editorial/craft-facial.webp',
+  'tattoo-artists': '/editorial/craft-tattoo-work.webp',
 };
 
 /** Category image keyed by the shared `service_category` enum value. */

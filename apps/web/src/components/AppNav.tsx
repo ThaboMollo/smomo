@@ -90,7 +90,7 @@ export function AppNav() {
       <header className="sticky top-0 z-30 border-b border-border/60 bg-bg/85 backdrop-blur-md">
         <Container className="flex h-16 items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-5">
-            <Link href="/app" aria-label="Smomo home" className="shrink-0">
+            <Link href="/app" aria-label="SMOMO home" className="shrink-0">
               <BrandLogo className="h-8 w-auto" priority />
             </Link>
             <nav aria-label="App" className="hidden items-center gap-1 md:flex">

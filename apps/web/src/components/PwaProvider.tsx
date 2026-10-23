@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 type BeforeInstallPromptEvent = Event & {
@@ -19,6 +20,7 @@ export function PwaProvider() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIosHint, setShowIosHint] = useState(false);
   const [dismissed, setDismissed] = useState(true); // hidden until we know it's useful
+  const pathname = usePathname();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -80,14 +82,17 @@ export function PwaProvider() {
     dismiss();
   };
 
-  if (dismissed || (!deferredPrompt && !showIosHint)) return null;
+  // The banner is fixed to the bottom of the screen, where forms and wizards keep their own
+  // action bars, so it would cover buttons like "Next". Keep it to browsing pages.
+  const inTask = pathname === '/login' || pathname === '/register' || (pathname.startsWith('/app/') && pathname !== '/app');
+  if (dismissed || inTask || (!deferredPrompt && !showIosHint)) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
       <div className="mx-auto flex max-w-md items-center gap-3 rounded-[22px] border border-border bg-card p-3 shadow-lg">
         <img src="/icons/icon-192.png" alt="" className="h-10 w-10 rounded" />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm text-text">Install Smomo</p>
+          <p className="truncate text-sm text-text">Install SMOMO</p>
           <p className="truncate text-xs text-text-muted">
             {deferredPrompt
               ? 'Add it to your home screen for a faster, app-like experience.'

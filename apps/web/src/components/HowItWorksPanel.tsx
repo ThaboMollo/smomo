@@ -9,19 +9,21 @@ const STEPS = {
     title: 'Three steps from wish to booked.',
     steps: [
       ['Post or browse', 'Describe what you need with a photo and budget, or browse pros near you.'],
-      ['Get offers', 'Verified pros nearby send a price. Compare ratings and portfolios, accept one.'],
-      ['Book and pay', 'Chat to arrange the details and pay the pro directly by PayShap.'],
+      ['Get offers', 'Pros nearby send a price. Compare their portfolios and offers, then accept one.'],
+      ['Book and pay', 'Chat to arrange the details and pay the pro directly (PayShap in South Africa).'],
     ],
     cta: { href: '/app/request/new', label: 'Post a request' },
+    image: { src: '/editorial/craft-makeup-work.webp', alt: 'A make-up artist applying eye make-up' },
   },
   pros: {
     title: 'Your studio, your clients, your price.',
     steps: [
       ['Set up your studio', 'Create your profile, list services and upload your portfolio.'],
-      ['Go online, get requests', 'Get verified, go online and receive nearby client requests in real time.'],
-      ['Deliver and get paid', 'Send offers, complete the job, capture proof and get paid by PayShap.'],
+      ['Go online, get requests', 'Add your ID details, go online and receive nearby client requests in real time.'],
+      ['Deliver and get paid', 'Send offers, complete the job, capture proof and get paid directly by your client.'],
     ],
-    cta: { href: '/app/studio', label: 'Become a provider' },
+    cta: { href: '/register?as=pro', label: 'Join as a pro' },
+    image: { src: '/editorial/craft-hair-salon.webp', alt: 'A stylist braiding a client’s hair in a bright salon' },
   },
 } as const;
 
@@ -92,7 +94,7 @@ export function HowItWorksPanel({ initial = 'clients' }: { initial?: Audience })
       </div>
 
       <div className="relative min-h-[420px] overflow-hidden rounded-[32px] lg:col-span-4">
-        <Image src="/samples/beautician7.jpg" alt="A make-up artist at work" fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover" />
+        <Image src={data.image.src} alt={data.image.alt} fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover" />
         <div className="absolute inset-x-4 bottom-4 rounded-[22px] bg-card p-5 text-text">
           <div className="text-sm text-text-muted">Example offer · Make-up · Sat 10:00</div>
           <div className="mt-1 font-[family-name:var(--font-heading)] text-3xl">Bridal trial, R850</div>

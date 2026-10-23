@@ -13,7 +13,7 @@ export default function OfflinePage() {
       <Kicker>No connection</Kicker>
       <h1 className="mt-3 text-4xl">You&rsquo;re offline</h1>
       <p className="mt-4 max-w-md text-text-muted">
-        Smomo can&rsquo;t reach the network right now. Check your connection and try again —
+        SMOMO can&rsquo;t reach the network right now. Check your connection and try again —
         pages you&rsquo;ve already visited will still open.
       </p>
       <div className="mt-8">

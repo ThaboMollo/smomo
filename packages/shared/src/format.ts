@@ -1,5 +1,7 @@
 import { formatDistanceToNow } from 'date-fns';
 
+import { COUNTRIES, type CountryCode } from './countries';
+
 export function formatZar(amount: number | null | undefined): string {
   if (amount == null) return '—';
   return `R${Number(amount).toLocaleString('en-ZA', {
@@ -63,12 +65,25 @@ export function timeLeft(iso: string): string {
   return `${Math.round(hrs / 24)} d left`;
 }
 
-/** Normalise a SA phone number to E.164 (+27...). */
-export function toE164(raw: string): string | null {
-  const digits = raw.replace(/[^\d+]/g, '');
-  if (digits.startsWith('+')) return digits;
-  if (digits.startsWith('27')) return `+${digits}`;
-  if (digits.startsWith('0')) return `+27${digits.slice(1)}`;
-  if (digits.length === 9) return `+27${digits}`;
-  return null;
+/**
+ * Normalise a phone number to E.164 (+<dial><number>). Numbers typed with a leading '+' or
+ * '00' are taken as international; anything else is read as a local number in `country`
+ * (default South Africa, which keeps the old behaviour). Returns null when the length
+ * isn't plausible for that country, instead of saving something unusable.
+ */
+export function toE164(raw: string, country: CountryCode = 'ZA'): string | null {
+  const cleaned = (raw ?? '').trim().replace(/[^\d+]/g, '');
+  if (!cleaned) return null;
+
+  if (cleaned.startsWith('+') || cleaned.startsWith('00')) {
+    const digits = cleaned.replace(/^\+|^00/, '');
+    return /^\d{8,15}$/.test(digits) ? `+${digits}` : null;
+  }
+
+  const c = COUNTRIES[country];
+  let d = cleaned;
+  // Typed with the country code but no '+', e.g. 27821234567.
+  if (d.startsWith(c.dial) && c.nsn.includes(d.length - c.dial.length)) return `+${d}`;
+  if (c.trunk && d.startsWith(c.trunk)) d = d.slice(1);
+  return c.nsn.includes(d.length) ? `+${c.dial}${d}` : null;
 }

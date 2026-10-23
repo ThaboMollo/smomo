@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
   typescript: { ignoreBuildErrors: false },
   poweredByHeader: false,
   images: {
+    formats: ['image/avif', 'image/webp'],
     // Remote images (portfolios, avatars) come from Supabase Storage and Unsplash.
     remotePatterns: [
       { protocol: 'https', hostname: 'ltnjiihfgvwtzrmtkclh.supabase.co' },

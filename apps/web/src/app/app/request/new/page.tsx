@@ -19,19 +19,20 @@ import { Field, Steps } from '@/components/ui';
 import { api } from '@/lib/api';
 import { categoryImage } from '@/lib/catalog';
 import { createClient } from '@/lib/supabase/client';
-import { useCoords } from '@/lib/use-coords';
+import { AddressField } from '@/components/location/AddressField';
+import { useLocation } from '@/lib/use-location';
 
 const STEP_LABEL = ['Service', 'Details', 'Review'] as const;
 
 export default function NewRequest() {
   const router = useRouter();
-  const { coords, source } = useCoords();
+  const { place, setPlace } = useLocation();
+  const [locErr, setLocErr] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const [target, setTarget] = useState<string | null>(null);
   const [category, setCategory] = useState<ServiceCategory | null>(null);
   const [mode, setMode] = useState<BookingMode>('mobile');
   const [description, setDescription] = useState('');
-  const [address, setAddress] = useState('');
   const [budgetMin, setBudgetMin] = useState('');
   const [budgetMax, setBudgetMax] = useState('');
   const [consent, setConsent] = useState(false);
@@ -58,6 +59,7 @@ export default function NewRequest() {
   const publish = useMutation({
     mutationFn: async () => {
       if (!category) throw new Error('Pick a service');
+      if (!place) throw new Error('Choose where this is happening');
       let imageUrl: string | null = null;
       if (file) {
         const supabase = createClient();
@@ -72,10 +74,10 @@ export default function NewRequest() {
       const res = await api.requests.create({
         category,
         bookingMode: mode,
-        lat: coords.latitude,
-        lng: coords.longitude,
+        lat: place.lat,
+        lng: place.lng,
         description: description.trim() || undefined,
-        address: address.trim() || undefined,
+        address: place.label,
         budgetMin: budgetMin ? Number(budgetMin) : null,
         budgetMax: budgetMax ? Number(budgetMax) : null,
         imageUrl,
@@ -92,6 +94,10 @@ export default function NewRequest() {
   const next = () => {
     setError(undefined);
     if (step === 1 && !category) return setError('Pick a service to continue');
+    if (step === 2 && !place) {
+      setLocErr('Choose where you need the pro, so nearby pros can see your request.');
+      return setError('Choose your location to continue');
+    }
     if (step === 2 && budgetErr) return setError(budgetErr);
     setStep((s) => Math.min(3, s + 1));
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -175,16 +181,21 @@ export default function NewRequest() {
             <h1 className="text-5xl">Tell pros the details</h1>
             <p className="mt-2 text-text-muted">All optional, but clearer requests get better offers.</p>
           </div>
-          <Field
+          <AddressField
             label={mode === 'mobile' ? 'Your address or area' : 'Your area'}
-            hint={
-              source === 'device'
-                ? 'We also use your device location to find pros nearby.'
-                : 'Location is off, so pros near Cape Town will see this. Turn on location for better matches.'
-            }
-          >
-            <input className="input" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="e.g. Rosebank, Johannesburg" autoComplete="street-address" />
-          </Field>
+            hint="Search for your address, suburb or town. Pros nearby are matched using it."
+            value={place}
+            onChange={(p) => {
+              setLocErr(null);
+              setPlace(p);
+            }}
+            error={locErr}
+          />
+          {place?.country && place.country !== 'ZA' ? (
+            <p className="rounded-2xl bg-primary-100 px-4 py-3 text-sm text-primary-700">
+              Prices on SMOMO are shown in South African rand (R) for now. Agree how you’ll pay with your pro in chat.
+            </p>
+          ) : null}
           <Field label="What would you like?">
             <textarea
               className="input"
@@ -194,7 +205,7 @@ export default function NewRequest() {
             />
           </Field>
           <div className="field">
-            <span className="font-medium text-text">Budget (R)</span>
+            <span className="font-medium text-text">Budget (rand, R)</span>
             <div className="grid grid-cols-2 gap-3">
               <input aria-label="Minimum budget in rand" placeholder="Min" inputMode="numeric" className="input tnum" value={budgetMin} onChange={(e) => setBudgetMin(numOnly(e.target.value))} aria-invalid={!!budgetErr || undefined} />
               <input aria-label="Maximum budget in rand" placeholder="Max" inputMode="numeric" className="input tnum" value={budgetMax} onChange={(e) => setBudgetMax(numOnly(e.target.value))} aria-invalid={!!budgetErr || undefined} />
@@ -236,7 +247,7 @@ export default function NewRequest() {
               [
                 ['Service', categoryLabel(category), 1],
                 ['Where', BOOKING_MODE_LABEL[mode], 1],
-                ['Area', address.trim() || 'Not given', 2],
+                ['Area', place?.label ?? 'Not given', 2],
                 ['Details', description.trim() || 'Not given', 2],
                 ['Budget', formatBudget(budgetMin ? Number(budgetMin) : null, budgetMax ? Number(budgetMax) : null) ?? 'Open to offers', 2],
                 ['Photo', file ? file.name : 'None', 2],

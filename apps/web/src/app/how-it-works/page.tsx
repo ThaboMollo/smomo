@@ -8,13 +8,13 @@ import { Container } from '@/components/ui';
 export const metadata: Metadata = {
   title: 'How it works',
   description:
-    'How Smomo connects clients with beauty, hair, nails, make-up and tattoo professionals in South Africa: post a request, get offers, book and pay via PayShap.',
+    'How SMOMO connects clients with beauty, hair, nails, make-up and tattoo professionals across Southern Africa: post a request, get offers, book and pay your pro directly.',
 };
 
 const FAQ = [
-  ['Is it free to post a request?', 'Yes. You only pay the pro you choose, directly, by PayShap.'],
-  ['How are pros verified?', 'Pros confirm their SA ID (checked with the Luhn rule) or passport before they can accept bookings.'],
-  ['What if something goes wrong with a payment?', 'Payments are recorded in the app. If a pro disputes one, it goes to the Smomo admin team.'],
+  ['Is it free to post a request?', 'Yes. You only pay the pro you choose, directly. In South Africa that’s by PayShap; elsewhere you agree the payment method in chat.'],
+  ['What checks are there on pros?', 'Pros add an ID number (SA ID, passport or national ID) before they can accept bookings. We check that the number is valid in format; it is not a background check.'],
+  ['What if something goes wrong with a payment?', 'Payments are recorded in the app. If a pro disputes one, it goes to the SMOMO admin team.'],
   ['Can the pro come to me?', 'Many do. Choose "They come to me" or "At their studio" when you post a request or browse.'],
 ];
 
@@ -23,9 +23,9 @@ export default function HowItWorks() {
     <Container className="flex flex-col gap-5 pt-3">
       <PageHero
         crumbs={[{ href: '/', label: 'Home' }, { label: 'How it works' }]}
-        title="How Smomo works"
+        title="How SMOMO works"
         subtitle="One place to find, compare and book beauty and body-art pros, whether you want to browse or let offers come to you."
-        image="/samples/nail_tech6.jpg"
+        image="/editorial/consult-phone.webp"
       />
       <HowItWorksPanel initial="clients" />
       <div id="pros" className="scroll-mt-24">

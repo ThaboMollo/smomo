@@ -6,6 +6,7 @@ import { PageHero } from '@/components/PageHero';
 import { ProviderListCard } from '@/components/ProviderListCard';
 import { Container, EmptyState, Kicker } from '@/components/ui';
 import {
+  CATEGORY_HERO,
   CATEGORY_IMAGE,
   CATEGORY_LABEL,
   CATEGORY_NOTE,
@@ -31,8 +32,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!isCategorySlug(category)) return {};
   const label = CATEGORY_LABEL[category];
   return {
-    title: `${label} near you in South Africa`,
-    description: `Book trusted ${label.toLowerCase()} across South Africa on Smomo. Browse by city, compare ratings and portfolios, and book to you or at their studio.`,
+    title: `${label} near you in Southern Africa`,
+    description: `Book trusted ${label.toLowerCase()} across South Africa, Lesotho, Eswatini, Botswana, Zimbabwe and Namibia on SMOMO. Browse by city, compare portfolios and prices, and book to you or at their studio.`,
     alternates: { canonical: `/${category}` },
   };
 }
@@ -49,9 +50,9 @@ export default async function CategoryHub({ params }: Params) {
     <Container className="flex flex-col gap-5 pt-3">
       <PageHero
         crumbs={[{ href: '/', label: 'Home' }, { label }]}
-        title={`${label} in South Africa`}
+        title={`${label} in Southern Africa`}
         subtitle={CATEGORY_NOTE[cat]}
-        image={CATEGORY_IMAGE[cat]}
+        image={CATEGORY_HERO[cat]}
       >
         <div className="flex flex-wrap gap-2 pt-2">
           <Link href={`/app/request/new?category=${SLUG_TO_CATEGORY[cat]}`} className="btn btn-light">

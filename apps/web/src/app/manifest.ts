@@ -4,17 +4,17 @@ import { SITE_NAME } from '@/lib/env';
 // Static manifest (no request-time APIs) so Next can cache it at build time.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${SITE_NAME} — Beauty, hair, nails, make-up & tattoo pros`,
+    name: `${SITE_NAME}: Your look. Your people.`,
     short_name: SITE_NAME,
     description:
-      'Find and book trusted hairdressers, nail technicians, make-up artists, beauticians and tattoo artists near you in South Africa. Post a request and get offers.',
+      'Find independent hair, nail, make-up, beauty and tattoo professionals near you across South Africa, Lesotho, Eswatini, Botswana, Zimbabwe and Namibia. See their work, post your look and compare offers.',
     id: '/',
     start_url: '/?source=pwa',
     scope: '/',
     display: 'standalone',
     orientation: 'portrait',
-    background_color: '#faf9fc',
-    theme_color: '#6d28d9',
+    background_color: '#251719',
+    theme_color: '#251719',
     lang: 'en-ZA',
     categories: ['lifestyle', 'shopping', 'beauty'],
     icons: [

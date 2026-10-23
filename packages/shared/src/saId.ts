@@ -57,7 +57,16 @@ export function validateSaId(input: string): SaIdResult {
   };
 }
 
-/** Passports: basic format check only (6–12 alphanumerics). */
+/** Strip the spaces, dashes and slashes people type in passport and national ID numbers. */
+export function normalizeIdNumber(input: string): string {
+  return (input ?? '').replace(/[\s\-\/.]/g, '').toUpperCase();
+}
+
+/**
+ * Passports and national ID numbers from other countries: basic format check only
+ * (6–15 letters or digits once spaces and dashes are removed). This does not verify
+ * that the document is real.
+ */
 export function validatePassport(input: string): boolean {
-  return /^[A-Za-z0-9]{6,12}$/.test((input ?? '').trim());
+  return /^[A-Za-z0-9]{6,15}$/.test(normalizeIdNumber(input));
 }

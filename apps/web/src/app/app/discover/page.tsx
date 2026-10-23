@@ -11,7 +11,8 @@ import { DiscoverProviderCard } from '@/components/DiscoverProviderCard';
 import { EmptyState, Skeleton } from '@/components/ui';
 import { api } from '@/lib/api';
 import { categoryImage } from '@/lib/catalog';
-import { useCoords } from '@/lib/use-coords';
+import { AddressField } from '@/components/location/AddressField';
+import { useLocation } from '@/lib/use-location';
 
 const MODES: { value: 'all' | BookingMode; label: string }[] = [
   { value: 'all', label: 'Any' },
@@ -20,17 +21,18 @@ const MODES: { value: 'all' | BookingMode; label: string }[] = [
 ];
 
 export default function Discover() {
-  const { coords, ready, source } = useCoords();
+  const { place, setPlace, ready } = useLocation();
+  const [changing, setChanging] = useState(false);
   const [category, setCategory] = useState<ServiceCategory | null>(null);
   const [mode, setMode] = useState<'all' | BookingMode>('all');
 
   const providers = useQuery({
-    queryKey: ['discover', coords, category, mode],
-    enabled: ready,
+    queryKey: ['discover', place?.lat, place?.lng, category, mode],
+    enabled: ready && !!place,
     queryFn: () =>
       api.providers.search({
-        lat: coords.latitude,
-        lng: coords.longitude,
+        lat: place!.lat,
+        lng: place!.lng,
         category: category ?? undefined,
         mode: mode === 'all' ? undefined : mode,
         maxKm: 50,
@@ -44,11 +46,33 @@ export default function Discover() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-5">
       <div>
-        <p className="text-sm text-text-muted">
-          {!ready ? 'Finding your location…' : source === 'device' ? 'Within 50 km of you' : 'Location is off, showing pros near Cape Town'}
-        </p>
         <h1 className="text-5xl">Discover</h1>
+        {place && !changing ? (
+          <p className="mt-2 flex flex-wrap items-center gap-x-2 text-text-muted">
+            <span>
+              Within 50 km of <span className="font-medium text-text">{place.label}</span>
+            </span>
+            <button type="button" onClick={() => setChanging(true)} className="font-medium text-primary-700 underline underline-offset-4">
+              Change
+            </button>
+          </p>
+        ) : null}
       </div>
+
+      {ready && (!place || changing) ? (
+        <div className="rounded-[24px] border border-border bg-card p-4 sm:p-5">
+          <AddressField
+            label={place ? 'Search somewhere else' : 'Where do you want to find pros?'}
+            hint="Search for your address, suburb or town, or use your current location."
+            value={null}
+            showMap={false}
+            onChange={(p) => {
+              setPlace(p);
+              if (p) setChanging(false);
+            }}
+          />
+        </div>
+      ) : null}
 
       {/* Broadcast CTA */}
       <Link
@@ -100,14 +124,14 @@ export default function Discover() {
 
       {/* Results */}
       <section aria-live="polite" className="flex flex-col gap-3">
-        {!ready || providers.isLoading ? (
+        {!ready || (place && providers.isLoading) ? (
           <>
             <p className="text-sm text-text-muted">Finding pros near you…</p>
             <Skeleton className="h-[116px]" />
             <Skeleton className="h-[116px]" />
             <Skeleton className="h-[116px]" />
           </>
-        ) : providers.isError ? (
+        ) : !place ? null : providers.isError ? (
           <EmptyState
             title="We couldn't load pros right now"
             body="Check your connection and try again."
@@ -132,7 +156,11 @@ export default function Discover() {
         ) : (
           <EmptyState
             title="No pros nearby for this filter"
-            body="Try another service, or post a request and pros will come to you."
+            body={
+              place?.country && place.country !== 'ZA'
+                ? 'We’re just opening in your country. Post a request and pros will see it as they join.'
+                : 'Try another service, or post a request and pros will come to you.'
+            }
             action={
               <Link href={requestHref} className="btn btn-primary">
                 Post a request

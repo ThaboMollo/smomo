@@ -6,12 +6,15 @@ import { useState } from 'react';
 
 import {
   CATEGORIES,
+  detectCountry,
   SOCIAL_PLATFORMS,
   type ServiceCategory,
   type ServiceMode,
 } from '@smomo/shared';
 
 import { CategoryIcon } from '@/components/CategoryIcon';
+import { AddressField } from '@/components/location/AddressField';
+import type { Place } from '@/lib/places';
 import { api } from '@/lib/api';
 import { useMe } from '@/lib/use-me';
 
@@ -44,6 +47,12 @@ function Form({ onSaved }: { onSaved: () => void }) {
     x_handle: p?.x_handle ?? '',
     tiktok: p?.tiktok ?? '',
   });
+  // Where the pro is based. Starts as the saved position; only re-sent if they change it.
+  const saved0: Place | null =
+    p?.base_lat != null && p?.base_lng != null
+      ? { label: p.base_address ?? 'Saved location', lat: p.base_lat, lng: p.base_lng, country: detectCountry(p.base_address) }
+      : null;
+  const [loc, setLoc] = useState<Place | null>(saved0);
   const [error, setError] = useState<string>();
   const [saved, setSaved] = useState(false);
 
@@ -65,6 +74,9 @@ function Form({ onSaved }: { onSaved: () => void }) {
         tiktok: socials.tiktok || null,
         xHandle: socials.x_handle || null,
       });
+      if (loc && (loc.lat !== saved0?.lat || loc.lng !== saved0?.lng)) {
+        await api.practitioner.setLocation({ lat: loc.lat, lng: loc.lng, address: loc.label });
+      }
     },
     onSuccess: () => {
       setSaved(true);
@@ -108,6 +120,15 @@ function Form({ onSaved }: { onSaved: () => void }) {
         {serviceMode !== 'studio' ? (
           <input placeholder="Travel radius (km)" inputMode="numeric" className={inputCls} value={radiusKm} onChange={(e) => setRadiusKm(e.target.value)} />
         ) : null}
+        <AddressField
+          label="Where you’re based"
+          hint="Search for your studio or home address, suburb or town. Clients near here will find you."
+          value={loc}
+          onChange={(v) => {
+            setSaved(false);
+            setLoc(v);
+          }}
+        />
         <label className="flex items-center gap-2 text-sm text-text-muted">
           <input type="checkbox" checked={requiresDeposit} onChange={(e) => setRequiresDeposit(e.target.checked)} />
           Require a deposit to confirm bookings

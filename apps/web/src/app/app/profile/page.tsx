@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { toE164 } from '@smomo/shared';
 
 import { Icon } from '@/components/Icon';
+import { AddressField } from '@/components/location/AddressField';
 import { Avatar, Card, Stars } from '@/components/ui';
 import { api } from '@/lib/api';
 import { createClient } from '@/lib/supabase/client';
@@ -117,7 +118,7 @@ export default function Profile() {
           <div>
             <p className="font-medium text-primary-700">{isPractitioner ? 'Your studio' : 'Become a provider'}</p>
             <p className="text-sm text-text-muted">
-              {isPractitioner ? 'Manage services, portfolio & availability.' : 'Offer your services and earn on Smomo.'}
+              {isPractitioner ? 'Manage services, portfolio & availability.' : 'Offer your services on SMOMO.'}
             </p>
           </div>
           <Icon icon={faBriefcase} size={22} />
@@ -131,9 +132,19 @@ export default function Profile() {
           <input placeholder="First name" className={inputCls} value={firstName} onChange={(e) => setFirstName(e.target.value)} />
           <input placeholder="Last name" className={inputCls} value={lastName} onChange={(e) => setLastName(e.target.value)} />
         </div>
-        <input placeholder="Mobile number" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} />
-        <input placeholder="WhatsApp (optional)" className={inputCls} value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
-        <input placeholder="Home address (optional)" className={inputCls} value={homeAddress} onChange={(e) => setHomeAddress(e.target.value)} />
+        <input placeholder="Mobile number, e.g. +27 82 123 4567" aria-label="Mobile number" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <input placeholder="WhatsApp (optional), e.g. +266 5812 3456" aria-label="WhatsApp number" className={inputCls} value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
+        {profile ? (
+          <AddressField
+            key={profile.id}
+            label="Home address (optional)"
+            initialText={profile.home_address ?? ''}
+            value={null}
+            showMap={false}
+            onText={setHomeAddress}
+            onChange={(p) => p && setHomeAddress(p.label)}
+          />
+        ) : null}
         {error ? <p className="text-sm text-danger">{error}</p> : null}
         <button
           onClick={() => save.mutate()}

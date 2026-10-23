@@ -4,50 +4,61 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 /* ──────────────────────────────────────────────────────────────
-   Smomo, bento edition.
-   Layout language from the bento references (big rounded panels,
-   deep feature panels, pill actions, giant wordmark footer), colour
-   only from the Smomo brand board: Deep Violet #6D28D9, Soft Lilac
-   #EDE9FE, Rose Gold #D4AF7C. No orange anywhere.
-   Token NAMES are unchanged so every page keeps compiling.
+   SMOMO 2.0 design tokens.
+   Token NAMES are unchanged from the previous edition so every page keeps
+   compiling; only the values moved to the SMOMO brand:
+   Midnight Ink #251719, Warm Canvas #F4EFE7, Signature Pink #E64D74,
+   Soft Lilac #C7B1F3, Electric Lime #CCF36D. Space Grotesk over DM Sans.
    ────────────────────────────────────────────────────────────── */
 @theme {
   /* Ground & ink */
-  --color-bg: #f4f1fa;
+  --color-bg: #f4efe7;
   --color-card: #ffffff;
-  --color-card-muted: #f8f6fc;
-  --color-text: #1a1523;
-  --color-text-muted: #5c5568;
-  --color-text-faint: #857d92;
-  --color-border: #e5e1ee;
+  --color-card-muted: #faf6f0;
+  --color-text: #251719;
+  --color-text-muted: #5f5053;
+  --color-text-faint: #6f6062;
+  --color-border: #d9d0c9;
 
-  /* Deep violet: the brand primary. Fills are allowed for primary actions. */
-  --color-primary: #6d28d9;
-  --color-primary-dark: #5b21b6;
-  --color-primary-soft: #ede9fe;
-  --color-primary-100: #f6f3fe;
-  --color-primary-200: #ede9fe;
-  --color-primary-300: #d9cdfb;
-  --color-primary-400: #b79cf3;
-  --color-primary-500: #8b5cf6;
-  --color-primary-600: #6d28d9;
-  --color-primary-700: #5b21b6;
-  --color-primary-800: #46199a;
-  --color-primary-900: #2e1065;
-  --color-primary-950: #1e0b45;
+  /* "primary" is the pink scale. 600 is the accessible deep pink (white text passes);
+     950 is Midnight Ink, used for dark feature panels. */
+  --color-primary: #aa204a;
+  --color-primary-dark: #8c1a3d;
+  --color-primary-soft: #fcebf0;
+  --color-primary-100: #fcebf0;
+  --color-primary-200: #f9d6df;
+  --color-primary-300: #f2b3c3;
+  --color-primary-400: #ea8199;
+  --color-primary-500: #e64d74;
+  --color-primary-600: #aa204a;
+  --color-primary-700: #8c1a3d;
+  --color-primary-800: #5c2a35;
+  --color-primary-900: #3a2326;
+  --color-primary-950: #251719;
 
-  /* Rose gold: stars, sparkles and small marks */
-  --color-accent: #d4af7c;
-  --color-accent-deep: #a2783f;
-  --color-star: #a2783f;
+  /* Accent: Electric Lime on dark panels; stars and small marks use deep pink */
+  --color-accent: #ccf36d;
+  --color-accent-deep: #aa204a;
+  --color-star: #aa204a;
 
   --color-success: #15803d;
-  --color-danger: #dc2626;
+  --color-danger: #c0261d;
 
-  /* Type: Cormorant Garamond display over DM Sans UI text */
-  --font-heading: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  /* Brand palette, direct */
+  --color-ink: #251719;
+  --color-canvas: #f4efe7;
+  --color-pink: #e64d74;
+  --color-pink-deep: #aa204a;
+  --color-lilac: #c7b1f3;
+  --color-lime: #ccf36d;
+  --color-line: #d9d0c9;
+
+  /* Type: Space Grotesk display over DM Sans. (--font-mono is kept as a name for the
+     small-caps labels, now set in DM Sans.) */
+  --font-heading: var(--font-grotesk), Arial, sans-serif;
+  --font-display: var(--font-grotesk), Arial, sans-serif;
   --font-body: var(--font-dmsans), system-ui, sans-serif;
-  --font-mono: var(--font-dmmono), ui-monospace, Menlo, monospace;
+  --font-mono: var(--font-dmsans), system-ui, sans-serif;
   --font-sans: var(--font-dmsans), system-ui, sans-serif;
 
   --radius-brand: 28px;
@@ -68,9 +79,9 @@ body {
 
 h1, h2, h3 {
   font-family: var(--font-heading);
-  font-weight: 500;
-  letter-spacing: -0.015em;
-  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
 }
 h4 { font-weight: 600; }
 
@@ -81,9 +92,10 @@ h4 { font-weight: 600; }
 
 /* Small mono caps above a heading, with a dot like the references */
 .kicker {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.2em;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-primary-700);
 }
@@ -97,8 +109,8 @@ h4 { font-weight: 600; }
 /* Big display wordmark in the footer */
 .wordmark {
   font-family: var(--font-heading);
-  font-weight: 600;
-  letter-spacing: -0.045em;
+  font-weight: 700;
+  letter-spacing: -0.06em;
   line-height: 0.8;
 }
 
@@ -106,19 +118,21 @@ h4 { font-weight: 600; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
   min-height: 44px; padding: 0.7rem 1.4rem; border-radius: 999px;
-  font-size: 0.95rem; font-weight: 500; line-height: 1.2;
+  font-size: 0.95rem; font-weight: 700; line-height: 1.2;
+  border: 2px solid transparent;
   transition: background-color .15s, border-color .15s, color .15s, transform .1s;
   cursor: pointer; text-align: center;
 }
 .btn:active { transform: translateY(1px); }
 .btn:disabled, .btn[aria-disabled='true'] { opacity: .5; cursor: not-allowed; transform: none; }
-.btn-primary { background: var(--color-primary); color: #fff; }
-.btn-primary:hover { background: var(--color-primary-dark); }
-.btn-outline { border: 1px solid var(--color-border); background: var(--color-card); color: var(--color-text); }
-.btn-outline:hover { border-color: var(--color-primary-400); background: var(--color-primary-100); }
-.btn-light { background: #fff; color: var(--color-primary-950); }
-.btn-light:hover { background: var(--color-primary-200); }
-.btn-danger { border: 1px solid var(--color-border); background: var(--color-card); color: var(--color-danger); }
+/* Ink on Signature Pink (4.7:1); white on it would not pass at this size. */
+.btn-primary { background: var(--color-pink); color: var(--color-ink); }
+.btn-primary:hover { background: var(--color-ink); color: var(--color-canvas); }
+.btn-outline { border-color: var(--color-text); background: transparent; color: var(--color-text); }
+.btn-outline:hover { background: var(--color-text); color: var(--color-bg); }
+.btn-light { background: var(--color-canvas); color: var(--color-ink); }
+.btn-light:hover { background: var(--color-pink); color: var(--color-ink); }
+.btn-danger { border-color: var(--color-border); background: var(--color-card); color: var(--color-danger); }
 .btn-danger:hover { border-color: var(--color-danger); }
 .btn-block { width: 100%; }
 
@@ -129,7 +143,7 @@ h4 { font-weight: 600; }
   font-size: 1rem; transition: border-color .15s, box-shadow .15s;
 }
 .input::placeholder { color: var(--color-text-faint); }
-.input:hover { border-color: var(--color-primary-300); }
+.input:hover { border-color: var(--color-text-faint); }
 .input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-200); }
 .input[aria-invalid='true'] { border-color: var(--color-danger); }
 textarea.input { min-height: 110px; resize: vertical; }
@@ -140,14 +154,14 @@ textarea.input { min-height: 110px; resize: vertical; }
   border: 1px solid var(--color-border); background: var(--color-card); color: var(--color-text);
   font-size: .875rem; transition: background-color .15s, border-color .15s, color .15s; cursor: pointer;
 }
-.chip:hover { border-color: var(--color-primary-400); }
+.chip:hover { border-color: var(--color-text); }
 .chip[aria-pressed='true'], .chip[aria-checked='true'], .chip-on {
-  border-color: var(--color-primary); background: var(--color-primary); color: #fff;
+  border-color: var(--color-text); background: var(--color-text); color: var(--color-bg);
 }
 
 .segmented { display: flex; gap: 4px; padding: 4px; border-radius: 999px; border: 1px solid var(--color-border); background: var(--color-card); }
 .segmented > button { flex: 1; min-height: 40px; border-radius: 999px; padding: .5rem .75rem; font-size: .875rem; color: var(--color-text-muted); transition: background-color .15s, color .15s; }
-.segmented > button[aria-checked='true'] { background: var(--color-primary-200); color: var(--color-primary-700); font-weight: 500; }
+.segmented > button[aria-checked='true'] { background: var(--color-text); color: var(--color-bg); font-weight: 600; }
 
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -169,41 +183,43 @@ textarea.input { min-height: 110px; resize: vertical; }
   outline-offset: 2px;
 }
 
-::selection { background: var(--color-primary-200); color: var(--color-primary-900); }
+::selection { background: var(--color-lilac); color: var(--color-ink); }
 
 /* ── Dark theme ────────────────────────────────────────────── */
 html[data-theme='dark'] {
-  --color-bg: #110d18;
-  --color-card: #1b1626;
-  --color-card-muted: #231d31;
-  --color-text: #f3eefb;
-  --color-text-muted: #b4abc6;
-  --color-text-faint: #8e859c;
-  --color-border: #332c46;
+  --color-bg: #170f11;
+  --color-card: #231719;
+  --color-card-muted: #2b1d20;
+  --color-text: #f4efe7;
+  --color-text-muted: #c6b8bb;
+  --color-text-faint: #a0919a;
+  --color-border: #3d2d31;
 
-  --color-primary: #7c3aed;        /* fills keep white text at > 4.5:1 */
-  --color-primary-dark: #6d28d9;
-  --color-primary-soft: #241a3a;
-  --color-primary-100: #201a33;
-  --color-primary-200: #2b2248;
-  --color-primary-300: #4a3b73;
-  --color-primary-400: #6d4bb0;
-  --color-primary-500: #8b5cf6;
-  --color-primary-600: #a78bfa;
-  --color-primary-700: #cbb8fb;    /* accent text, light on dark */
-  --color-primary-800: #ddd0fc;
-  --color-primary-900: #2e1065;
-  --color-primary-950: #1e0b45;
+  --color-primary: #c93a63;        /* fills keep white text at > 4.5:1 */
+  --color-primary-dark: #aa204a;
+  --color-primary-soft: #2e1d21;
+  --color-primary-100: #2e1d21;
+  --color-primary-200: #3d262c;
+  --color-primary-300: #5a3440;
+  --color-primary-400: #8a4660;
+  --color-primary-500: #e64d74;
+  --color-primary-600: #ee7e98;
+  --color-primary-700: #f5b3c3;    /* accent text, light on dark */
+  --color-primary-800: #f9d6df;
+  --color-primary-900: #3a2326;
+  --color-primary-950: #120a0c;
 
-  --color-accent: #d8b98a;
-  --color-accent-deep: #d8b98a;
-  --color-star: #d9ad6e;
+  --color-accent: #ccf36d;
+  --color-accent-deep: #ccf36d;
+  --color-star: #f5b3c3;
 
   --color-success: #4ade80;
-  --color-danger: #f87171;
+  --color-danger: #ff8a80;
 
   color-scheme: dark;
 }
+
+html[data-theme='dark'] .btn-primary:hover { background: var(--color-canvas); color: var(--color-ink); }
 
 html[data-theme='dark'] ::selection { background: var(--color-primary-300); color: var(--color-text); }
 
@@ -211,3 +227,7 @@ html[data-theme='dark'] ::selection { background: var(--color-primary-300); colo
 .brand-logo-dark { display: none; }
 html[data-theme='dark'] .brand-logo-light { display: none; }
 html[data-theme='dark'] .brand-logo-dark { display: block; }
+
+/* Map pin (Leaflet divIcon): no default white box. */
+.smomo-pin { background: transparent; border: 0; }
+.leaflet-container { font-family: var(--font-body); }
