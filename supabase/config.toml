@@ -1,0 +1,20 @@
+# Supabase CLI config for the Smomo project.
+#
+#   supabase link --project-ref ltnjiihfgvwtzrmtkclh
+#   supabase migration list          # compare local files to remote history
+#   supabase db push                 # apply pending migrations
+#
+# The 15 migrations that built the current schema live only in the remote
+# history (supabase_migrations.schema_migrations). Run `supabase db pull` once
+# after linking to materialise them locally as a baseline.
+
+project_id = "ltnjiihfgvwtzrmtkclh"
+
+[db]
+major_version = 17
+
+[db.migrations]
+schema_paths = []
+
+[functions.send-push]
+verify_jwt = true

@@ -5,9 +5,8 @@ import { Alert, Linking, ScrollView, View } from 'react-native';
 
 import { BOOKING_MODE_LABEL, categoryEmoji, categoryLabel } from '@/lib/categories';
 import { formatWhen, formatZar } from '@/lib/format';
-import { notifyUsers } from '@/lib/push';
+import { notifyBooking } from '@/lib/push';
 import { spacing, useTheme } from '@/lib/theme';
-import { useProviderDetail } from '@/data/discovery';
 import {
   useBooking,
   useCancelBooking,
@@ -45,8 +44,10 @@ export default function BookingDetail() {
   const { userId } = useAuth();
   const { data, isLoading } = useBooking(id);
 
-  const { data: provider } = useProviderDetail(data?.booking.practitioner_id);
-  const payshap = provider?.practitioner.payshap_proxy ?? null;
+  // Payout details come with the booking detail now: the database authorises
+  // them per booking (practitioner_payout RLS), rather than hanging off the
+  // public provider profile.
+  const payshap = data?.payshapProxy ?? null;
 
   const startBooking = useStartBooking();
   const cancelBooking = useCancelBooking();
@@ -64,6 +65,8 @@ export default function BookingDetail() {
   const { booking, payments, reviews } = data;
   const isClient = booking.client_id === userId;
   const other = isClient ? booking.practitioner : booking.client;
+  // Phone moved to profile_contact; the API returns it only to a party.
+  const counterpartyPhone = data.counterparty?.phone ?? null;
   const myC2pDone = reviews.some((r) => r.direction === 'c2p');
 
   const onCancel = () =>
@@ -108,12 +111,12 @@ export default function BookingDetail() {
                 color={colors.primary}
                 onPress={() => router.push(`/(app)/chat/${booking.id}`)}
               />
-              {other?.phone ? (
+              {counterpartyPhone ? (
                 <Ionicons
                   name="call"
                   size={22}
                   color={colors.primary}
-                  onPress={() => Linking.openURL(`tel:${other.phone}`)}
+                  onPress={() => Linking.openURL(`tel:${counterpartyPhone}`)}
                 />
               ) : null}
             </Row>
@@ -256,8 +259,8 @@ function PaymentCard({
             loading={markPaid.isPending}
             onPress={() => {
               markPaid.mutate({ paymentId: payment.id, reference: reference.trim(), bookingId });
-              notifyUsers(
-                [payment.payee_id],
+              notifyBooking(
+                bookingId,
                 'Client marked a payment as paid',
                 `Please verify the ${formatZar(payment.amount_zar)} PayShap payment.`,
                 { url: `/(app)/booking/${bookingId}` },
@@ -288,8 +291,8 @@ function PaymentCard({
               loading={verifyPayment.isPending}
               onPress={() => {
                 verifyPayment.mutate({ paymentId: payment.id, verified: true, bookingId });
-                notifyUsers(
-                  [payment.payer_id],
+                notifyBooking(
+                  bookingId,
                   'Payment verified ✅',
                   `Your ${formatZar(payment.amount_zar)} payment was confirmed.`,
                   { url: `/(app)/booking/${bookingId}` },

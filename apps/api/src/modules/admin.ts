@@ -1,7 +1,14 @@
 import { Body, Controller, ForbiddenException, Get, Module, Param, Post } from '@nestjs/common';
 
-import { Db, RequireRegistered } from '../auth/decorators';
+import {
+  zResolveDispute,
+  zResolveReport,
+  type ResolveDisputeInput,
+  type ResolveReportInput,
+} from '@smomo/shared';
+import { CurrentUser, Db, RequireRegistered, type RequestUser } from '../auth/decorators';
 import type { Db as SupaClient } from '../supabase/supabase.service';
+import { ZodValidationPipe } from '../common/zod-validation.pipe';
 
 async function ensureAdmin(db: SupaClient) {
   const { data, error } = await db.rpc('is_admin');
@@ -28,13 +35,15 @@ class AdminController {
   @Post('reports/:id/resolve')
   async resolveReport(
     @Db() db: SupaClient,
+    @CurrentUser() user: RequestUser,
     @Param('id') id: string,
-    @Body() body: { status: string; resolution?: string },
+    @Body(new ZodValidationPipe(zResolveReport)) body: ResolveReportInput,
   ) {
     await ensureAdmin(db);
+    // resolved_by was never recorded before, so who actioned a report was lost.
     const { error } = await db
       .from('reports')
-      .update({ status: body.status as any, resolution: body.resolution })
+      .update({ status: body.status, resolution: body.resolution, resolved_by: user.id })
       .eq('id', id);
     if (error) throw error;
     return { ok: true };
@@ -57,13 +66,18 @@ class AdminController {
   @Post('disputes/:paymentId/resolve')
   async resolveDispute(
     @Db() db: SupaClient,
+    @CurrentUser() user: RequestUser,
     @Param('paymentId') paymentId: string,
-    @Body() body: { resolveAs: 'verified' | 'rejected' },
+    @Body(new ZodValidationPipe(zResolveDispute)) body: ResolveDisputeInput,
   ) {
     await ensureAdmin(db);
     const { error } = await db
       .from('payments')
-      .update({ status: body.resolveAs, verified_at: new Date().toISOString() })
+      .update({
+        status: body.resolveAs,
+        verified_at: new Date().toISOString(),
+        verified_by: user.id,
+      })
       .eq('id', paymentId);
     if (error) throw error;
     return { ok: true };

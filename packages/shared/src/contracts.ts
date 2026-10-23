@@ -113,7 +113,8 @@ const zHandle = z
   .nullable()
   .optional();
 
-export const zSaveBusinessProfile = z.object({
+export const zSaveBusinessProfile = z
+  .object({
   businessName: z.string().min(2).max(120),
   bio: z.string().max(1000).optional(),
   categories: z.array(zServiceCategory).min(1),
@@ -126,7 +127,13 @@ export const zSaveBusinessProfile = z.object({
   facebook: zHandle,
   tiktok: zHandle,
   xHandle: zHandle,
-});
+  })
+  // requires_deposit is derivable from the percentage; the DB now enforces that
+  // they agree (practitioner_profiles_deposit_coherent, migration 06).
+  .refine((v) => !v.requiresDeposit || (v.depositPercentage ?? 0) >= 1, {
+    path: ['depositPercentage'],
+    message: 'Set a deposit percentage of at least 1, or turn deposits off',
+  });
 export type SaveBusinessProfileInput = z.infer<typeof zSaveBusinessProfile>;
 
 export const zSetLocation = z.object({
@@ -163,6 +170,20 @@ export const zCreateReport = z.object({
   details: z.string().max(1000).optional(),
 });
 export type CreateReportInput = z.infer<typeof zCreateReport>;
+
+/* ----------------------------- Admin ----------------------------- */
+export const zReportStatus = z.enum(['open', 'reviewing', 'resolved', 'dismissed']);
+
+export const zResolveReport = z.object({
+  status: zReportStatus,
+  resolution: z.string().max(1000).optional(),
+});
+export type ResolveReportInput = z.infer<typeof zResolveReport>;
+
+export const zResolveDispute = z.object({
+  resolveAs: z.enum(['verified', 'rejected']),
+});
+export type ResolveDisputeInput = z.infer<typeof zResolveDispute>;
 
 /* ----------------------------- Pagination ----------------------------- */
 export const zPagination = z.object({

@@ -9,8 +9,17 @@ import {
 
 /** Human-readable messages for unique-constraint (23505) violations, keyed by constraint name. */
 const UNIQUE_VIOLATION_MESSAGES: Record<string, string> = {
-  profiles_phone_key: 'That mobile number is already registered. Please log in or use a different number.',
-  profiles_email_key: 'That email is already registered. Please log in.',
+  // phone moved to profile_contact in migration 04; keep the old key so the
+  // message stays correct either side of migration 08.
+  profile_contact_phone_key:
+    'That mobile number is already registered. Please log in or use a different number.',
+  profiles_phone_key:
+    'That mobile number is already registered. Please log in or use a different number.',
+  device_push_tokens_expo_push_token_key: 'This device is already registered.',
+  reviews_booking_id_direction_key: 'You have already reviewed this booking.',
+  request_offers_request_id_practitioner_id_key:
+    'You have already made an offer on this request.',
+  practitioner_profiles_slug_key: 'That profile URL is taken. Try a different business name.',
 };
 
 function friendlyUniqueViolation(exception: any): string {

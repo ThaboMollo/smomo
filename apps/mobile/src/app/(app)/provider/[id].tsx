@@ -3,7 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { safeBack } from '@/lib/nav';
 import { Linking, Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 
-import { SOCIAL_PLATFORMS, socialUrl } from '@smomo/shared';
+import { SOCIAL_PLATFORMS, handleFromSocials, socialUrl } from '@smomo/shared';
 import { SERVICE_MODE_LABEL, categoryEmoji, categoryLabel } from '@/lib/categories';
 import { formatTimeAgo, formatZar } from '@/lib/format';
 import { radius, spacing, useTheme } from '@/lib/theme';
@@ -106,7 +106,7 @@ export default function ProviderProfile() {
         {(() => {
           const socials = SOCIAL_PLATFORMS.map((platform) => ({
             platform,
-            url: socialUrl(platform, practitioner[platform.key]),
+            url: socialUrl(platform, handleFromSocials(practitioner.socials, platform)),
           })).filter((s) => s.url);
           return socials.length ? (
             <Row style={{ gap: spacing.sm, flexWrap: 'wrap', marginTop: spacing.md }}>

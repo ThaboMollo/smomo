@@ -35,29 +35,32 @@ class PractitionerController {
     return (data ?? []) as unknown as FeedRequest[];
   }
 
+  /**
+   * One transaction via save_business_profile() (migration 05b). It writes
+   * practitioner_profiles, practitioner_categories and practitioner_socials
+   * together and flips profiles.is_practitioner — previously three separate
+   * PostgREST calls that could half-apply.
+   */
   @Put('profile')
   async saveProfile(
     @Db() db: SupaClient,
-    @CurrentUser() user: RequestUser,
     @Body(new ZodValidationPipe(zSaveBusinessProfile)) input: SaveBusinessProfileInput,
   ) {
-    const { error } = await db.from('practitioner_profiles').upsert({
-      id: user.id,
-      business_name: input.businessName,
-      bio: input.bio,
-      categories: input.categories,
-      years_experience: input.yearsExperience ?? null,
-      service_mode: input.serviceMode,
-      travel_radius_km: input.travelRadiusKm,
-      requires_deposit: input.requiresDeposit,
-      deposit_percentage: input.requiresDeposit ? (input.depositPercentage ?? 0) : null,
-      instagram: input.instagram ?? null,
-      facebook: input.facebook ?? null,
-      tiktok: input.tiktok ?? null,
-      x_handle: input.xHandle ?? null,
+    const { error } = await db.rpc('save_business_profile', {
+      p_business_name: input.businessName,
+      p_bio: input.bio,
+      p_categories: input.categories,
+      p_years_experience: input.yearsExperience ?? undefined,
+      p_service_mode: input.serviceMode,
+      p_travel_radius_km: input.travelRadiusKm,
+      p_requires_deposit: input.requiresDeposit,
+      p_deposit_percentage: input.depositPercentage ?? undefined,
+      p_instagram: input.instagram ?? undefined,
+      p_facebook: input.facebook ?? undefined,
+      p_tiktok: input.tiktok ?? undefined,
+      p_x_handle: input.xHandle ?? undefined,
     });
     if (error) throw error;
-    await db.from('profiles').update({ is_practitioner: true }).eq('id', user.id);
     return { ok: true };
   }
 
@@ -75,16 +78,15 @@ class PractitionerController {
     return { ok: true };
   }
 
+  /** Payout details live in practitioner_payout (migration 04), not on the public profile. */
   @Post('payshap')
   async setPayshap(
     @Db() db: SupaClient,
-    @CurrentUser() user: RequestUser,
     @Body(new ZodValidationPipe(zPayshap)) input: { payshapProxy: string },
   ) {
-    const { error } = await db
-      .from('practitioner_profiles')
-      .update({ payshap_proxy: input.payshapProxy })
-      .eq('id', user.id);
+    const { error } = await db.rpc('set_practitioner_payout', {
+      p_payshap_proxy: input.payshapProxy,
+    });
     if (error) throw error;
     return { ok: true };
   }
@@ -110,10 +112,13 @@ class PractitionerController {
     @Body(new ZodValidationPipe(zFinalize)) input: z.infer<typeof zFinalize>,
   ) {
     await db.from('profiles').update({ is_practitioner: true }).eq('id', user.id);
-    const { error: ppErr } = await db
-      .from('practitioner_profiles')
-      .upsert({ id: user.id, payshap_proxy: input.payshapProxy });
+    // The practitioner_profiles row must exist before payout can reference it.
+    const { error: ppErr } = await db.from('practitioner_profiles').upsert({ id: user.id });
     if (ppErr) throw ppErr;
+    const { error: payErr } = await db.rpc('set_practitioner_payout', {
+      p_payshap_proxy: input.payshapProxy,
+    });
+    if (payErr) throw payErr;
     const { error: locErr } = await db.rpc('set_practitioner_location', {
       p_lat: input.lat,
       p_lng: input.lng,

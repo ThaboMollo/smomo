@@ -32,7 +32,9 @@ class ProvidersController {
   async get(@Db() db: SupaClient, @Param('id') id: string): Promise<ProviderDetail | null> {
     const [prof, pp, svc, pf, rv] = await Promise.all([
       db.from('profiles').select('*').eq('id', id).maybeSingle(),
-      db.from('practitioner_profiles').select('*').eq('id', id).maybeSingle(),
+      // practitioner_directory, not practitioner_profiles: it carries the
+      // aggregated categories/socials and never exposes payout details.
+      db.from('practitioner_directory').select('*').eq('id', id).maybeSingle(),
       db.from('services').select('*').eq('practitioner_id', id).eq('is_active', true),
       db
         .from('portfolio_items')

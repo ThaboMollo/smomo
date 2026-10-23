@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native';
 
 import { categoryEmoji, categoryLabel, type ServiceCategory } from '@/lib/categories';
 import { formatBudget, formatZar } from '@/lib/format';
-import { notifyUsers } from '@/lib/push';
+import { notifyRequestClient } from '@/lib/push';
 import { spacing } from '@/lib/theme';
 import { useMakeOffer } from '@/data/requests';
 import { AppText, Button, Card, Header, Input, Screen } from '@/ui';
@@ -34,8 +34,8 @@ export default function MakeOffer() {
     setError(undefined);
     try {
       await makeOffer.mutateAsync({ requestId: params.id!, price: p, message: message.trim() || undefined });
-      notifyUsers(
-        [params.clientId],
+      notifyRequestClient(
+        params.id,
         'New offer received',
         `A provider offered ${formatZar(p)} for your request.`,
         { url: `/(app)/request/${params.id}` },

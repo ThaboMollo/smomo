@@ -33,12 +33,9 @@ export default function BookingDetail() {
 
   const { data, isLoading } = useQuery({ queryKey: ['booking', id], queryFn: () => api.bookings.get(id) });
   const booking = data?.booking;
-  const { data: provider } = useQuery({
-    queryKey: ['provider', booking?.practitioner_id],
-    queryFn: () => api.providers.get(booking!.practitioner_id),
-    enabled: !!booking?.practitioner_id,
-  });
-  const payshap = provider?.practitioner.payshap_proxy ?? null;
+  // Authorised per booking by practitioner_payout RLS, not read off the public
+  // provider profile — which also drops a whole provider fetch per page view.
+  const payshap = data?.payshapProxy ?? null;
 
   const refetch = () => qc.invalidateQueries({ queryKey: ['booking', id] });
 
@@ -46,6 +43,8 @@ export default function BookingDetail() {
   if (!booking) return <p className="text-text-muted">Booking not found.</p>;
   const isClient = booking.client_id === userId;
   const other = isClient ? booking.practitioner : booking.client;
+  // Phone moved to profile_contact; the API returns it only to a party.
+  const counterpartyPhone = data.counterparty?.phone ?? null;
   const active = booking.status === 'confirmed' || booking.status === 'in_progress';
   const clientReviewDone = (data?.reviews ?? []).some((r) => r.direction === 'c2p');
 
@@ -67,11 +66,8 @@ export default function BookingDetail() {
             <p className="font-medium">{other?.full_name ?? (isClient ? 'Provider' : 'Client')}</p>
             <p className="text-sm text-text-muted">{isClient ? 'Your provider' : 'Your client'}</p>
           </div>
-          {other?.phone ? (
-            <a
-              href={`tel:${other.phone}`}
-              className="btn btn-outline text-primary-700"
-            >
+          {counterpartyPhone ? (
+            <a href={`tel:${counterpartyPhone}`} className="btn btn-outline text-primary-700">
               Call
             </a>
           ) : null}

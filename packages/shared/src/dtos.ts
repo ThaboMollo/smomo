@@ -1,6 +1,11 @@
-import type { Enums, Tables } from './database';
+import type { Enums, Tables, Views } from './database';
 
 export type Profile = Tables<'profiles'>;
+export type ProfileContact = Tables<'profile_contact'>;
+export type PractitionerDirectoryRow = Views<'practitioner_directory'>;
+
+/** A provider's social handles, keyed by platform. Replaces the four columns. */
+export type SocialHandles = Partial<Record<Enums<'social_platform'>, string>>;
 export type Booking = Tables<'bookings'>;
 export type Payment = Tables<'payments'>;
 export type Review = Tables<'reviews'>;
@@ -12,10 +17,20 @@ export type PortfolioItem = Tables<'portfolio_items'>;
 export type PractitionerProfile = Tables<'practitioner_profiles'>;
 export type Subscription = Tables<'subscriptions'>;
 
-export type PartyProfile = Pick<
-  Profile,
-  'id' | 'full_name' | 'avatar_url' | 'phone' | 'client_rating'
->;
+/**
+ * The public half of a booking party. Phone deliberately absent: it moved to
+ * profile_contact (migration 04) and now arrives via `BookingDetail.counterparty`,
+ * which the database authorises per booking.
+ */
+export type PartyProfile = Pick<Profile, 'id' | 'full_name' | 'avatar_url' | 'client_rating'>;
+
+/** The other side of a booking, with the contact details only a party may see. */
+export type BookingCounterparty = {
+  user_id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  phone: string | null;
+};
 
 /** Row shape returned by the search_providers RPC / providers search endpoint. */
 export type ProviderCard = {
@@ -41,7 +56,12 @@ export type ProviderReview = Review & {
 
 export type ProviderDetail = {
   profile: Profile;
-  practitioner: PractitionerProfile;
+  /**
+   * Read from the practitioner_directory view (migration 05), so `categories`
+   * and `socials` come from the 4NF tables and payout details are absent by
+   * construction. The PayShap proxy arrives via `BookingDetail.payshapProxy`.
+   */
+  practitioner: PractitionerDirectoryRow;
   services: Service[];
   portfolio: PortfolioItem[];
   reviews: ProviderReview[];
@@ -69,6 +89,10 @@ export type BookingDetail = {
   booking: BookingWithParties;
   payments: Payment[];
   reviews: Review[];
+  /** The other party's contact details. Null when the caller is not a party. */
+  counterparty: BookingCounterparty | null;
+  /** Where to pay the practitioner. Null unless the caller is the client/practitioner. */
+  payshapProxy: string | null;
 };
 
 /** Row shape returned by feed_requests_for_practitioner. */

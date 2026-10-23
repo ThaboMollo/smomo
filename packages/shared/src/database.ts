@@ -288,6 +288,87 @@ export type Database = {
         }
         Relationships: []
       }
+      practitioner_categories: {
+        Row: {
+          category: Database["public"]["Enums"]["service_category"]
+          created_at: string
+          practitioner_id: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["service_category"]
+          created_at?: string
+          practitioner_id: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["service_category"]
+          created_at?: string
+          practitioner_id?: string
+        }
+        Relationships: []
+      }
+      practitioner_payout: {
+        Row: {
+          payshap_proxy: string | null
+          practitioner_id: string
+          updated_at: string
+        }
+        Insert: {
+          payshap_proxy?: string | null
+          practitioner_id: string
+          updated_at?: string
+        }
+        Update: {
+          payshap_proxy?: string | null
+          practitioner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      practitioner_socials: {
+        Row: {
+          created_at: string
+          handle: string
+          platform: Database["public"]["Enums"]["social_platform"]
+          practitioner_id: string
+        }
+        Insert: {
+          created_at?: string
+          handle: string
+          platform: Database["public"]["Enums"]["social_platform"]
+          practitioner_id: string
+        }
+        Update: {
+          created_at?: string
+          handle?: string
+          platform?: Database["public"]["Enums"]["social_platform"]
+          practitioner_id?: string
+        }
+        Relationships: []
+      }
+      profile_contact: {
+        Row: {
+          home_address: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+          whatsapp_number: string | null
+        }
+        Insert: {
+          home_address?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+          whatsapp_number?: string | null
+        }
+        Update: {
+          home_address?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+          whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
       practitioner_profiles: {
         Row: {
           base_address: string | null
@@ -647,10 +728,87 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      /** Read model for provider listings and public profiles (migration 05). */
+      practitioner_directory: {
+        Row: {
+          avatar_url: string | null
+          base_address: string | null
+          base_lat: number | null
+          base_lng: number | null
+          bio: string | null
+          business_name: string | null
+          categories: Database["public"]["Enums"]["service_category"][]
+          created_at: string
+          deposit_percentage: number | null
+          full_name: string | null
+          id: string
+          is_online: boolean
+          jobs_done: number
+          min_price: number | null
+          rating: number | null
+          rating_count: number
+          requires_deposit: boolean
+          service_mode: Database["public"]["Enums"]["service_mode"]
+          slug: string | null
+          socials: Json
+          travel_radius_km: number
+          updated_at: string
+          verification_status: Database["public"]["Enums"]["verification_status"]
+          verified_at: string | null
+          years_experience: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_offer: { Args: { p_offer_id: string }; Returns: string }
+      booking_counterparty_contact: {
+        Args: { p_booking_id: string }
+        Returns: {
+          avatar_url: string
+          full_name: string
+          phone: string
+          user_id: string
+        }[]
+      }
+      complete_booking: {
+        Args: {
+          p_booking_id: string
+          p_comment?: string
+          p_proof_image_url: string
+          p_rating: number
+        }
+        Returns: undefined
+      }
+      save_business_profile: {
+        Args: {
+          p_bio?: string
+          p_business_name: string
+          p_categories: Database["public"]["Enums"]["service_category"][]
+          p_deposit_percentage?: number
+          p_facebook?: string
+          p_instagram?: string
+          p_requires_deposit: boolean
+          p_service_mode: Database["public"]["Enums"]["service_mode"]
+          p_tiktok?: string
+          p_travel_radius_km: number
+          p_x_handle?: string
+          p_years_experience?: number
+        }
+        Returns: undefined
+      }
+      set_practitioner_payout: {
+        Args: { p_payshap_proxy: string }
+        Returns: undefined
+      }
+      set_profile_contact: {
+        Args: {
+          p_home_address?: string
+          p_phone?: string
+          p_whatsapp_number?: string
+        }
+        Returns: undefined
+      }
       create_request: {
         Args: {
           p_address?: string
@@ -755,6 +913,7 @@ export type Database = {
         | "nail_technician"
         | "tattoo_artist"
       service_mode: "studio" | "mobile" | "both"
+      social_platform: "instagram" | "facebook" | "tiktok" | "x"
       subscription_status: "trialing" | "active" | "past_due" | "canceled"
       verification_status: "unverified" | "pending" | "verified" | "rejected"
     }
@@ -768,6 +927,8 @@ type DefaultSchema = Database["public"]
 
 export type Tables<T extends keyof DefaultSchema["Tables"]> =
   DefaultSchema["Tables"][T]["Row"]
+export type Views<T extends keyof DefaultSchema["Views"]> =
+  DefaultSchema["Views"][T]["Row"]
 export type TablesInsert<T extends keyof DefaultSchema["Tables"]> =
   DefaultSchema["Tables"][T]["Insert"]
 export type TablesUpdate<T extends keyof DefaultSchema["Tables"]> =

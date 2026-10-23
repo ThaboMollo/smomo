@@ -15,15 +15,15 @@ If you've visited the site before on the same `localhost` port, unregister the s
 
 ## Architecture
 
-| Piece | Where |
-|---|---|
-| Page (composition, metadata, viewport) | `apps/web/src/app/page.tsx` |
-| Scoped styles (type scale, buttons, placeholders, motion) | `apps/web/src/app/landing.css` |
-| Brand tokens (ink, canvas, pink, pink-deep, lilac, lime, line, display font) | `@theme` block in `apps/web/src/app/globals.css` (additive) |
-| Copy, routes, asset register, trust claims | `apps/web/src/lib/landing-content.ts` |
-| Live provider preview data | `apps/web/src/lib/landing-data.ts` (public API, same source as category pages) |
-| Components | `apps/web/src/components/landing/` |
-| Header/footer swap | `SiteHeader.tsx` / `SiteFooter.tsx` render the landing versions only when `pathname === '/'` |
+| Piece                                                                        | Where                                                                                        |
+| ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Page (composition, metadata, viewport)                                       | `apps/web/src/app/page.tsx`                                                                  |
+| Scoped styles (type scale, buttons, placeholders, motion)                    | `apps/web/src/app/landing.css`                                                               |
+| Brand tokens (ink, canvas, pink, pink-deep, lilac, lime, line, display font) | `@theme` block in `apps/web/src/app/globals.css` (additive)                                  |
+| Copy, routes, asset register, trust claims                                   | `apps/web/src/lib/landing-content.ts`                                                        |
+| Live provider preview data                                                   | `apps/web/src/lib/landing-data.ts` (public API, same source as category pages)               |
+| Components                                                                   | `apps/web/src/components/landing/`                                                           |
+| Header/footer swap                                                           | `SiteHeader.tsx` / `SiteFooter.tsx` render the landing versions only when `pathname === '/'` |
 
 Components: `LandingHeader` (sticky, scroll state, mobile sheet with focus trap), `Hero` + `HeroFinder`, `CraftsSection`, `CreatorStory`, `LooksSection`, `TalentSection` (async server component in `Suspense`, with loading, error and empty states), `RequestSection`, `TrustSection`, `ProsSection`, `BrandStatement`, `LandingFooter`, plus primitives `SmomoMark` / `SmomoLockup`, `EditorialImage`, `Reveal`.
 
@@ -51,21 +51,21 @@ To ship a photo: add it under `apps/web/public/editorial/`, set `src` on the mat
 
 - **Provider cards** show only what the public API returns: name, crafts, photo and a starting price when one exists. **Ratings, review counts and jobs-done are intentionally not shown.** The live API currently lists five providers; four have seed-style slugs (`…-a000`), Unsplash avatars, round-number ratings and portfolios made of the `/samples` stock files. I could not verify review integrity (no database access), so they're omitted rather than presented as real. Purge or replace the seed data before launch.
 - **Trust section** claims were checked against the code. The SA ID check is a format (Luhn) check and is described as exactly that, not as identity verification. PayShap is described as peer-to-peer with SMOMO recording payments. No claim about cost, refunds or guaranteed bookings is made.
-- **"Made by someone" and "Looks worth saving"** show labelled placeholders only: no invented creator names, quotes, save counts or likes.
+- **"Made by Apex Motus" and "Looks worth saving"** show labelled placeholders only: no invented creator names, quotes, save counts or likes.
 - **Footer**: there are no Privacy, Terms, support or social pages or verified contact details in the product. They're listed as "(to be published)" rather than linked to nothing.
 
 ## Destinations (all existing routes)
 
-| CTA | Goes to |
-|---|---|
-| Explore Talent (finder) | `/{category}` or `/{category}/{city}` (public listings) |
-| Post Your Look | `/app/request/new` (signed-out visitors go to `/login?next=…` and return) |
-| Explore All Talent | `/app/discover` (same auth redirect; there is no public all-crafts directory) |
-| Meet the Creators | `#talent` on the page |
-| Join as a Pro | `/register?next=/app/studio` (existing provider onboarding); "Open your studio" → `/login?next=/app/studio` |
-| Log In / Join SMOMO | `/login` / `/register` |
-| How It Works / For Professionals | `/how-it-works` / `/how-it-works#pros` |
-| Crafts, cities, footer | `/hairdressers`, `/nail-technicians`, `/makeup-artists`, `/beauticians`, `/tattoo-artists`, `/city/*`, `/download` |
+| CTA                              | Goes to                                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Explore Talent (finder)          | `/{category}` or `/{category}/{city}` (public listings)                                                            |
+| Post Your Look                   | `/app/request/new` (signed-out visitors go to `/login?next=…` and return)                                          |
+| Explore All Talent               | `/app/discover` (same auth redirect; there is no public all-crafts directory)                                      |
+| Meet the Creators                | `#talent` on the page                                                                                              |
+| Join as a Pro                    | `/register?next=/app/studio` (existing provider onboarding); "Open your studio" → `/login?next=/app/studio`        |
+| Log In / Join SMOMO              | `/login` / `/register`                                                                                             |
+| How It Works / For Professionals | `/how-it-works` / `/how-it-works#pros`                                                                             |
+| Crafts, cities, footer           | `/hairdressers`, `/nail-technicians`, `/makeup-artists`, `/beauticians`, `/tattoo-artists`, `/city/*`, `/download` |
 
 ## Known follow-ups (outside this landing-only scope)
 

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 
 import { capturePhoto, pickFromLibrary } from '@/lib/pickImage';
-import { notifyUsers } from '@/lib/push';
+import { notifyBooking } from '@/lib/push';
 import { radius, spacing, useTheme } from '@/lib/theme';
 import { uploadImage, type PickedImage } from '@/lib/upload';
 import { useBooking, useCompleteBooking } from '@/data/bookings';
@@ -55,8 +55,8 @@ export default function CompleteBooking() {
         comment: comment.trim() || undefined,
         proofImageUrl: url,
       });
-      notifyUsers(
-        [booking.client_id],
+      notifyBooking(
+        booking.id,
         'Your booking is complete 💜',
         'Tap to leave a review for your provider.',
         { url: `/(app)/booking/${booking.id}` },

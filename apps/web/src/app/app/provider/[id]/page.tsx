@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation';
 import {
   SERVICE_MODE_LABEL,
   SOCIAL_PLATFORMS,
+  handleFromSocials,
   categoryLabel,
   formatTimeAgo,
   formatZar,
@@ -78,7 +79,7 @@ export default function ProviderProfile() {
       {(() => {
         const socials = SOCIAL_PLATFORMS.map((platform) => ({
           platform,
-          url: socialUrl(platform, practitioner[platform.key]),
+          url: socialUrl(platform, handleFromSocials(practitioner.socials, platform)),
         })).filter((s) => s.url);
         return socials.length ? (
           <div className="flex flex-wrap gap-2">

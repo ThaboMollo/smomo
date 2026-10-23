@@ -4,7 +4,7 @@ import { Alert, FlatList, View } from 'react-native';
 
 import { categoryEmoji, categoryLabel, BOOKING_MODE_LABEL } from '@/lib/categories';
 import { formatBudget, formatWhen, formatZar, timeLeft } from '@/lib/format';
-import { notifyUsers } from '@/lib/push';
+import { notifyBooking } from '@/lib/push';
 import { spacing, useTheme } from '@/lib/theme';
 import {
   useAcceptOffer,
@@ -57,8 +57,8 @@ export default function RequestDetail() {
           onPress: async () => {
             try {
               const bookingId = await acceptOffer.mutateAsync(offer.id);
-              notifyUsers(
-                [offer.practitioner_id],
+              notifyBooking(
+                bookingId,
                 'Offer accepted 🎉',
                 'A client accepted your offer. Open Smomo to see the booking.',
                 { url: `/(app)/booking/${bookingId}` },
