@@ -13,6 +13,7 @@ import type {
   MakeOfferInput,
   MarkPaidInput,
   PortfolioItem,
+  Me,
   Profile,
   ProviderCard,
   ProviderDetail,
@@ -138,8 +139,7 @@ export function createApiClient(opts: ApiClientOptions) {
     },
 
     me: {
-      get: () =>
-        req<{ profile: Profile; practitioner: unknown; subscription: unknown }>('GET', '/me'),
+      get: () => req<Me>('GET', '/me'),
       updateProfile: (input: UpdateProfileInput) => req<void>('PATCH', '/me', { body: input }),
       submitIdentity: (input: SubmitIdentityInput) => req<void>('POST', '/me/identity', { body: input }),
     },

@@ -2,8 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js';
 import type { Database } from '@smomo/shared';
 
-import type { PendingMigration16 } from './pending-migration-16';
-
 /**
  * `supabase gen types` models an RPC argument that carries a DB default as `p_x?: T` —
  * optional, but never `null`. In Postgres those arguments are `default null` and accept
@@ -25,15 +23,7 @@ type Fns = Database['public']['Functions'];
 
 export type DbSchema = Omit<Database, 'public'> & {
   public: Omit<Database['public'], 'Functions'> & {
-    Functions: {
-      // Every RPC except the three migration 16 reshapes, widened as described above.
-      [K in Exclude<keyof Fns, keyof PendingMigration16>]: Omit<Fns[K], 'Args'> & {
-        Args: AcceptsNull<Fns[K]['Args']>;
-      };
-      // Those three are REPLACED, not intersected: an intersection would keep the old
-      // `p_lat: number` and `number & (number | null)` is still `number`.
-      // See pending-migration-16.ts — delete it once the types are regenerated.
-    } & PendingMigration16;
+    Functions: { [K in keyof Fns]: Omit<Fns[K], 'Args'> & { Args: AcceptsNull<Fns[K]['Args']> } };
   };
 };
 

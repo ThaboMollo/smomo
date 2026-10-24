@@ -13,10 +13,21 @@ import {
 import type { Coords } from '@/lib/location';
 import { api } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
+import type { MePractitioner, MeProfile } from '@smomo/shared';
+
 import type { Enums, Tables } from '@/types/database';
 
-export type Profile = Tables<'profiles'>;
-export type PractitionerProfile = Tables<'practitioner_profiles'>;
+/**
+ * What the screens actually receive from `GET /me`, not the bare table rows.
+ *
+ * `MeProfile` and `MePractitioner` include the fields the API re-flattens from the
+ * row-secured side tables — contact details, payout, categories, social handles — which
+ * migration 10 removed as columns. Typing these as `Tables<'profiles'>` claimed
+ * `profile.phone` still existed on the table; it does not, and only the composition in
+ * `apps/api/src/modules/me.ts` puts it back.
+ */
+export type Profile = MeProfile;
+export type PractitionerProfile = MePractitioner;
 export type Subscription = Tables<'subscriptions'>;
 
 export type RegisterCommon = {

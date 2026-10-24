@@ -17,7 +17,7 @@
     "build": "tsup src/index.ts --format esm,cjs --dts --clean",
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
     "typecheck": "tsc --noEmit",
-    "gen:types": "supabase gen types typescript --project-id ltnjiihfgvwtzrmtkclh --schema public > src/database.ts.tmp && mv src/database.ts.tmp src/database.ts"
+    "gen:types": "supabase gen types typescript --project-id ltnjiihfgvwtzrmtkclh --schema public > src/database.ts.tmp && mv src/database.ts.tmp src/database.ts && node ../../scripts/fix-geography-types.mjs"
   },
   "dependencies": {
     "date-fns": "^4.4.0",

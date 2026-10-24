@@ -39,6 +39,10 @@ export default function ProviderProfile() {
   }
 
   const { profile, practitioner, services, portfolio, reviews } = data;
+  // `practitioner` comes from the `practitioner_directory` VIEW, and every column of a
+  // view is nullable in the generated types — Postgres cannot prove otherwise. Normalise
+  // the one array here rather than guarding at each use.
+  const categories = practitioner.categories ?? [];
   const tile = (width - spacing.lg * 2 - spacing.sm * 2) / 3;
 
   const onRequest = () =>
@@ -46,7 +50,7 @@ export default function ProviderProfile() {
       pathname: '/(app)/new-request',
       params: {
         target: id,
-        category: practitioner.categories[0],
+        category: categories[0],
         businessName: practitioner.business_name ?? profile.full_name ?? 'pro',
       },
     });
@@ -71,7 +75,7 @@ export default function ProviderProfile() {
             <AppText variant="title" weight="700" numberOfLines={1}>
               {practitioner.business_name ?? profile.full_name}
             </AppText>
-            <StarRating value={practitioner.rating} count={practitioner.rating_count} size={16} />
+            <StarRating value={practitioner.rating} count={practitioner.rating_count ?? undefined} size={16} />
             <Row style={{ gap: spacing.sm, marginTop: 4 }}>
               {practitioner.verification_status === 'verified' ? (
                 <Badge label="Verified" tone="success" icon="shield-checkmark" />
@@ -84,14 +88,14 @@ export default function ProviderProfile() {
         </Row>
 
         <AppText variant="small" color="textMuted" style={{ marginTop: spacing.md }}>
-          {SERVICE_MODE_LABEL[practitioner.service_mode]}
+          {SERVICE_MODE_LABEL[practitioner.service_mode ?? 'both']}
           {practitioner.service_mode !== 'studio'
             ? ` · travels up to ${practitioner.travel_radius_km} km`
             : ''}
         </AppText>
 
         <Row style={{ gap: spacing.sm, flexWrap: 'wrap', marginTop: spacing.sm }}>
-          {practitioner.categories.map((c) => (
+          {categories.map((c) => (
             <Badge key={c} label={categoryLabel(c)} tone="primary" />
           ))}
         </Row>

@@ -44,6 +44,7 @@ after any one of them.
 | 15 | `rpc_param_defaults` | no (function) | no — but deploy the API after |
 | 16 | `optional_coordinates_and_city` | no (adds nullable columns) | no — but deploy all three after |
 | 17 | `withhold_request_address_until_booked` | no (one RLS policy) | no — closes a leak, apply first |
+| 18 | `practitioner_verification_rpc` | no (new table + function) | no — needed by the console |
 
 Note: 11 sorts before 10 by timestamp, which is intentional — the contract
 phase stays last. 14 also sorts before 12 and 13; it is a standalone trigger fix
@@ -129,6 +130,18 @@ when the columns move.
   hold. Guarded by `apps/api/test/security/request-address-privacy.spec.ts`, which posts
   its own directed request rather than reading whatever happens to be in the table — the
   vacuous version of that assertion is how this survived.
+- **18** `practitioner_profiles.verification_status` was written by nothing: all 16 call
+  sites across the API, web and mobile only read it, and migration 12 had revoked
+  `authenticated`'s UPDATE on the column. Since column privileges are checked before RLS,
+  even an admin could not change it from a client — admitting a pro to the marketplace was
+  an untracked service-role edit in the SQL editor. That gate matters: `make_offer` refuses
+  an unverified pro and the request feed returns them nothing.
+
+  Adds `set_practitioner_verification()` (admin-checked in the DB, P0001/P0002 per the
+  migration-13 convention), an append-only `practitioner_verification_events` log so every
+  decision has an author and a reason, and maintenance of the pre-existing but unwritten
+  `verified_at`. Also revokes the stray `anon` INSERT/UPDATE grants on
+  `verification_status` that migration 12 left behind.
 
 ## Rollback
 

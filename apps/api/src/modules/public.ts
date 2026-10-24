@@ -72,23 +72,32 @@ class PublicController {
     if (error) throw error;
     if (!pp) throw new NotFoundException('Provider not found');
 
+    // Every column of a view is nullable in the generated types — Postgres cannot prove
+    // otherwise for a view, and `pnpm gen:types` now reflects that honestly. `id` and
+    // `slug` come from the underlying table's primary key and its unique slug, so a null
+    // either here would mean the view itself is broken; treat that as not-found rather
+    // than letting a null leak into three queries and the DTO.
+    const id = pp.id;
+    const providerSlug = pp.slug;
+    if (!id || !providerSlug) throw new NotFoundException('Provider not found');
+
     const [svc, pf, rv] = await Promise.all([
       db
         .from('services')
         .select('id, category, title, description, indicative_price_zar')
-        .eq('practitioner_id', pp.id)
+        .eq('practitioner_id', id)
         .eq('is_active', true),
       db
         .from('portfolio_items')
         .select('id, image_url, caption, category')
-        .eq('practitioner_id', pp.id)
+        .eq('practitioner_id', id)
         .eq('is_public', true)
         .order('created_at', { ascending: false })
         .limit(24),
       db
         .from('reviews')
         .select('rating, comment, created_at, reviewer:profiles!reviews_reviewer_id_fkey(full_name)')
-        .eq('reviewee_id', pp.id)
+        .eq('reviewee_id', id)
         .eq('direction', 'c2p')
         .order('created_at', { ascending: false })
         .limit(20),
@@ -97,15 +106,18 @@ class PublicController {
     const socials = socialsOf((pp as any).socials);
 
     return {
-      id: pp.id,
-      slug: (pp as any).slug,
+      id,
+      slug: providerSlug,
       business_name: pp.business_name,
       bio: pp.bio,
       categories: pp.categories ?? [],
-      service_mode: pp.service_mode,
+      // Defaults match the table's own: `service_mode` is NOT NULL DEFAULT 'both', and the
+      // two counters are NOT NULL DEFAULT 0, so these can only be reached if the view
+      // stops matching the table.
+      service_mode: pp.service_mode ?? 'both',
       rating: pp.rating,
-      rating_count: pp.rating_count,
-      jobs_done: pp.jobs_done,
+      rating_count: pp.rating_count ?? 0,
+      jobs_done: pp.jobs_done ?? 0,
       base_address: pp.base_address,
       avatar_url: (pp as any).avatar_url ?? null,
       instagram: socials.instagram ?? null,

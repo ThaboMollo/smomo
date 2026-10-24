@@ -28,7 +28,11 @@ export default function ProviderProfile() {
   if (!data) return <p className="text-text-muted">Provider not found.</p>;
 
   const { profile, practitioner, services, portfolio, reviews } = data;
-  const requestHref = `/app/request/new?target=${id}&category=${practitioner.categories[0] ?? ''}`;
+  // `practitioner` is a row of the `practitioner_directory` VIEW, and every column of a
+  // view is nullable in the generated types — Postgres cannot prove otherwise. Normalise
+  // here rather than guarding at each use below.
+  const categories = practitioner.categories ?? [];
+  const requestHref = `/app/request/new?target=${id}&category=${categories[0] ?? ''}`;
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-24">
@@ -45,7 +49,7 @@ export default function ProviderProfile() {
             {practitioner.business_name ?? profile.full_name}
           </h1>
           <div className="mt-1">
-            <Stars rating={practitioner.rating} count={practitioner.rating_count} />
+            <Stars rating={practitioner.rating} count={practitioner.rating_count ?? undefined} />
           </div>
           <div className="mt-2 flex flex-wrap gap-2">
             {practitioner.verification_status === 'verified' ? (
@@ -59,14 +63,14 @@ export default function ProviderProfile() {
       </div>
 
       <p className="text-sm text-text-muted">
-        {SERVICE_MODE_LABEL[practitioner.service_mode]}
+        {SERVICE_MODE_LABEL[practitioner.service_mode ?? 'both']}
         {practitioner.service_mode !== 'studio'
           ? ` · travels up to ${practitioner.travel_radius_km} km`
           : ''}
       </p>
 
       <div className="flex flex-wrap gap-2">
-        {practitioner.categories.map((c) => (
+        {categories.map((c) => (
           <Badge key={c} tone="primary">
             {categoryLabel(c)}
           </Badge>

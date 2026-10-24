@@ -11,7 +11,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./theme.css": "./theme.css"
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --clean",
@@ -22,5 +23,9 @@
     "@smomo/config": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "~5.7.2"
-  }
+  },
+  "files": [
+    "dist",
+    "theme.css"
+  ]
 }

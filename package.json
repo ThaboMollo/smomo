@@ -15,7 +15,8 @@
     "web": "pnpm --filter web dev",
     "api": "pnpm --filter api start:dev",
     "gen:types": "pnpm --filter @smomo/shared gen:types",
-    "lint:emoji": "node scripts/check-no-emoji.mjs"
+    "lint:emoji": "node scripts/check-no-emoji.mjs",
+    "admin": "pnpm --filter admin dev"
   },
   "devDependencies": {
     "turbo": "^2.3.3"

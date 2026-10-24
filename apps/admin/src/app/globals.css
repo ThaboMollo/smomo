@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+/* The SMOMO design system — the same tokens, primitives and dark theme the consumer web
+   app uses, so the console is recognisably the same product. */
+@import "@smomo/ui-tokens/theme.css";
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Console register.
+
+   Same palette and type, dialled more formal: the consumer app is generous and
+   rounded, a back-office tool is dense and square. These are additions, not
+   overrides of the shared primitives — `.btn`, `.input` and `.chip` keep working
+   exactly as they do on the web so a component moved between the two does not
+   change shape.
+   ────────────────────────────────────────────────────────────────────────── */
+@layer components {
+  /* Headings drop the display face and the tight tracking. A console is read, not sold. */
+  .console h1, .console h2, .console h3 {
+    font-family: var(--font-body);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  /* Panels: 10px instead of the brand's 20-28px, and a flat ground. */
+  .panel {
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-card);
+  }
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .75rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .panel-title { font-size: .9375rem; font-weight: 600; color: var(--color-text); }
+  .panel-body { padding: 1rem; }
+
+  /* Dense data table. Tabular numerals come from the shared `th, td` rule. */
+  .table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+  .table th {
+    text-align: left;
+    font-weight: 600;
+    font-size: .75rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding: .625rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+  .table td {
+    padding: .6875rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+    color: var(--color-text);
+  }
+  .table tbody tr:last-child td { border-bottom: 0; }
+  .table tbody tr:hover td { background: var(--color-card-muted); }
+
+  /* Status pill. Square-ish on purpose — it reads as metadata, not as a brand badge. */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: .375rem;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    padding: .125rem .4375rem;
+    font-size: .75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .tag-ok      { border-color: color-mix(in oklab, var(--color-success) 40%, transparent); color: var(--color-success); }
+  .tag-warn    { border-color: color-mix(in oklab, var(--color-warning) 40%, transparent); color: var(--color-warning); }
+  .tag-danger  { border-color: color-mix(in oklab, var(--color-danger) 40%, transparent); color: var(--color-danger); }
+  .tag-neutral { color: var(--color-text-muted); }
+
+  /* Smaller, squarer buttons than the brand pill. */
+  .btn-console {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .375rem;
+    min-height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    padding: 0 .75rem;
+    font-size: .8125rem;
+    font-weight: 500;
+    color: var(--color-text);
+    transition: background-color .12s, border-color .12s, color .12s;
+  }
+  .btn-console:hover { border-color: var(--color-text-faint); background: var(--color-card-muted); }
+  .btn-console:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-console-primary { border-color: transparent; background: var(--color-primary); color: var(--color-on-primary); }
+  .btn-console-primary:hover { background: var(--color-primary-dark); border-color: transparent; color: #fff; }
+  .btn-console-danger { color: var(--color-danger); }
+  .btn-console-danger:hover { border-color: var(--color-danger); background: transparent; }
+
+  /* Sidebar nav item. */
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: .625rem;
+    border-radius: 8px;
+    padding: .5rem .625rem;
+    font-size: .875rem;
+    color: var(--color-text-muted);
+    transition: background-color .12s, color .12s;
+  }
+  .nav-item:hover { background: var(--color-card-muted); color: var(--color-text); }
+  .nav-item[aria-current='page'] { background: var(--color-primary-100); color: var(--color-primary-700); font-weight: 600; }
+
+  .nav-section {
+    padding: .5rem .625rem .25rem;
+    font-size: .6875rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+
+  /* A single figure on the overview. */
+  .stat { padding: .875rem 1rem; }
+  .stat-label { font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; color: var(--color-text-muted); }
+  .stat-value { margin-top: .25rem; font-size: 1.75rem; font-weight: 600; line-height: 1.1; color: var(--color-text); }
+}

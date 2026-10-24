@@ -66,33 +66,6 @@
   text-transform: uppercase;
 }
 
-/* ── The official symbol: the approved artwork used as an alpha mask, so it can
-      take any flat brand colour without being redrawn or altered. ── */
-.smomo-mark {
-  display: inline-block;
-  flex: none;
-  aspect-ratio: 734 / 665;
-  background-color: currentColor;
-  -webkit-mask: url('/brand/smomo-symbol-256.webp') center / contain no-repeat;
-  mask: url('/brand/smomo-symbol-256.webp') center / contain no-repeat;
-}
-.smomo-mark--md {
-  -webkit-mask-image: url('/brand/smomo-symbol-640.webp');
-  mask-image: url('/brand/smomo-symbol-640.webp');
-}
-.smomo-mark--lg {
-  -webkit-mask-image: url('/brand/smomo-symbol-1280.webp');
-  mask-image: url('/brand/smomo-symbol-1280.webp');
-}
-
-.smomo-wordmark {
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.06em;
-  line-height: 1;
-  text-transform: lowercase;
-}
-
 /* ── Buttons ── */
 .sm-btn {
   display: inline-flex;
