@@ -34,7 +34,9 @@ export type RegisterCommon = {
 
 export type RegisterPractitioner = RegisterCommon & {
   workAddress?: string | null;
-  workCoords: Coords;
+  /** Null when geolocation is parked; `workCity` carries the match (migration 16). */
+  workCoords: Coords | null;
+  workCity?: string | null;
   payshapProxy: string;
 };
 
@@ -64,8 +66,10 @@ type AuthState = {
   /** For an already-registered user (e.g. a client) turning on practitioner mode. */
   finalizePractitioner: (input: {
     payshapProxy: string;
-    workCoords: Coords;
+    /** Null when geolocation is parked; `workCity` carries the match (migration 16). */
+    workCoords: Coords | null;
     workAddress?: string | null;
+    workCity?: string | null;
   }) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -189,9 +193,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // (name/bio/categories) was already saved during anonymous Studio setup.
       await api.practitioner.finalize({
         payshapProxy: input.payshapProxy,
-        lat: input.workCoords.latitude,
-        lng: input.workCoords.longitude,
+        lat: input.workCoords?.latitude ?? null,
+        lng: input.workCoords?.longitude ?? null,
         address: input.workAddress ?? null,
+        city: input.workCity ?? null,
       });
       await refresh();
     },
@@ -199,12 +204,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const finalizePractitioner = useCallback(
-    async (input: { payshapProxy: string; workCoords: Coords; workAddress?: string | null }) => {
+    async (input: {
+      payshapProxy: string;
+      workCoords: Coords | null;
+      workAddress?: string | null;
+      workCity?: string | null;
+    }) => {
       await api.practitioner.finalize({
         payshapProxy: input.payshapProxy,
-        lat: input.workCoords.latitude,
-        lng: input.workCoords.longitude,
+        lat: input.workCoords?.latitude ?? null,
+        lng: input.workCoords?.longitude ?? null,
         address: input.workAddress ?? null,
+        city: input.workCity ?? null,
       });
       await refresh();
     },

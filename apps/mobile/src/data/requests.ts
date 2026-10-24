@@ -13,7 +13,10 @@ export function useCreateRequest() {
     mutationFn: async (input: {
       category: ServiceCategory;
       bookingMode: BookingMode;
-      coords: Coords;
+      /** Null when geolocation is parked — `city` carries the match then (migration 16). */
+      coords: Coords | null;
+      /** City/town as typed. Required when there are no coordinates. */
+      city?: string | null;
       description?: string;
       address?: string;
       scheduledAt?: string | null;
@@ -27,10 +30,11 @@ export function useCreateRequest() {
       const res = await api.requests.create({
         category: input.category,
         bookingMode: input.bookingMode,
-        lat: input.coords.latitude,
-        lng: input.coords.longitude,
+        lat: input.coords?.latitude ?? null,
+        lng: input.coords?.longitude ?? null,
         description: input.description,
         address: input.address,
+        city: input.city ?? null,
         scheduledAt: input.scheduledAt ?? null,
         budgetMin: input.budgetMin ?? null,
         budgetMax: input.budgetMax ?? null,

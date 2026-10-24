@@ -45,9 +45,10 @@ export type ProviderCard = {
   verification_status: Enums<'verification_status'>;
   is_online: boolean;
   min_price: number | null;
-  distance_km: number;
-  lat: number;
-  lng: number;
+  /** Null when either side has no coordinates — match was by city. Hide distance then. */
+  distance_km: number | null;
+  lat: number | null;
+  lng: number | null;
 };
 
 export type ProviderReview = Review & {
@@ -104,13 +105,18 @@ export type FeedRequest = {
   category: Enums<'service_category'>;
   description: string | null;
   booking_mode: Enums<'booking_mode'>;
-  address: string | null;
+  /**
+   * The town only. The client's street address is deliberately NOT in the feed — a
+   * practitioner gets it from the booking once the client accepts (migration 16).
+   */
+  city: string | null;
   scheduled_at: string | null;
   budget_min: number | null;
   budget_max: number | null;
   image_url: string | null;
   expires_at: string;
-  distance_km: number;
+  /** Null when either side has no coordinates — matched by city. */
+  distance_km: number | null;
   has_offered: boolean;
   created_at: string;
 };

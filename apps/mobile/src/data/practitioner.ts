@@ -23,11 +23,17 @@ export function useSaveBusinessProfile() {
 export function useSetLocation() {
   const { refresh } = useAuth();
   return useMutation({
-    mutationFn: async (input: { coords: Coords; address?: string | null }) => {
+    mutationFn: async (input: {
+      /** Null when geolocation is parked; `city` carries the match (migration 16). */
+      coords: Coords | null;
+      address?: string | null;
+      city?: string | null;
+    }) => {
       await api.practitioner.setLocation({
-        lat: input.coords.latitude,
-        lng: input.coords.longitude,
+        lat: input.coords?.latitude ?? null,
+        lng: input.coords?.longitude ?? null,
         address: input.address ?? null,
+        city: input.city ?? null,
       });
       await refresh();
     },

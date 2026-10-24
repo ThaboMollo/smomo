@@ -7,7 +7,9 @@ import { CategoryIcon } from '@/components/CategoryIcon';
 import { CATEGORIES, type ServiceCategory, type ServiceMode } from '@/lib/categories';
 import { SOCIAL_PLATFORMS } from '@smomo/shared';
 import { toE164 } from '@/lib/format';
+import { GEOLOCATION_ENABLED } from '@/lib/features';
 import { getCurrentCoords, reverseGeocode } from '@/lib/location';
+import { ManualAddressFields, type ResolvedAddress } from '@/components/ManualAddressFields';
 import { spacing, useTheme } from '@/lib/theme';
 import { useSaveBusinessProfile, useSetLocation, useSetPayshap } from '@/data/practitioner';
 import { useAuth } from '@/providers/AuthProvider';
@@ -29,6 +31,9 @@ export default function EditStudio() {
   const [requiresDeposit, setRequiresDeposit] = useState(!!practitioner?.requires_deposit);
   const [depositPct, setDepositPct] = useState(String(practitioner?.deposit_percentage ?? 20));
   const [address, setAddress] = useState(practitioner?.base_address ?? '');
+  // Parked geolocation: the typed base address, held until Save rather than written on
+  // every keystroke. Null means "unchanged", so an untouched form saves no location.
+  const [basePlace, setBasePlace] = useState<ResolvedAddress | null>(null);
   const [socials, setSocials] = useState<Record<string, string>>({
     instagram: practitioner?.instagram ?? '',
     facebook: practitioner?.facebook ?? '',
@@ -69,6 +74,15 @@ export default function EditStudio() {
       xHandle: socials.x_handle || null,
     });
     await savePayshap.mutateAsync(proxy);
+    // Only when the manual form produced a new address; the GPS button handles the other path.
+    if (basePlace) {
+      // No coordinates: the typed base is matched on its city (migration 16).
+      await setLocation.mutateAsync({
+        coords: null,
+        address: basePlace.text,
+        city: basePlace.city,
+      });
+    }
     safeBack();
   };
 
@@ -113,15 +127,31 @@ export default function EditStudio() {
         </Row>
         {requiresDeposit ? <Input label="Deposit %" keyboardType="numeric" value={depositPct} onChangeText={setDepositPct} /> : null}
 
-        <Input label="Base address" value={address} onChangeText={setAddress} />
-        <Button
-          title="Update to my current location"
-          variant="secondary"
-          icon="location"
-          loading={setLocation.isPending}
-          onPress={onUpdateLocation}
-          style={{ marginBottom: spacing.lg }}
-        />
+        {GEOLOCATION_ENABLED ? (
+          <>
+            <Input label="Base address" value={address} onChangeText={setAddress} />
+            <Button
+              title="Update to my current location"
+              variant="secondary"
+              icon="location"
+              loading={setLocation.isPending}
+              onPress={onUpdateLocation}
+              style={{ marginBottom: spacing.lg }}
+            />
+          </>
+        ) : (
+          // Parked: re-type the base address. Saving it also moves the stored point, which
+          // is what "update my location" did, so the GPS button has nothing left to do.
+          <ManualAddressFields
+            title="Base address"
+            hint="Clients near here will find you."
+            initialText={address || null}
+            onResolved={(a) => {
+              setBasePlace(a);
+              if (a) setAddress(a.text);
+            }}
+          />
+        )}
 
         <AppText variant="small" color="textMuted" weight="600" style={{ marginBottom: spacing.xs }}>
           Social media

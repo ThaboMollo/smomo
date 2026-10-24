@@ -152,7 +152,15 @@ export function createApiClient(opts: ApiClientOptions) {
         req<void>('POST', '/practitioner/payshap', { body: { payshapProxy } }),
       toggleOnline: (isOnline: boolean) =>
         req<void>('POST', '/practitioner/online', { body: { isOnline } }),
-      finalize: (input: { payshapProxy: string; lat: number; lng: number; address?: string | null }) =>
+      // Coordinates optional since migration 16: with geolocation parked the base is a
+      // typed address plus a city, and the city is what matching uses.
+      finalize: (input: {
+        payshapProxy: string;
+        lat?: number | null;
+        lng?: number | null;
+        address?: string | null;
+        city?: string | null;
+      }) =>
         req<void>('POST', '/practitioner/finalize', { body: input }),
       listServices: (practitionerId: string) =>
         req<Service[]>('GET', `/practitioner/${practitionerId}/services`),

@@ -7,7 +7,9 @@ import type { Coords } from '@/lib/location';
 export type PendingRequest = {
   category: ServiceCategory;
   bookingMode: BookingMode;
-  coords: Coords;
+  /** Null when geolocation is parked; `city` carries the match (migration 16). */
+  coords: Coords | null;
+  city?: string | null;
   description?: string;
   address?: string;
   scheduledAt?: string | null;

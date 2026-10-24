@@ -16,12 +16,20 @@ import { CurrentUser, Db, RequireRegistered, type RequestUser } from '../auth/de
 import type { Db as SupaClient } from '../supabase/supabase.service';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 
-const zFinalize = z.object({
-  payshapProxy: z.string().min(6).max(20),
-  lat: z.number(),
-  lng: z.number(),
-  address: z.string().max(300).nullable().optional(),
-});
+// Coordinates are optional since migration 16 — a provider finishing setup with
+// geolocation parked has a typed address and a city, and no point at all.
+const zFinalize = z
+  .object({
+    payshapProxy: z.string().min(6).max(20),
+    lat: z.number().min(-90).max(90).nullable().optional(),
+    lng: z.number().min(-180).max(180).nullable().optional(),
+    address: z.string().max(300).nullable().optional(),
+    city: z.string().trim().max(120).nullable().optional(),
+  })
+  .refine((v) => (v.lat != null && v.lng != null) || !!v.city?.trim(), {
+    path: ['city'],
+    message: 'Add the city so clients nearby can find you',
+  });
 const zOnline = z.object({ isOnline: z.boolean() });
 const zPayshap = z.object({ payshapProxy: z.string().min(6).max(20) });
 
@@ -70,9 +78,10 @@ class PractitionerController {
     @Body(new ZodValidationPipe(zSetLocation)) input: SetLocationInput,
   ) {
     const { error } = await db.rpc('set_practitioner_location', {
-      p_lat: input.lat,
-      p_lng: input.lng,
+      p_lat: input.lat ?? null,
+      p_lng: input.lng ?? null,
       p_address: input.address ?? null,
+      p_city: input.city ?? null,
     });
     if (error) throw error;
     return { ok: true };
@@ -124,9 +133,10 @@ class PractitionerController {
     });
     if (payErr) throw payErr;
     const { error: locErr } = await db.rpc('set_practitioner_location', {
-      p_lat: input.lat,
-      p_lng: input.lng,
+      p_lat: input.lat ?? null,
+      p_lng: input.lng ?? null,
       p_address: input.address ?? null,
+      p_city: input.city ?? null,
     });
     if (locErr) throw locErr;
     const trialEnds = new Date();

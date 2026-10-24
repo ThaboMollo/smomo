@@ -7,7 +7,11 @@ import { FlatList, Pressable, ScrollView, View } from 'react-native';
 import { CategoryIcon } from '@/components/CategoryIcon';
 import { NavIcon } from '@/components/NavIcon';
 import { ProviderCardView } from '@/components/ProviderCardView';
+import { COUNTRIES, type CountryCode } from '@smomo/shared';
+
 import { CATEGORIES, type BookingMode, type ServiceCategory } from '@/lib/categories';
+import { CityCentreSelect } from '@/components/ManualAddressFields';
+import { GEOLOCATION_ENABLED } from '@/lib/features';
 import { getCurrentCoords, type Coords } from '@/lib/location';
 import { radius, spacing, useTheme } from '@/lib/theme';
 import { useNearbyProviders } from '@/data/discovery';
@@ -22,23 +26,32 @@ const MODES: { value: 'all' | BookingMode; label: string }[] = [
 
 export default function Discover() {
   const { colors } = useTheme();
+  // Parked geolocation: there is no position at all. The search centre is a city name and
+  // the RPC matches on it, returning no distances (migration 16).
   const [coords, setCoords] = useState<Coords | null>(null);
   const [category, setCategory] = useState<ServiceCategory | null>(null);
   const [mode, setMode] = useState<'all' | BookingMode>('all');
+  // The chosen search centre, shown in the picker so it is never a silent default.
+  const [centre, setCentre] = useState<{ country: CountryCode; city: string } | null>(() =>
+    GEOLOCATION_ENABLED ? null : { country: 'ZA', city: COUNTRIES.ZA.cities[0].name },
+  );
 
   useEffect(() => {
+    if (!GEOLOCATION_ENABLED) return;
     getCurrentCoords().then(setCoords);
   }, []);
 
   const { data: providers, isLoading, isError, refetch, isRefetching } = useNearbyProviders({
     coords,
+    city: GEOLOCATION_ENABLED ? null : centre?.city,
     category,
     mode: mode === 'all' ? null : mode,
   });
 
   const list = providers ?? [];
   const online = list.filter((p) => p.is_online).length;
-  const loading = isLoading || !coords;
+  // Parked, "ready" means a chosen city, not a fix that is never coming.
+  const loading = isLoading || (GEOLOCATION_ENABLED ? !coords : !centre);
 
   const header = (
     <>
@@ -47,9 +60,18 @@ export default function Discover() {
           Discover
         </AppText>
         <AppText variant="small" color="textMuted" style={{ marginTop: spacing.sm }}>
-          Within 50 km of you
+          {GEOLOCATION_ENABLED ? 'Within 50 km of you' : `Within 50 km of ${centre?.city ?? '—'}`}
         </AppText>
       </View>
+
+      {GEOLOCATION_ENABLED ? null : (
+        <View style={{ marginTop: spacing.md }}>
+          <CityCentreSelect
+            value={centre}
+            onChange={(v) => setCentre({ country: v.country, city: v.city })}
+          />
+        </View>
+      )}
 
       {/* Broadcast CTA. The web's is an ink panel, not a pink one. */}
       <Pressable

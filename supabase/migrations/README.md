@@ -42,6 +42,7 @@ after any one of them.
 | 13 | `admin_write_rpcs` | no (functions) | yes — admin.ts calls them |
 | 14 | `fix_handle_new_user_after_contact_split` | no (trigger function) | no |
 | 15 | `rpc_param_defaults` | no (function) | no — but deploy the API after |
+| 16 | `optional_coordinates_and_city` | no (adds nullable columns) | no — but deploy all three after |
 
 Note: 11 sorts before 10 by timestamp, which is intentional — the contract
 phase stays last. 14 also sorts before 12 and 13; it is a standalone trigger fix
@@ -101,6 +102,19 @@ when the columns move.
   and the old signature is dropped. The paired half is the `?? null` sweep in
   `apps/api/src/modules/*.ts`; the guard is
   `apps/api/test/contract/rpc-params.spec.ts`.
+- **16** Coordinates become optional and the typed city carries matching instead, so
+  geolocation can be switched off without inventing a point for every typed address
+  (which made "2.1 km away" indefensible). `booking_requests.location` drops NOT NULL;
+  `city` is added to `booking_requests` and `practitioner_profiles`; `create_request`,
+  `set_practitioner_location` and `search_providers` take nullable coordinates plus
+  `p_city`; and both read RPCs return `distance_km` as null when there is no point to
+  measure from. It also **removes `address` from `feed_requests_for_practitioner`** — a
+  practitioner browsing the open feed now sees the town only, and gets the street address
+  from the booking once the client accepts.
+
+  Backwards-compatible with the already-deployed app: every argument name the old API
+  sends still exists, with `p_city` defaulted, so nothing fails to resolve. Until the
+  deploy lands the feed simply shows a blank address and no distance.
 
 ## Rollback
 
@@ -109,4 +123,6 @@ re-applying the previous definition (recoverable from `supabase db pull` output
 taken before you start). 04–07 add tables and backfill; dropping the new tables
 reverts them. **10 is not reversible** — the dropped columns are gone. Take a
 backup before applying it. 15 is reversible by re-applying 05b's definition of
-`save_business_profile` and dropping the new argument order.
+`save_business_profile` and dropping the new argument order. 16 is reversible for the
+functions the same way; the two `city` columns can be dropped, and re-adding NOT NULL to
+`booking_requests.location` requires that no pointless rows have been written yet.

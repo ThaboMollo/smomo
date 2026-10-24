@@ -5,7 +5,9 @@ import { ScrollView, View } from 'react-native';
 
 import { CountryPicker } from '@/components/CountryPicker';
 import { toE164 } from '@/lib/format';
+import { GEOLOCATION_ENABLED } from '@/lib/features';
 import { geocodeAddress, getCurrentCoords } from '@/lib/location';
+import { ManualAddressFields, type ResolvedAddress } from '@/components/ManualAddressFields';
 import { validatePassport, validateSaId } from '@/lib/saId';
 import { spacing } from '@/lib/theme';
 import { useCreateRequest } from '@/data/requests';
@@ -28,6 +30,8 @@ export default function Register() {
   const [idNumber, setIdNumber] = useState('');
   const [homeAddress, setHomeAddress] = useState('');
   const [workAddress, setWorkAddress] = useState('');
+  // Parked geolocation: the structured form supplies the work base's text and point.
+  const [workPlace, setWorkPlace] = useState<ResolvedAddress | null>(null);
   const [mobile, setMobile] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [payshap, setPayshap] = useState('');
@@ -72,11 +76,15 @@ export default function Register() {
       };
 
       if (isPractitioner) {
-        const coords = (workAddress.trim() ? await geocodeAddress(workAddress.trim()) : null) ?? (await getCurrentCoords());
+        // A typed address has no point by design (migration 16); the city carries the match.
+        const coords = workPlace
+          ? null
+          : ((workAddress.trim() ? await geocodeAddress(workAddress.trim()) : null) ?? (await getCurrentCoords()));
         await registerPractitioner({
           ...common,
           workAddress: workAddress.trim() || null,
           workCoords: coords,
+          workCity: workPlace?.city ?? null,
           payshapProxy: toE164(payshap)!,
         });
         router.replace('/(app)');
@@ -179,9 +187,27 @@ export default function Register() {
         <AppText variant="small" color="textMuted" weight="600" style={{ marginBottom: spacing.sm }}>
           Where
         </AppText>
-        <Input label="Home address" value={homeAddress} onChangeText={setHomeAddress} />
+        {GEOLOCATION_ENABLED ? (
+          <Input label="Home address" value={homeAddress} onChangeText={setHomeAddress} />
+        ) : (
+          <ManualAddressFields
+            title="Home address"
+            onResolved={(a) => setHomeAddress(a?.text ?? '')}
+          />
+        )}
         {isPractitioner ? (
-          <Input label="Work address (studio / base)" value={workAddress} onChangeText={setWorkAddress} hint="Used to match you to nearby clients." />
+          GEOLOCATION_ENABLED ? (
+            <Input label="Work address (studio / base)" value={workAddress} onChangeText={setWorkAddress} hint="Used to match you to nearby clients." />
+          ) : (
+            <ManualAddressFields
+              title="Work address (studio / base)"
+              hint="Used to match you to nearby clients."
+              onResolved={(a) => {
+                setWorkPlace(a);
+                setWorkAddress(a?.text ?? '');
+              }}
+            />
+          )
         ) : null}
 
         {isPractitioner ? (

@@ -13,14 +13,22 @@ export type Suggestion = {
   country?: CountryCode | null;
 };
 
-/** A located place: what the app stores and sends to the API. */
+/**
+ * A place the app can act on: what it stores and sends to the API.
+ *
+ * Coordinates are nullable since migration 16. With geolocation parked there is no
+ * geocoder, so a typed address has no point and `city` is what matching uses instead —
+ * we deliberately do not substitute a city centre, because every distance derived from
+ * it would be fiction. A Place therefore always has either coordinates or a city.
+ */
 export type Place = {
   /** Human-readable address to show and save as the address text. */
   label: string;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   /** Null when the place is outside the countries SMOMO serves. */
   country: CountryCode | null;
+  /** City/town. Required when there are no coordinates; it carries the match. */
   city?: string;
 };
 

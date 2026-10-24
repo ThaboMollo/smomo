@@ -27,7 +27,9 @@ export default function Discover() {
   const [mode, setMode] = useState<'all' | BookingMode>('all');
 
   const providers = useQuery({
-    queryKey: ['discover', place?.lat, place?.lng, category, mode],
+    // `city` is part of the key: with geolocation parked there are no coordinates to vary,
+    // so the city is the only thing that distinguishes one search from another.
+    queryKey: ['discover', place?.lat, place?.lng, place?.city, category, mode],
     enabled: ready && !!place,
     queryFn: () =>
       api.providers.search({
@@ -36,6 +38,7 @@ export default function Discover() {
         category: category ?? undefined,
         mode: mode === 'all' ? undefined : mode,
         maxKm: 50,
+        city: place!.city ?? null,
       }),
   });
 
@@ -49,8 +52,10 @@ export default function Discover() {
         <h1 className="text-5xl">Discover</h1>
         {place && !changing ? (
           <p className="mt-2 flex flex-wrap items-center gap-x-2 text-text-muted">
+            {/* Only claim a radius when we actually measured one. */}
             <span>
-              Within 50 km of <span className="font-medium text-text">{place.label}</span>
+              {place.lat != null && place.lng != null ? 'Within 50 km of ' : 'Pros in '}
+              <span className="font-medium text-text">{place.city || place.label}</span>
             </span>
             <button type="button" onClick={() => setChanging(true)} className="font-medium text-primary-700 underline underline-offset-4">
               Change

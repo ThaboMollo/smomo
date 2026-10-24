@@ -1,11 +1,16 @@
 import * as Location from 'expo-location';
 
+import { GEOLOCATION_ENABLED } from '@/lib/features';
+
 export type Coords = { latitude: number; longitude: number };
 
 /** Cape Town CBD — sensible fallback when GPS is unavailable. */
 export const DEFAULT_COORDS: Coords = { latitude: -33.9249, longitude: 18.4241 };
 
 export async function getCurrentCoords(): Promise<Coords> {
+  // Parked: never prompt for location permission. Callers that need a real position ask
+  // for a typed address instead; this fallback only keeps map defaults sane.
+  if (!GEOLOCATION_ENABLED) return DEFAULT_COORDS;
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== 'granted') return DEFAULT_COORDS;
   try {
@@ -19,6 +24,7 @@ export async function getCurrentCoords(): Promise<Coords> {
 }
 
 export async function reverseGeocode(coords: Coords): Promise<string | null> {
+  if (!GEOLOCATION_ENABLED) return null;
   try {
     const [place] = await Location.reverseGeocodeAsync(coords);
     if (!place) return null;
@@ -36,6 +42,7 @@ export async function reverseGeocode(coords: Coords): Promise<string | null> {
  * When we DO need to send a point, we insert a WKT string via the geography cast.
  */
 export async function geocodeAddress(address: string): Promise<Coords | null> {
+  if (!GEOLOCATION_ENABLED) return null;
   try {
     const results = await Location.geocodeAsync(address);
     if (results?.length) {

@@ -116,6 +116,7 @@ function BecomeProvider({ onDone }: { onDone: () => void }) {
         lat: place.lat,
         lng: place.lng,
         address: place.label,
+        city: place.city ?? null,
       });
     },
     onSuccess: onDone,

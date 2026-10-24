@@ -37,6 +37,13 @@ export type Country = {
   /** [west, south, east, north] */
   bbox: [number, number, number, number];
   cities: City[];
+  /**
+   * What this country calls its top-level subdivision. Used as the field label in the
+   * manual address form, so a Namibian doesn't get asked for a "Province".
+   */
+  subdivisionLabel: 'Province' | 'District' | 'Region';
+  /** Those subdivisions, alphabetical. The manual address form offers exactly these. */
+  subdivisions: string[];
 };
 
 export const COUNTRIES: Record<CountryCode, Country> = {
@@ -64,6 +71,18 @@ export const COUNTRIES: Record<CountryCode, Country> = {
       { slug: 'nelspruit', name: 'Nelspruit', lat: -25.4753, lng: 30.9694 },
       { slug: 'kimberley', name: 'Kimberley', lat: -28.7282, lng: 24.7499 },
     ],
+    subdivisionLabel: 'Province',
+    subdivisions: [
+      'Eastern Cape',
+      'Free State',
+      'Gauteng',
+      'KwaZulu-Natal',
+      'Limpopo',
+      'Mpumalanga',
+      'North West',
+      'Northern Cape',
+      'Western Cape',
+    ],
   },
   LS: {
     code: 'LS',
@@ -84,6 +103,19 @@ export const COUNTRIES: Record<CountryCode, Country> = {
       { slug: 'teyateyaneng', name: 'Teyateyaneng', lat: -29.15, lng: 27.75 },
       { slug: 'mafeteng', name: 'Mafeteng', lat: -29.8167, lng: 27.2333 },
       { slug: 'quthing', name: 'Quthing', lat: -30.4, lng: 27.7 },
+    ],
+    subdivisionLabel: 'District',
+    subdivisions: [
+      'Berea',
+      'Butha-Buthe',
+      'Leribe',
+      'Mafeteng',
+      'Maseru',
+      'Mohale’s Hoek',
+      'Mokhotlong',
+      'Qacha’s Nek',
+      'Quthing',
+      'Thaba-Tseka',
     ],
   },
   SZ: {
@@ -106,6 +138,13 @@ export const COUNTRIES: Record<CountryCode, Country> = {
       { slug: 'piggs-peak', name: 'Piggs Peak', lat: -25.9667, lng: 31.25 },
       { slug: 'nhlangano', name: 'Nhlangano', lat: -27.1167, lng: 31.2 },
     ],
+    subdivisionLabel: 'Region',
+    subdivisions: [
+      'Hhohho',
+      'Lubombo',
+      'Manzini',
+      'Shiselweni',
+    ],
   },
   BW: {
     code: 'BW',
@@ -126,6 +165,19 @@ export const COUNTRIES: Record<CountryCode, Country> = {
       { slug: 'molepolole', name: 'Molepolole', lat: -24.4067, lng: 25.495 },
       { slug: 'kasane', name: 'Kasane', lat: -17.8, lng: 25.15 },
       { slug: 'serowe', name: 'Serowe', lat: -22.3833, lng: 26.7167 },
+    ],
+    subdivisionLabel: 'District',
+    subdivisions: [
+      'Central',
+      'Chobe',
+      'Ghanzi',
+      'Kgalagadi',
+      'Kgatleng',
+      'Kweneng',
+      'North East',
+      'North West',
+      'South East',
+      'Southern',
     ],
   },
   ZW: {
@@ -148,6 +200,19 @@ export const COUNTRIES: Record<CountryCode, Country> = {
       { slug: 'victoria-falls', name: 'Victoria Falls', lat: -17.9243, lng: 25.8572 },
       { slug: 'masvingo', name: 'Masvingo', lat: -20.0637, lng: 30.8277 },
     ],
+    subdivisionLabel: 'Province',
+    subdivisions: [
+      'Bulawayo',
+      'Harare',
+      'Manicaland',
+      'Mashonaland Central',
+      'Mashonaland East',
+      'Mashonaland West',
+      'Masvingo',
+      'Matabeleland North',
+      'Matabeleland South',
+      'Midlands',
+    ],
   },
   NA: {
     code: 'NA',
@@ -168,6 +233,23 @@ export const COUNTRIES: Record<CountryCode, Country> = {
       { slug: 'oshakati', name: 'Oshakati', lat: -17.7886, lng: 15.687 },
       { slug: 'rundu', name: 'Rundu', lat: -17.9333, lng: 19.7667 },
       { slug: 'katima-mulilo', name: 'Katima Mulilo', lat: -17.5, lng: 24.2667 },
+    ],
+    subdivisionLabel: 'Region',
+    subdivisions: [
+      'Erongo',
+      'Hardap',
+      'Karas',
+      'Kavango East',
+      'Kavango West',
+      'Khomas',
+      'Kunene',
+      'Ohangwena',
+      'Omaheke',
+      'Omusati',
+      'Oshana',
+      'Oshikoto',
+      'Otjozondjupa',
+      'Zambezi',
     ],
   },
 };

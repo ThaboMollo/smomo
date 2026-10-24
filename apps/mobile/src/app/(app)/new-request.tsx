@@ -13,7 +13,9 @@ import {
   type ServiceCategory,
 } from '@/lib/categories';
 import { formatWhen } from '@/lib/format';
+import { GEOLOCATION_ENABLED } from '@/lib/features';
 import { getCurrentCoords, reverseGeocode, type Coords } from '@/lib/location';
+import { ManualAddressFields, type ResolvedAddress } from '@/components/ManualAddressFields';
 import { pickFromLibrary } from '@/lib/pickImage';
 import { spacing, useTheme } from '@/lib/theme';
 import { uploadImage } from '@/lib/upload';
@@ -40,12 +42,18 @@ export default function NewRequest() {
   const [consent, setConsent] = useState(false);
   const [coords, setCoords] = useState<Coords | null>(null);
   const [address, setAddress] = useState('');
+  // With geolocation parked there is no point to send, so the typed city is what the
+  // request is matched on (migration 16).
+  const [city, setCity] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string>();
 
   useEffect(() => {
+    // Parked: no permission prompt and no position. The typed address below supplies both
+    // the text and a city-level point instead.
+    if (!GEOLOCATION_ENABLED) return;
     getCurrentCoords().then(async (c) => {
       setCoords(c);
       const a = await reverseGeocode(c);
@@ -73,13 +81,21 @@ export default function NewRequest() {
 
   const onSubmit = async () => {
     if (!category) return setError('Pick a service category');
-    if (!coords) return setError('We need your location to match you with pros');
+    // One or the other is enough: a point, or a city to match within.
+    if (!coords && !city?.trim()) {
+      return setError(
+        GEOLOCATION_ENABLED
+          ? 'We need your location to match you with pros'
+          : 'Fill in the address so we can match you with pros nearby',
+      );
+    }
     setError(undefined);
 
     const requestInput = {
       category,
       bookingMode: mode,
       coords,
+      city,
       description: description.trim() || undefined,
       address: address.trim() || undefined,
       scheduledAt: asap ? null : when.toISOString(),
@@ -146,7 +162,21 @@ export default function NewRequest() {
           ]}
         />
         <View style={{ height: spacing.md }} />
-        <Input label="Address / area" placeholder="Where should the service happen?" value={address} onChangeText={setAddress} />
+        {GEOLOCATION_ENABLED ? (
+          <Input label="Address / area" placeholder="Where should the service happen?" value={address} onChangeText={setAddress} />
+        ) : (
+          <ManualAddressFields
+            title="Where should the service happen?"
+            hint="We match you to pros near this address."
+            onResolved={(a: ResolvedAddress | null) => {
+              setError(undefined);
+              setAddress(a?.text ?? '');
+              // No coordinates by design — the city is what gets matched on.
+              setCoords(null);
+              setCity(a?.city ?? null);
+            }}
+          />
+        )}
 
         <Input
           label="Details (optional)"

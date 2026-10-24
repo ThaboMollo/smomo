@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { categoryLabel, formatDistance, formatZar, type ProviderCard } from '@smomo/shared';
 
+
 import { Stars } from '@/components/ui';
 import { categoryImage } from '@/lib/catalog';
 import { cardPhoto } from '@/lib/images';
@@ -35,7 +36,11 @@ export function DiscoverProviderCard({ p }: { p: ProviderCard }) {
         </div>
         <div className="truncate text-sm text-text-muted">
           {p.categories.map((c) => categoryLabel(c)).join(' · ')}
-          <span className="tnum"> · {formatDistance(p.distance_km)} away</span>
+          {/* Null distance means the match was by city, not by point (migration 16): show
+              nothing rather than a number we'd be inventing. */}
+          {p.distance_km != null ? (
+            <span className="tnum"> · {formatDistance(p.distance_km)} away</span>
+          ) : null}
         </div>
         <div className="flex items-center justify-between text-sm">
           <Stars rating={p.rating} count={p.rating_count} />

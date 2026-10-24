@@ -6,6 +6,8 @@ import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 
 import { COUNTRIES, COUNTRY_LIST, type CountryCode } from '@smomo/shared';
 
 import type { Place, Suggestion } from '@/lib/places';
+import { GEOLOCATION_ENABLED } from '@/lib/features';
+import { ManualAddressField } from './ManualAddressField';
 
 const MapPin = dynamic(() => import('./MapPin').then((m) => m.MapPin), {
   ssr: false,
@@ -41,11 +43,24 @@ async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
 }
 
 /**
- * Address search in the style of a ride-hailing app: type, pick a suggestion, and the app
- * knows where you are. It also offers "use my current location", a draggable pin to fine-tune
- * the spot, and a pick-your-city fallback for addresses the search can't find.
+ * Where someone is. One component, two implementations, chosen by the
+ * `NEXT_PUBLIC_GEOLOCATION_ENABLED` switch (see `@/lib/features`):
+ *
+ *   on  → `<SearchAddressField>`, the ride-hailing-style autocomplete with "use my
+ *         current location" and a draggable pin.
+ *   off → `<ManualAddressField>`, where the address is typed out field by field.
+ *
+ * The switch lives here rather than at the call sites so all six of them — register,
+ * profile, studio, studio/profile, request/new and discover — keep working untouched and
+ * cannot drift apart. Both implementations honour the same props, so `value`/`onChange`
+ * callers get a `Place` either way and `onText` callers get the text either way.
  */
-export function AddressField({ label, hint, placeholder = 'Start typing an address, suburb or town', value, onChange, error, showMap = true, bias, autoComplete, initialText, onText }: Props) {
+export function AddressField(props: Props) {
+  return GEOLOCATION_ENABLED ? <SearchAddressField {...props} /> : <ManualAddressField {...props} />;
+}
+
+/** The geolocation implementation. Only reachable with the switch on. */
+function SearchAddressField({ label, hint, placeholder = 'Start typing an address, suburb or town', value, onChange, error, showMap = true, bias, autoComplete, initialText, onText }: Props) {
   const id = useId();
   const listId = `${id}-list`;
   const [query, setQuery] = useState(value?.label ?? initialText ?? '');
@@ -352,7 +367,10 @@ export function AddressField({ label, hint, placeholder = 'Start typing an addre
         </p>
       ) : null}
 
-      {value && showMap ? (
+      {/* `value.lat/lng` are nullable since migration 16, but this branch only runs in the
+          geolocated implementation, where a confirmed place always carries a point. The
+          explicit check is what proves that to the type checker rather than asserting it. */}
+      {value && showMap && value.lat != null && value.lng != null ? (
         <div className="mt-1 space-y-2">
           <MapPin lat={value.lat} lng={value.lng} onMove={moved} />
           <p className="text-sm text-text-muted">

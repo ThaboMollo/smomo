@@ -1,8 +1,12 @@
 import { getPlacesProvider } from '@/lib/places';
 import { allow, clientKey, sameOrigin } from '@/lib/places/rate-limit';
+import { GEOLOCATION_ENABLED } from '@/lib/features';
 
 /** GET /api/places/details?id=..&session=.. → { place } (for providers that don't return coordinates with suggestions) */
 export async function GET(req: Request) {
+  // Geolocation parked: the endpoint does not exist as far as callers are concerned, so
+  // nothing reaches Google or photon.komoot.io. See NEXT_PUBLIC_GEOLOCATION_ENABLED.
+  if (!GEOLOCATION_ENABLED) return Response.json({ error: 'not_found' }, { status: 404 });
   if (!sameOrigin(req)) return Response.json({ error: 'forbidden' }, { status: 403 });
   if (!allow(`dt:${clientKey(req)}`)) return Response.json({ error: 'rate_limited' }, { status: 429 });
 

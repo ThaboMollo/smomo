@@ -4,7 +4,7 @@ import { FlatList } from 'react-native';
 
 import { CategoryIcon } from '@/components/CategoryIcon';
 import { categoryLabel, BOOKING_MODE_LABEL } from '@/lib/categories';
-import { formatBudget, formatDistance, formatWhen, timeLeft } from '@/lib/format';
+import { formatBudget, formatWhen, formatWhereAway, joinMeta, timeLeft } from '@/lib/format';
 import { spacing, useTheme } from '@/lib/theme';
 import { usePractitionerFeed } from '@/data/requests';
 import { useToggleOnline } from '@/data/practitioner';
@@ -109,8 +109,11 @@ export default function Feed() {
                 <Badge label={timeLeft(item.expires_at)} tone="primary" />
               </Row>
               <AppText variant="small" color="textMuted" style={{ marginTop: 4 }}>
-                {BOOKING_MODE_LABEL[item.booking_mode]} · {formatDistance(item.distance_km)} away ·{' '}
-                {formatWhen(item.scheduled_at)}
+                {joinMeta(
+                  BOOKING_MODE_LABEL[item.booking_mode],
+                  formatWhereAway(item.distance_km, item.city),
+                  formatWhen(item.scheduled_at),
+                )}
               </AppText>
               {item.description ? (
                 <AppText variant="body" style={{ marginTop: spacing.sm }}>

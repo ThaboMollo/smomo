@@ -18,11 +18,13 @@ class ProvidersController {
     @Query(new ZodValidationPipe(zSearchProvidersQuery)) q: SearchProvidersQuery,
   ): Promise<ProviderCard[]> {
     const { data, error } = await db.rpc('search_providers', {
-      p_lat: q.lat,
-      p_lng: q.lng,
-      p_category: q.category,
-      p_mode: q.mode,
+      p_lat: q.lat ?? null,
+      p_lng: q.lng ?? null,
+      p_category: q.category ?? null,
+      p_mode: q.mode ?? null,
       p_max_km: q.maxKm,
+      // Carries the match when there are no coordinates (migration 16).
+      p_city: q.city ?? null,
     });
     if (error) throw error;
     return (data ?? []) as unknown as ProviderCard[];

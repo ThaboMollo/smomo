@@ -32,6 +32,51 @@ npx expo start        # press i (iOS), a (Android), or scan the QR in Expo Go
 > Maps, camera and push need a **dev build** (`npx expo run:ios` / `run:android`) for full
 > fidelity; most of the app also works in Expo Go.
 
+## Feature switches
+
+### Geolocation
+
+Address search and device GPS are behind **one switch, set per runtime**. It is **off by
+default** — unset, or anything other than `true` / `1` / `yes`, means parked.
+
+| App | Variable | File | Also set in |
+|-----|----------|------|-------------|
+| Web | `NEXT_PUBLIC_GEOLOCATION_ENABLED` | `apps/web/.env.local` | Vercel → Project → Settings → Environment Variables |
+| Mobile | `EXPO_PUBLIC_GEOLOCATION_ENABLED` | `apps/mobile/.env` | EAS build profile (`eas.json` → `env`) |
+
+Both are read in exactly one place each — `apps/web/src/lib/features.ts` and
+`apps/mobile/src/lib/features.ts` — and nothing else reads `process.env` for this.
+
+**Off (parked).** `<AddressField>` renders `<ManualAddressField>` instead of the
+autocomplete, and the person types the address out: country, address line 1, address line 2
+(optional), suburb, city, and whatever that country calls its province — Province in
+South Africa and Zimbabwe, District in Lesotho and Botswana, Region in Eswatini and
+Namibia (`subdivisions` in `packages/shared/src/countries.ts`). The `/api/places/*` routes
+answer 404, so nothing reaches Google or `photon.komoot.io`. On mobile nothing asks for
+location permission; Discover gets a country + city picker instead of a GPS fix.
+
+**No coordinates are sent at all.** Migration 16 made the point optional
+(`booking_requests.location` dropped its NOT NULL) and added a `city` column to
+`booking_requests` and `practitioner_profiles`. `search_providers` and
+`feed_requests_for_practitioner` match on the typed city whenever either side has no
+point, and return `distance_km` as **null** — so the apps hide distance rather than
+printing a number measured from a city centre. A request or a base must carry either
+coordinates or a city; the RPC refuses one with neither.
+
+**The client's street address is no longer in the practitioner feed.** It used to be:
+`feed_requests_for_practitioner` returned `address` to every eligible practitioner
+browsing open requests. It now returns `city` only. The full address reaches the
+practitioner once the client accepts an offer — `accept_offer` copies it onto `bookings`
+with status `confirmed`, and `bookings.bk_select_party` lets that practitioner read it
+from there.
+
+**On.** The ride-hailing-style autocomplete, "use my current location", the draggable map
+pin and device GPS, exactly as before. Nothing else changes: both implementations satisfy
+the same props, so all six web call sites and every mobile screen are untouched either way.
+
+Both are inlined at build time, so flipping either one needs a rebuild — a Vercel redeploy
+for web, `expo start --clear` or a new build for mobile. Not just a restart.
+
 ## Required manual configuration
 A few things need dashboard/credentials access that can't be scripted:
 

@@ -25,6 +25,7 @@ class RequestsController {
       p_lng: input.lng,
       p_description: input.description ?? null,
       p_address: input.address ?? null,
+      p_city: input.city ?? null,
       p_scheduled_at: input.scheduledAt ?? null,
       p_budget_min: input.budgetMin ?? null,
       p_budget_max: input.budgetMax ?? null,

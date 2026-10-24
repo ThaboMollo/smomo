@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 
+import { GEOLOCATION_ENABLED } from '@/lib/features';
 import type { Place } from '@/lib/places';
 
 /**
@@ -30,7 +31,12 @@ function snapshot(): Place | null {
   cachedRaw = raw;
   try {
     const p = raw ? (JSON.parse(raw) as Place) : null;
-    cachedPlace = p && Number.isFinite(p.lat) && Number.isFinite(p.lng) ? p : null;
+    // A place is usable with coordinates OR with a city. Checking only the coordinates —
+    // which is what this did before migration 16 — threw away every manually typed
+    // address on reload, because those deliberately carry no point.
+    const hasPoint = p != null && Number.isFinite(p.lat) && Number.isFinite(p.lng);
+    const hasCity = !!p?.city?.trim();
+    cachedPlace = p && (hasPoint || hasCity) ? p : null;
   } catch {
     cachedPlace = null;
   }
@@ -68,7 +74,9 @@ export function useLocation() {
   useEffect(() => {
     let cancelled = false;
     const done = () => !cancelled && setReady(true);
-    if (snapshot() || !('geolocation' in navigator) || !navigator.permissions?.query) {
+    // Parked: never touch the Geolocation API, not even behind an already-granted
+    // permission. The screen asks for a typed address instead.
+    if (!GEOLOCATION_ENABLED || snapshot() || !('geolocation' in navigator) || !navigator.permissions?.query) {
       done();
       return () => {
         cancelled = true;

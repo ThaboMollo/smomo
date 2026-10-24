@@ -6,23 +6,33 @@ import type { Coords } from '@/lib/location';
 
 export type { ProviderCard, ProviderDetail } from '@smomo/shared';
 
+/**
+ * Nearby providers — by distance when we have a position, by city when we don't.
+ *
+ * Since migration 16 the search needs one or the other, not both: with geolocation parked
+ * there are no coordinates, and `city` is what the RPC matches on (returning `distance_km`
+ * as null so the cards know to hide it).
+ */
 export function useNearbyProviders(params: {
   coords: Coords | null;
+  /** Search centre by name, for when there is no position. */
+  city?: string | null;
   category?: ServiceCategory | null;
   mode?: BookingMode | null;
   maxKm?: number;
 }) {
-  const { coords, category, mode, maxKm = 50 } = params;
+  const { coords, city, category, mode, maxKm = 50 } = params;
   return useQuery({
-    queryKey: ['providers', coords?.latitude, coords?.longitude, category, mode, maxKm],
-    enabled: !!coords,
+    queryKey: ['providers', coords?.latitude, coords?.longitude, city, category, mode, maxKm],
+    enabled: !!coords || !!city?.trim(),
     queryFn: () =>
       api.providers.search({
-        lat: coords!.latitude,
-        lng: coords!.longitude,
+        lat: coords?.latitude ?? null,
+        lng: coords?.longitude ?? null,
         category: category ?? undefined,
         mode: mode ?? undefined,
         maxKm,
+        city: city ?? null,
       }),
   });
 }

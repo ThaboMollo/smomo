@@ -7,8 +7,9 @@ import {
   BOOKING_MODE_LABEL,
   categoryLabel,
   formatBudget,
-  formatDistance,
   formatWhen,
+  formatWhereAway,
+  joinMeta,
   timeLeft,
 } from '@smomo/shared';
 
@@ -68,8 +69,16 @@ export default function Feed() {
                 </span>
                 <Badge tone="primary">{timeLeft(r.expires_at)}</Badge>
               </div>
+              {/* `formatWhereAway` gives the distance when we have one and the town when we
+                  don't, and `joinMeta` drops the separator rather than leaving "· away"
+                  behind. The street address is not here on purpose — the practitioner gets
+                  it from the booking once the client accepts (migration 16). */}
               <p className="mt-1 text-sm text-text-muted">
-                {BOOKING_MODE_LABEL[r.booking_mode]} · {formatDistance(r.distance_km)} away · {formatWhen(r.scheduled_at)}
+                {joinMeta(
+                  BOOKING_MODE_LABEL[r.booking_mode],
+                  formatWhereAway(r.distance_km, r.city),
+                  formatWhen(r.scheduled_at),
+                )}
               </p>
               {r.description ? <p className="mt-2">{r.description}</p> : null}
               <div className="mt-2 flex items-center justify-between text-sm text-text-muted">

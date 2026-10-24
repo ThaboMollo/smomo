@@ -13,31 +13,52 @@ export const zServiceMode = z.enum(['studio', 'mobile', 'both']);
 export const zIdType = z.enum(['sa_id', 'passport']);
 
 /* ----------------------------- Discovery ----------------------------- */
-export const zSearchProvidersQuery = z.object({
-  lat: z.coerce.number(),
-  lng: z.coerce.number(),
-  category: zServiceCategory.optional(),
-  mode: zBookingMode.optional(),
-  maxKm: z.coerce.number().positive().max(200).default(50),
-});
+/**
+ * `lat`/`lng` are optional because geolocation can be parked (migration 16): with no
+ * geocoder there is no point to search from, and `city` carries the match instead. One of
+ * the two has to be there — coordinates or a city — or there is nothing to match on and
+ * the RPC returns no rows.
+ */
+export const zSearchProvidersQuery = z
+  .object({
+    lat: z.coerce.number().nullable().optional(),
+    lng: z.coerce.number().nullable().optional(),
+    category: zServiceCategory.optional(),
+    mode: zBookingMode.optional(),
+    maxKm: z.coerce.number().positive().max(200).default(50),
+    city: z.string().trim().max(120).nullable().optional(),
+  })
+  .refine((v) => (v.lat != null && v.lng != null) || !!v.city?.trim(), {
+    path: ['city'],
+    message: 'Searching needs either coordinates or a city',
+  });
 export type SearchProvidersQuery = z.infer<typeof zSearchProvidersQuery>;
 
 /* ----------------------------- Requests ----------------------------- */
-export const zCreateRequest = z.object({
-  category: zServiceCategory,
-  bookingMode: zBookingMode,
-  lat: z.number(),
-  lng: z.number(),
-  description: z.string().max(1000).optional(),
-  address: z.string().max(300).optional(),
-  scheduledAt: z.string().datetime().nullable().optional(),
-  budgetMin: z.number().nonnegative().nullable().optional(),
-  budgetMax: z.number().nonnegative().nullable().optional(),
-  imageUrl: z.string().url().nullable().optional(),
-  targetPractitionerId: z.string().uuid().nullable().optional(),
-  consent: z.boolean().default(false),
-  expiresMinutes: z.number().int().positive().max(1440).default(30),
-});
+export const zCreateRequest = z
+  .object({
+    category: zServiceCategory,
+    bookingMode: zBookingMode,
+    // Nullable since migration 16: a request may have only a typed city. The DB refuses a
+    // request that has neither, and the refine below says so before it gets that far.
+    lat: z.number().nullable().optional(),
+    lng: z.number().nullable().optional(),
+    description: z.string().max(1000).optional(),
+    address: z.string().max(300).optional(),
+    /** City/town as typed. Carries matching when there are no coordinates. */
+    city: z.string().trim().max(120).nullable().optional(),
+    scheduledAt: z.string().datetime().nullable().optional(),
+    budgetMin: z.number().nonnegative().nullable().optional(),
+    budgetMax: z.number().nonnegative().nullable().optional(),
+    imageUrl: z.string().url().nullable().optional(),
+    targetPractitionerId: z.string().uuid().nullable().optional(),
+    consent: z.boolean().default(false),
+    expiresMinutes: z.number().int().positive().max(1440).default(30),
+  })
+  .refine((v) => (v.lat != null && v.lng != null) || !!v.city?.trim(), {
+    path: ['city'],
+    message: 'Add the city so pros nearby can find this request',
+  });
 export type CreateRequestInput = z.infer<typeof zCreateRequest>;
 
 /* ----------------------------- Offers ----------------------------- */
@@ -136,11 +157,22 @@ export const zSaveBusinessProfile = z
   });
 export type SaveBusinessProfileInput = z.infer<typeof zSaveBusinessProfile>;
 
-export const zSetLocation = z.object({
-  lat: z.number(),
-  lng: z.number(),
-  address: z.string().max(300).nullable().optional(),
-});
+/**
+ * The provider's base. Coordinates are optional (migration 16) — with geolocation parked
+ * the base is a typed address, and `city` is what clients in the same town match against.
+ * Bounds are checked here because nothing else did (spec RC-3b).
+ */
+export const zSetLocation = z
+  .object({
+    lat: z.number().min(-90).max(90).nullable().optional(),
+    lng: z.number().min(-180).max(180).nullable().optional(),
+    address: z.string().max(300).nullable().optional(),
+    city: z.string().trim().max(120).nullable().optional(),
+  })
+  .refine((v) => (v.lat != null && v.lng != null) || !!v.city?.trim(), {
+    path: ['city'],
+    message: 'Add the city so clients nearby can find you',
+  });
 export type SetLocationInput = z.infer<typeof zSetLocation>;
 
 export const zSetPayshap = z.object({ payshapProxy: z.string().min(6).max(20) });

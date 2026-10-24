@@ -78,6 +78,8 @@ export default function NewRequest() {
         lng: place.lng,
         description: description.trim() || undefined,
         address: place.label,
+        // Carries the match when there are no coordinates (migration 16).
+        city: place.city ?? null,
         budgetMin: budgetMin ? Number(budgetMin) : null,
         budgetMax: budgetMax ? Number(budgetMax) : null,
         imageUrl,

@@ -6,7 +6,9 @@ import { ScrollView, Switch, View } from 'react-native';
 import { CategoryIcon } from '@/components/CategoryIcon';
 import { CATEGORIES, type ServiceCategory, type ServiceMode } from '@/lib/categories';
 import { toE164 } from '@/lib/format';
+import { GEOLOCATION_ENABLED } from '@/lib/features';
 import { geocodeAddress, getCurrentCoords } from '@/lib/location';
+import { ManualAddressFields, type ResolvedAddress } from '@/components/ManualAddressFields';
 import { spacing, useTheme } from '@/lib/theme';
 import { useSaveBusinessProfile } from '@/data/practitioner';
 import { useAuth } from '@/providers/AuthProvider';
@@ -29,6 +31,8 @@ export default function Onboarding() {
   const [depositPct, setDepositPct] = useState('20');
   // Only collected here when the user is already registered (else captured at registration).
   const [workAddress, setWorkAddress] = useState('');
+  // Parked geolocation: the structured form supplies both the text and a city-level point.
+  const [workPlace, setWorkPlace] = useState<ResolvedAddress | null>(null);
   const [payshap, setPayshap] = useState('');
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
@@ -65,8 +69,23 @@ export default function Onboarding() {
         setBusy(false);
         return;
       }
-      const coords = (workAddress.trim() ? await geocodeAddress(workAddress.trim()) : null) ?? (await getCurrentCoords());
-      await finalizePractitioner({ payshapProxy: toE164(payshap)!, workCoords: coords, workAddress: workAddress.trim() || null });
+      if (!GEOLOCATION_ENABLED && !workPlace) {
+        setError('Fill in your work address so clients nearby can find you');
+        setBusy(false);
+        return;
+      }
+      // A typed address has no point by design (migration 16) — the city is what clients
+      // in the same town match against. Only the geolocated path produces coordinates.
+      const coords = workPlace
+        ? null
+        : ((workAddress.trim() ? await geocodeAddress(workAddress.trim()) : null) ?? (await getCurrentCoords()));
+      const addressText = workPlace?.text ?? workAddress.trim() ?? null;
+      await finalizePractitioner({
+        payshapProxy: toE164(payshap)!,
+        workCoords: coords,
+        workAddress: addressText || null,
+        workCity: workPlace?.city ?? null,
+      });
       setMode('work');
       router.replace('/(app)');
     } catch (e: any) {
@@ -125,7 +144,19 @@ export default function Onboarding() {
             <AppText variant="small" color="textMuted" weight="600" style={{ marginTop: spacing.md, marginBottom: spacing.sm }}>
               Payouts & base location
             </AppText>
-            <Input label="Work address (studio / base)" value={workAddress} onChangeText={setWorkAddress} hint="Used to match you to nearby clients." />
+            {GEOLOCATION_ENABLED ? (
+              <Input label="Work address (studio / base)" value={workAddress} onChangeText={setWorkAddress} hint="Used to match you to nearby clients." />
+            ) : (
+              <ManualAddressFields
+                title="Work address (studio / base)"
+                hint="Used to match you to nearby clients."
+                onResolved={(a) => {
+                  setError(undefined);
+                  setWorkPlace(a);
+                  setWorkAddress(a?.text ?? '');
+                }}
+              />
+            )}
             <Input label="PayShap number" placeholder="072 123 4567" keyboardType="phone-pad" value={payshap} onChangeText={setPayshap} />
           </>
         ) : null}

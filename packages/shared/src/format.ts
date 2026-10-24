@@ -26,6 +26,28 @@ export function formatDistance(km: number | null | undefined): string {
   return `${km.toFixed(1)} km`;
 }
 
+/**
+ * "2.1 km away", or the city, or nothing — whichever we can actually stand behind.
+ *
+ * `distance_km` is null whenever either side had no coordinates (geolocation parked, see
+ * migration 16), and the old call sites wrote `· {formatDistance(d)} away` inline, which
+ * rendered a bare "· away" the moment it went null. Returning the whole phrase keeps that
+ * decision in one place, and callers join it with a separator only when it is non-empty.
+ */
+export function formatWhereAway(
+  distanceKm: number | null | undefined,
+  city?: string | null,
+): string {
+  if (distanceKm != null) return `${formatDistance(distanceKm)} away`;
+  const town = city?.trim();
+  return town ? `in ${town}` : '';
+}
+
+/** Joins non-empty parts with " · ", so a missing piece never leaves a stray separator. */
+export function joinMeta(...parts: (string | null | undefined)[]): string {
+  return parts.map((p) => p?.trim()).filter(Boolean).join(' · ');
+}
+
 export function formatWhen(iso: string | null | undefined): string {
   if (!iso) return 'As soon as possible';
   const d = new Date(iso);

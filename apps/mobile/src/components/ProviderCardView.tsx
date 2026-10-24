@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import { categoryLabel } from '@/lib/categories';
 import { categoryImage } from '@/lib/catalog';
-import { formatDistance, formatZar } from '@/lib/format';
+import { formatWhereAway, joinMeta, formatZar } from '@/lib/format';
 import { radius, spacing, useTheme } from '@/lib/theme';
 import type { ProviderCard } from '@/data/discovery';
 import { AppText, Card, Row, StarRating } from '@/ui';
@@ -75,7 +75,9 @@ export function ProviderCardView({
           </Row>
 
           <AppText variant="small" color="textMuted" numberOfLines={1}>
-            {crafts} · {formatDistance(provider.distance_km)} away
+            {/* Null distance means the match came from the city, not a point (migration 16):
+                show the crafts alone rather than a distance we'd be inventing. */}
+            {joinMeta(crafts, formatWhereAway(provider.distance_km))}
           </AppText>
 
           <Row style={{ justifyContent: 'space-between' }}>
