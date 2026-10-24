@@ -113,7 +113,11 @@ class PractitionerController {
   ) {
     await db.from('profiles').update({ is_practitioner: true }).eq('id', user.id);
     // The practitioner_profiles row must exist before payout can reference it.
-    const { error: ppErr } = await db.from('practitioner_profiles').upsert({ id: user.id });
+    // ignoreDuplicates emits ON CONFLICT DO NOTHING; a bare upsert would emit
+    // DO UPDATE SET id = excluded.id, which needs UPDATE(id) — revoked in migration 12.
+    const { error: ppErr } = await db
+      .from('practitioner_profiles')
+      .upsert({ id: user.id }, { onConflict: 'id', ignoreDuplicates: true });
     if (ppErr) throw ppErr;
     const { error: payErr } = await db.rpc('set_practitioner_payout', {
       p_payshap_proxy: input.payshapProxy,

@@ -1,12 +1,14 @@
 # Smomo v3 — Web App + Shared NestJS API (Implementation Spec)
 
 ## Context
+
 Add a **Next.js web app** (SEO-first: "search tattoos → Smomo appears") alongside the existing
 Expo mobile app, and extract all shared Supabase/business logic into a **NestJS API layer** so both
 clients share one implementation. Built as a **monorepo**. This spec is assembled via a
 phase-by-phase interview.
 
 ## Locked high-level decisions
+
 - **API scope = Hybrid.** NestJS owns business/data logic. **Supabase Auth (JWT), Realtime
   (chat/feed) and Storage (uploads) stay direct on the clients.** RLS remains a safety net.
 - **Hosting = Vercel** for both `web` (Next.js) and `api` (NestJS as Node functions).
@@ -15,6 +17,7 @@ phase-by-phase interview.
 - **Web rendering = ISR/SSG** for public/SEO pages; client-side hydration for authed/interactive.
 
 ## Target structure (monorepo)
+
 ```
 smomo/
   apps/
@@ -34,12 +37,14 @@ smomo/
 ## DECISIONS LOG
 
 ### Phase 0 — Monorepo & tooling ✅
+
 - **Package manager: pnpm** (Expo needs `.npmrc` with `node-linker=hoisted` + Metro monorepo config).
 - **Orchestrator: Turborepo** (task caching + pipelines; Vercel-native).
 - **Shared packages (all four): `shared`, `api-client`, `ui-tokens`, `config`.**
 - Existing Expo app moves to `apps/mobile` (git history preserved via `git mv`).
 
 ### Phase 1 — Shared packages ✅
+
 - **Contracts = zod schemas in `packages/shared`** (single source of truth). NestJS validates via
   nestjs-zod; api-client infers TS types from the same schemas. No codegen step.
 - **api-client = typed fetch SDK + `getToken()` callback** (reads Supabase session). Both apps use
@@ -49,6 +54,7 @@ smomo/
   web maps them into its Tailwind theme, mobile imports them directly.
 
 ### Phase 2 — NestJS API foundation ✅
+
 - **DB logic = call existing Postgres RPCs** via the user-JWT Supabase client (reuse accept_offer,
   create_request, make_offer, verify_payment, etc.). New logic may be added in Nest services.
 - **Default DB access = per-request Supabase client with the user's JWT** (RLS applies).
@@ -61,6 +67,7 @@ smomo/
   Supabase/Postgres errors → clean HTTP responses.
 
 ### Phase 3 — API endpoints ✅
+
 - **Authed REST modules** (per domain, `/v1`): `providers` (search, :id), `requests`
   (create/list/:id + offers), `offers` (make/accept), `bookings` (list/:id + start/complete/cancel),
   `payments` (mark/verify), `reviews`, `me` (profile), `practitioner` (profile/services/portfolio/
@@ -77,6 +84,7 @@ smomo/
 - Also need a **marketing landing page** in web explaining what Smomo is & how it works.
 
 ### Phase 4 — Mobile migration ✅
+
 - **Full cutover:** rewrite all `src/data/*` hooks to call `api-client`; remove direct supabase-js
   data calls (incl. in-screen queries like payshap proxy, provider detail). Keep TanStack Query.
 - **Stays direct to Supabase on mobile:** Auth (session/JWT), Realtime chat, Storage uploads.
@@ -86,6 +94,7 @@ smomo/
 - Verify end-to-end on the emulator after cutover.
 
 ### Phase 5 — Web foundation ✅
+
 - **UI = Tailwind + shadcn/ui**, themed from `ui-tokens` so web matches the mobile brand.
 - **Auth = public browse open; login/register required to transact** (post requests, book, chat).
   No anonymous sessions on web (public pages cover browsing).
@@ -93,6 +102,7 @@ smomo/
 - Authed area under `/app` (or `/dashboard`) protected by middleware; public/SEO pages are open.
 
 ### Phase 6 — Web SEO ✅
+
 - **Human-readable URLs:** `/` (home), `/how-it-works`, `/[category]/[city]` listings,
   `/pro/[slug]` profiles, `/[category]` & `/[city]` hubs. Enum→slug map
   (tattoo_artist→`tattoo-artists`, nail_technician→`nail-technicians`, makeup_artist→`makeup-artists`,
@@ -103,6 +113,7 @@ smomo/
   `Service` on profiles, `ItemList` on listings, `BreadcrumbList` on hubs), `sitemap.ts`, `robots.ts`.
 
 ### Phase 7 — Web authed features ✅
+
 - **Sequence:** ship **full CLIENT web parity first** (post/track requests, view & accept offers,
   bookings, per-booking chat, PayShap pay, reviews) + all SEO; then **practitioner** (studio, feed,
   offers, schedule, complete+proof, portfolio) and **admin** in a follow-up.
@@ -110,6 +121,7 @@ smomo/
   PayShap payment + verify flow; direct-to-Storage image uploads; **web push notifications**.
 
 ### Phase 8 — Deploy & CI ✅
+
 - **Pipeline:** Vercel Git auto-deploy — two Vercel projects (`web`, `api`) from the monorepo;
   preview per PR, production on `main`. Gated DEV→UAT→PROD can be layered on later.
 - **Domain:** `*.vercel.app` for now; custom domain later (web on apex, api on `api.<domain>`).
@@ -119,6 +131,7 @@ smomo/
 ---
 
 ## IMPLEMENTATION STATUS
+
 - ✅ **Phase 0** — monorepo live (pnpm 9.12 + Turborepo); Expo app at `apps/mobile`, verified it
   still bundles (5.5MB iOS). `.npmrc` hoisted + monorepo `metro.config.js`.
 - ✅ **Phase 1** — packages `config`, `ui-tokens`, `shared` (types+dtos+zod contracts+utils),
@@ -130,13 +143,13 @@ smomo/
   Smoke-tested: health, public provider/listing/hub, authed search via anon JWT (RLS), 403 gate. ✅
 - ✅ **Phase 4** — mobile cutover: `src/data/*` + AuthProvider now call `@smomo/api-client`; lib
   utils/types/theme re-export from `@smomo/shared`/`@smomo/ui-tokens`; Auth/Realtime(chat)/Storage
-  stay direct. Typechecks + bundles (6.2MB iOS). `EXPO_PUBLIC_API_URL` = `http://10.0.2.2:4000/v1` (emulator).
+  stay direct. Typechecks + bundles (6.2MB iOS). `EXPO_PUBLIC_API_URL` = `https://smomo-api.vercel.app/v1` (emulator).
 - ✅ **Phase 5** — Next.js 16 web app (Tailwind v4). Public SEO pages built & verified rendering
   real API data with JSON-LD: home, how-it-works, `/[category]`, `/[category]/[city]` (50 SSG pages),
   `/city/[city]`, `/pro/[slug]` (ISR), sitemap.ts, robots.ts. `next build` → 72 static pages.
 - ✅ **Phase 6** — web authed client: @supabase/ssr (browser+server clients, middleware/proxy guard),
   login/register (email+password, SA-ID validated), `/app` dashboard, post request (geo + photo upload),
-  offers+accept, booking detail with PayShap pay + realtime chat. `next build` green (dynamic /app/*).
+  offers+accept, booking detail with PayShap pay + realtime chat. `next build` green (dynamic /app/\*).
 - ✅ **Phase 7** — web practitioner + admin. `useMe()` hook + role-aware `AppNav`; Studio
   (become-a-provider setup calling saveBusiness+finalize, online toggle, verification/subscription
   badges), services CRUD, portfolio (Storage upload + delete), request feed with make-offer
@@ -159,6 +172,7 @@ smomo/
   - PENDING: mobile EAS build with `EXPO_PUBLIC_API_URL=https://smomo-api.vercel.app/v1`.
 
 ## BUILD SEQUENCE
+
 1. **Monorepo**: init `pnpm-workspace.yaml` + `turbo.json`; `git mv` current app → `apps/mobile`;
    add `.npmrc` (`node-linker=hoisted`) + Metro monorepo config; confirm mobile still bundles.
 2. **Packages**: `config` (eslint/tsconfig) → `ui-tokens` (extract from mobile `theme.ts`) →
@@ -175,6 +189,7 @@ smomo/
 6. **Deploy/CI**: Vercel projects (web, api) + env; mobile EAS with `EXPO_PUBLIC_API_URL`.
 
 ## VERIFICATION
+
 - Mobile still bundles after monorepo move (Metro/`expo export`).
 - API: hit `/v1/public/providers/:slug` (no auth) and an authed endpoint with a Supabase JWT;
   confirm RLS still applies (user JWT) and `@RequireRegistered()` blocks anon writes.
@@ -184,8 +199,8 @@ smomo/
   indexable HTML); authed client flow end-to-end.
 
 ## RISKS / NOTES
+
 - **Expo + pnpm monorepo**: needs hoisted node-linker + Metro `watchFolders`/`nodeModulesPaths`.
 - **NestJS on Vercel serverless**: cold starts; the `getUser` token cache mitigates per-request cost.
 - **Slug backfill** for seeded providers; ensure uniqueness.
 - **Public endpoints** must return only public-safe columns (no ID numbers, phones, payshap).
-

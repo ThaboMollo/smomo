@@ -857,6 +857,21 @@ export type Database = {
         Args: { p_payment_id: string; p_reference: string }
         Returns: undefined
       }
+      resolve_dispute: {
+        Args: {
+          p_payment_id: string
+          p_resolve_as: Database["public"]["Enums"]["payment_status"]
+        }
+        Returns: undefined
+      }
+      resolve_report: {
+        Args: {
+          p_report_id: string
+          p_resolution?: string
+          p_status: Database["public"]["Enums"]["report_status"]
+        }
+        Returns: undefined
+      }
       search_providers: {
         Args: {
           p_category?: Database["public"]["Enums"]["service_category"]
