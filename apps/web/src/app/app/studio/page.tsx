@@ -12,6 +12,7 @@ import { Badge, Card, Field } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useLocation } from '@/lib/use-location';
 import { useMe } from '@/lib/use-me';
+import { CONSOLE_URL } from '@/lib/env';
 
 const inputCls = 'input';
 
@@ -36,6 +37,19 @@ function StudioOverview({ onChange }: { onChange: () => void }) {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
+      {/* Managing a studio moved to the SMOMO Console (apps/admin), which has the full set
+          — services, portfolio, offers, bookings, earnings. This screen stays as a summary
+          and a way in, rather than being deleted out from under anyone mid-session. */}
+      <div className="rounded-[20px] border border-primary-300 bg-primary-100 p-4 sm:p-5">
+        <p className="font-medium text-primary-700">Manage your business in the Console</p>
+        <p className="mt-1 text-sm text-primary-700/90">
+          Your profile, services, portfolio, offers, bookings and earnings all live there now.
+        </p>
+        <a href={CONSOLE_URL} className="btn btn-primary mt-3 inline-flex">
+          Open the Console
+        </a>
+      </div>
+
       <div className="flex items-center justify-between">
         <h1 className="text-4xl sm:text-5xl">{p?.business_name ?? 'Your studio'}</h1>
         <div className="flex gap-2">

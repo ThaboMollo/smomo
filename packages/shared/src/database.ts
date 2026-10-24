@@ -596,6 +596,58 @@ export type Database = {
           },
         ]
       }
+      practitioner_verification_events: {
+        Row: {
+          created_at: string
+          decided_by: string
+          from_status: Database["public"]["Enums"]["verification_status"]
+          id: string
+          note: string | null
+          practitioner_id: string
+          to_status: Database["public"]["Enums"]["verification_status"]
+        }
+        Insert: {
+          created_at?: string
+          decided_by: string
+          from_status: Database["public"]["Enums"]["verification_status"]
+          id?: string
+          note?: string | null
+          practitioner_id: string
+          to_status: Database["public"]["Enums"]["verification_status"]
+        }
+        Update: {
+          created_at?: string
+          decided_by?: string
+          from_status?: Database["public"]["Enums"]["verification_status"]
+          id?: string
+          note?: string | null
+          practitioner_id?: string
+          to_status?: Database["public"]["Enums"]["verification_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practitioner_verification_events_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "practitioner_verification_events_practitioner_id_fkey"
+            columns: ["practitioner_id"]
+            isOneToOne: false
+            referencedRelation: "practitioner_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "practitioner_verification_events_practitioner_id_fkey"
+            columns: ["practitioner_id"]
+            isOneToOne: false
+            referencedRelation: "practitioner_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_contact: {
         Row: {
           home_address: string | null
@@ -1157,6 +1209,14 @@ export type Database = {
       }
       set_practitioner_payout: {
         Args: { p_payshap_proxy: string }
+        Returns: undefined
+      }
+      set_practitioner_verification: {
+        Args: {
+          p_note?: string
+          p_practitioner_id: string
+          p_status: Database["public"]["Enums"]["verification_status"]
+        }
         Returns: undefined
       }
       set_profile_contact: {

@@ -42,30 +42,54 @@ from `apps/web/.env.local`.
 
 ## What works
 
-- Sign-in, the closed-by-default proxy gate, and role resolution.
-- The console shell: sidebar (role-gated), top bar, theme toggle, sign-out, and an
-  unverified-account banner for pros.
-- **Overview** — role-aware counts. A pro sees their pipeline and earnings; staff see what
-  is waiting on them.
-- **Platform → Verification** — the queue. Filter by status, see each pro against the ID on
-  file (masked to the last four digits), their categories, base and registration date, then
-  approve or reject. A rejection requires a reason, which the pro is shown.
+Every section in the sidebar is built.
 
-Verification needs **migration 18** applied before the buttons do anything; the RPC is what
-writes `verification_status`, and nothing else can.
+**Professional**
+- **Overview** — pipeline and earnings at a glance.
+- **My studio** — business profile, categories, how you work, deposit, socials; base
+  address and city; online/offline. A rejected pro sees the staff note explaining why.
+- **Services** — add, edit, hide and remove, with the "typical price" that feeds the
+  `from R…` figure on a public profile.
+- **Portfolio** — caption, hide and remove. Photos captured from a completed job are
+  labelled as such, since the client consented to those appearing.
+- **Offers** — the request feed with an inline offer form, plus offers already sent with
+  withdraw. An empty feed says *why* (not verified / offline) rather than just being empty.
+- **Bookings** — confirmed work. The only place the client's street address appears, and
+  only because the booking exists.
+- **Earnings** — received, awaiting confirmation, in dispute, and the payment list.
+
+**Staff** (`profiles.is_admin`)
+- **Platform** — counts across people, marketplace and subscriptions, each linking to the
+  list behind it.
+- **Verification** — the queue. Decide against the ID on file (masked to the last four
+  digits), categories, base and registration date. A rejection requires a reason, which
+  the pro is then shown on their studio page.
+- **Reports** and **Disputes** — resolve or dismiss, via the migration-13 RPCs.
+- **Providers & users** — searchable, read-only. No contact details or ID numbers.
+
+## Writes go through the database, not the API
+
+Reads are Supabase queries in Server Components, so RLS decides what is visible — a pro's
+"bookings" is their own without an `.eq()`. Writes are Server Actions calling the
+SECURITY DEFINER RPCs (`save_business_profile`, `set_practitioner_location`, `make_offer`,
+`set_practitioner_verification`, `resolve_report`, `resolve_dispute`), each of which
+re-checks authorisation itself. `requireStaff()` is a fast failure, never the boundary.
+
+This means the console does not depend on the Nest API being deployed.
 
 ## Not built yet
 
-- Professional sections: studio, services, portfolio, offers, bookings, earnings.
-- Platform sections: metrics, reports, disputes, providers & users.
-- Moving `/app/studio`, `/app/feed` and `/app/schedule` out of the consumer web app and
-  redirecting them here.
+- **Uploading** portfolio photos. It needs the Storage client, a signed upload path and
+  image validation, which `apps/mobile/src/lib/upload.ts` already has; a second divergent
+  implementation would be worse than pointing people at the one that works.
+- Chats/messaging — still only in the consumer app and mobile.
 - A Vercel project for this app and its own domain.
 
 ## Known gap
 
 The Supabase client here is not parameterised with `<Database>`, so reads are unchecked.
-See the note in `src/lib/supabase/client.ts` — supabase-js currently infers
-`.from('practitioner_profiles').select('id')` as `never`, which is pre-existing and affects
-the whole repo (no app types its client). Ruled out: the PostGIS `unknown` columns and the
-`PostgrestVersion` value.
+See the note in `src/lib/supabase/client.ts`: supabase-js infers
+`.from('practitioner_profiles').select('id')` as `never`, reproducible with that one call
+while `profiles` works. Pre-existing and repo-wide — no app types its client. Ruled out:
+the PostGIS `unknown` columns (now fixed) and the `PostgrestVersion` value. Row shapes are
+named from `@smomo/shared` DTOs at each call site as a partial substitute.

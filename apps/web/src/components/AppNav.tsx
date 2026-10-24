@@ -9,8 +9,11 @@ import { SignOutButton } from '@/components/SignOutButton';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Container } from '@/components/ui';
 import { useMe } from '@/lib/use-me';
+import { CONSOLE_URL } from '@/lib/env';
 
-type Item = { href: string; label: string; icon: ReactNode; exact?: boolean };
+/** `external` marks a destination in another app (the console), which Next's <Link>
+ *  should not prefetch and which is never highlighted as the current page. */
+type Item = { href: string; label: string; icon: ReactNode; exact?: boolean; external?: boolean };
 
 const svg = (d: ReactNode) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -54,36 +57,74 @@ const ICONS = {
   admin: svg(<path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z" />),
 };
 
+/**
+ * One nav destination. An `external` item renders a plain anchor: `<Link>` would try to
+ * client-navigate and prefetch a different application, which cannot work and wastes a
+ * request on every nav render.
+ */
+function NavLink({
+  item,
+  current,
+  className,
+  children,
+}: {
+  item: Item;
+  current: boolean;
+  className: string;
+  children: ReactNode;
+}) {
+  if (item.external) {
+    return (
+      <a href={item.href} className={className}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href={item.href} aria-current={current ? 'page' : undefined} className={className}>
+      {children}
+    </Link>
+  );
+}
+
 export function AppNav() {
   const pathname = usePathname();
   const { data } = useMe();
   const isPractitioner = !!data?.profile?.is_practitioner;
   const isAdmin = !!data?.profile?.is_admin;
 
+  /**
+   * The pro and staff destinations moved to the SMOMO Console (`apps/admin`), so the nav
+   * sends people there instead of to local copies: Requests became Offers, Schedule became
+   * Bookings, Studio became My studio, Admin became Platform. `/app/studio` is kept for
+   * a client who is not a pro yet, because it is also the "become a pro" onboarding.
+   */
   const items: Item[] = [
     { href: '/app', label: 'Home', icon: ICONS.home, exact: true },
     { href: '/app/discover', label: 'Discover', icon: ICONS.discover },
-    ...(isPractitioner
-      ? [
-          { href: '/app/feed', label: 'Requests', icon: ICONS.requests },
-          { href: '/app/schedule', label: 'Schedule', icon: ICONS.schedule },
-        ]
-      : []),
     { href: '/app/chats', label: 'Chats', icon: ICONS.chats },
-    { href: '/app/studio', label: isPractitioner ? 'Studio' : 'Become a pro', icon: ICONS.studio },
-    ...(isAdmin ? [{ href: '/app/admin', label: 'Admin', icon: ICONS.admin }] : []),
+    ...(isPractitioner
+      ? [{ href: CONSOLE_URL, label: 'Console', icon: ICONS.studio, external: true }]
+      : [{ href: '/app/studio', label: 'Become a pro', icon: ICONS.studio }]),
+    ...(isAdmin && !isPractitioner
+      ? [{ href: `${CONSOLE_URL}/platform`, label: 'Admin', icon: ICONS.admin, external: true }]
+      : []),
   ];
 
-  const isActive = (it: Item) => (it.exact ? pathname === it.href : pathname.startsWith(it.href));
+  // An external destination is never "active" — the console is a different app.
+  const isActive = (it: Item) =>
+    it.external ? false : it.exact ? pathname === it.href : pathname.startsWith(it.href);
 
   // Mobile tab bar: the most-used destinations only, profile last.
+  // Mobile tab bar: the most-used destinations only, profile last. Built by filtering the
+  // list above rather than looking items up by href, which broke whenever one moved.
   const mobileItems: Item[] = [
     items[0],
-    isPractitioner ? items.find((i) => i.href === '/app/feed')! : items[1],
+    items[1],
     items.find((i) => i.href === '/app/chats')!,
-    isPractitioner ? items.find((i) => i.href === '/app/studio')! : { href: '/app/profile', label: 'Profile', icon: ICONS.profile },
-    ...(isPractitioner ? [{ href: '/app/profile', label: 'Profile', icon: ICONS.profile }] : []),
-  ];
+    items.find((i) => i.external || i.href === '/app/studio')!,
+    { href: '/app/profile', label: 'Profile', icon: ICONS.profile },
+  ].filter(Boolean);
 
   return (
     <>
@@ -95,14 +136,14 @@ export function AppNav() {
             </Link>
             <nav aria-label="App" className="hidden items-center gap-1 md:flex">
               {items.map((it) => (
-                <Link
+                <NavLink
                   key={it.href}
-                  href={it.href}
-                  aria-current={isActive(it) ? 'page' : undefined}
+                  item={it}
+                  current={isActive(it)}
                   className={`whitespace-nowrap rounded-full px-3.5 py-2 text-sm transition-colors ${isActive(it) ? 'bg-primary-200 font-medium text-primary-700' : 'text-text-muted hover:bg-primary-100 hover:text-text'}`}
                 >
                   {it.label}
-                </Link>
+                </NavLink>
               ))}
             </nav>
           </div>
@@ -135,15 +176,15 @@ export function AppNav() {
           {mobileItems.map((it) => {
             const on = isActive(it);
             return (
-              <Link
+              <NavLink
                 key={it.href}
-                href={it.href}
-                aria-current={on ? 'page' : undefined}
+                item={it}
+                current={on}
                 className={`flex min-w-[64px] flex-col items-center gap-0.5 rounded-2xl px-2 py-1.5 text-[11px] ${on ? 'font-medium text-primary-700' : 'text-text-muted'}`}
               >
                 <span className={`flex h-8 w-12 items-center justify-center rounded-full ${on ? 'bg-primary-200' : ''}`}>{it.icon}</span>
                 {it.label}
-              </Link>
+              </NavLink>
             );
           })}
         </div>
