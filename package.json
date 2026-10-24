@@ -9,12 +9,13 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "lint": "turbo run lint",
+    "lint": "turbo run lint && node scripts/check-no-emoji.mjs",
     "typecheck": "turbo run typecheck",
     "mobile": "pnpm --filter mobile start",
     "web": "pnpm --filter web dev",
     "api": "pnpm --filter api start:dev",
-    "gen:types": "pnpm --filter @smomo/shared gen:types"
+    "gen:types": "pnpm --filter @smomo/shared gen:types",
+    "lint:emoji": "node scripts/check-no-emoji.mjs"
   },
   "devDependencies": {
     "turbo": "^2.3.3"

@@ -5,6 +5,8 @@ import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 
 
 import { COUNTRIES, COUNTRY_LIST, type CountryCode } from '@smomo/shared';
 
+import { CheckIcon } from '@/components/ui';
+
 import type { Place, Suggestion } from '@/lib/places';
 import { GEOLOCATION_ENABLED } from '@/lib/features';
 import { ManualAddressField } from './ManualAddressField';
@@ -273,9 +275,7 @@ function SearchAddressField({ label, hint, placeholder = 'Start typing an addres
         {loading ? (
           <span aria-hidden className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin rounded-full border-2 border-text-faint border-t-transparent" />
         ) : value ? (
-          <span aria-hidden className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-success">
-            ✓
-          </span>
+          <CheckIcon className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-success" />
         ) : null}
 
         {open && (items.length > 0 || showEmpty) ? (

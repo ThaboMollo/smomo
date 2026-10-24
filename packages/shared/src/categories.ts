@@ -4,16 +4,23 @@ export type ServiceCategory = Enums<'service_category'>;
 export type ServiceMode = Enums<'service_mode'>;
 export type BookingMode = Enums<'booking_mode'>;
 
+/**
+ * The service categories, in display order.
+ *
+ * No emoji field. Categories are drawn with `<CategoryIcon>` in both apps — a round crop
+ * of the category's own photography on web, the matching mark on mobile — so a glyph here
+ * would only ever be a second, worse source of truth. Emoji render differently on every
+ * platform and are not part of the brand.
+ */
 export const CATEGORIES: {
   value: ServiceCategory;
   label: string;
-  emoji: string;
 }[] = [
-  { value: 'hairdresser', label: 'Hair', emoji: '💇' },
-  { value: 'nail_technician', label: 'Nails', emoji: '💅' },
-  { value: 'makeup_artist', label: 'Make-up', emoji: '💄' },
-  { value: 'beautician', label: 'Beauty', emoji: '✨' },
-  { value: 'tattoo_artist', label: 'Tattoo', emoji: '🖋️' },
+  { value: 'hairdresser', label: 'Hair' },
+  { value: 'nail_technician', label: 'Nails' },
+  { value: 'makeup_artist', label: 'Make-up' },
+  { value: 'beautician', label: 'Beauty' },
+  { value: 'tattoo_artist', label: 'Tattoo' },
 ];
 
 const CATEGORY_MAP = Object.fromEntries(
@@ -22,10 +29,6 @@ const CATEGORY_MAP = Object.fromEntries(
 
 export function categoryLabel(c: ServiceCategory): string {
   return CATEGORY_MAP[c]?.label ?? c;
-}
-
-export function categoryEmoji(c: ServiceCategory): string {
-  return CATEGORY_MAP[c]?.emoji ?? '✨';
 }
 
 export const SERVICE_MODE_LABEL: Record<ServiceMode, string> = {

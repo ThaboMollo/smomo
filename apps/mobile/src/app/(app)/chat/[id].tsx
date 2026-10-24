@@ -7,7 +7,7 @@ import { spacing, useTheme } from '@/lib/theme';
 import { useBooking } from '@/data/bookings';
 import { useMessages, useSendMessage } from '@/data/chat';
 import { useAuth } from '@/providers/AuthProvider';
-import { AppText, Header, IconButton, Input, Loader, Screen } from '@/ui';
+import { AppText, Header, IconButton, Input, Ionicons, Loader, Screen } from '@/ui';
 
 export default function Chat() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -67,9 +67,12 @@ export default function Chat() {
               );
             }}
             ListEmptyComponent={
-              <AppText variant="small" color="textFaint" center style={{ marginTop: spacing.xl }}>
-                Say hi 👋 — coordinate the details of your booking here.
-              </AppText>
+              <View style={{ alignItems: 'center', gap: spacing.sm, marginTop: spacing.xl }}>
+                <Ionicons name="chatbubble-ellipses-outline" size={28} color={colors.textFaint} />
+                <AppText variant="small" color="textFaint" center>
+                  Say hi — coordinate the details of your booking here.
+                </AppText>
+              </View>
             }
           />
         )}

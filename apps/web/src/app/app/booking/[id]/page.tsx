@@ -15,7 +15,7 @@ import {
 
 import { CategoryIcon } from '@/components/CategoryIcon';
 import { ChatPanel } from '@/components/ChatPanel';
-import { Badge, Card } from '@/components/ui';
+import { Badge, Card, StarIcon } from '@/components/ui';
 import { api } from '@/lib/api';
 import { createClient } from '@/lib/supabase/client';
 import { uploadImage } from '@/lib/upload';
@@ -184,10 +184,13 @@ function ClientReview({
         {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}
+            type="button"
             onClick={() => setRating(n)}
-            className={`text-3xl ${n <= rating ? 'text-star' : 'text-text-faint'}`}
+            aria-label={`${n} star${n === 1 ? '' : 's'}`}
+            aria-pressed={n <= rating}
+            className={`p-1 ${n <= rating ? 'text-star' : 'text-text-faint'}`}
           >
-            ★
+            <StarIcon size={30} />
           </button>
         ))}
       </div>
@@ -293,8 +296,15 @@ function PractitionerActions({
         <p className="text-sm font-medium text-text-muted">Rate the client</p>
         <div className="mt-1 flex gap-1">
           {[1, 2, 3, 4, 5].map((n) => (
-            <button key={n} onClick={() => setRating(n)} className={`text-2xl ${n <= rating ? 'text-star' : 'text-text-faint'}`}>
-              ★
+            <button
+              key={n}
+              type="button"
+              onClick={() => setRating(n)}
+              aria-label={`${n} star${n === 1 ? '' : 's'}`}
+              aria-pressed={n <= rating}
+              className={`p-1 ${n <= rating ? 'text-star' : 'text-text-faint'}`}
+            >
+              <StarIcon size={24} />
             </button>
           ))}
         </div>

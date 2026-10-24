@@ -9,14 +9,15 @@ import { GEOLOCATION_ENABLED } from '@/lib/features';
 import { geocodeAddress, getCurrentCoords } from '@/lib/location';
 import { ManualAddressFields, type ResolvedAddress } from '@/components/ManualAddressFields';
 import { validatePassport, validateSaId } from '@/lib/saId';
-import { spacing } from '@/lib/theme';
+import { spacing, useTheme } from '@/lib/theme';
 import { useCreateRequest } from '@/data/requests';
 import { EmailInUseError, useAuth } from '@/providers/AuthProvider';
 import { usePendingRequest } from '@/providers/PendingRequestProvider';
 import type { Enums } from '@/types/database';
-import { AppText, Button, Header, Input, Screen, Segmented } from '@/ui';
+import { AppText, Button, Header, Input, Ionicons, Row, Screen, Segmented } from '@/ui';
 
 export default function Register() {
+  const { colors } = useTheme();
   const { role } = useLocalSearchParams<{ role?: 'client' | 'practitioner' }>();
   const isPractitioner = role === 'practitioner';
   const { registerClient, registerPractitioner } = useAuth();
@@ -158,7 +159,16 @@ export default function Register() {
                 value={idNumber}
                 onChangeText={setIdNumber}
                 error={idCheck && !idCheck.valid ? idCheck.reason : undefined}
-                hint={idCheck?.valid ? '✓ Looks good' : undefined}
+                hint={
+                idCheck?.valid ? (
+                  <Row style={{ gap: 4 }}>
+                    <Ionicons name="checkmark-circle" size={13} color={colors.success} />
+                    <AppText variant="caption" color="success">
+                      Looks good
+                    </AppText>
+                  </Row>
+                ) : undefined
+              }
               />
             ) : (
               <AppText variant="caption" color="textFaint" style={{ marginBottom: spacing.md }}>
@@ -174,7 +184,16 @@ export default function Register() {
             value={idNumber}
             onChangeText={setIdNumber}
             error={idCheck && !idCheck.valid ? idCheck.reason : undefined}
-            hint={idCheck?.valid ? '✓ Looks good' : undefined}
+            hint={
+                idCheck?.valid ? (
+                  <Row style={{ gap: 4 }}>
+                    <Ionicons name="checkmark-circle" size={13} color={colors.success} />
+                    <AppText variant="caption" color="success">
+                      Looks good
+                    </AppText>
+                  </Row>
+                ) : undefined
+              }
           />
         )}
 

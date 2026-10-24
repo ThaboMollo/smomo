@@ -10,7 +10,7 @@ import { toE164 } from '@smomo/shared';
 
 import { Icon } from '@/components/Icon';
 import { AddressField } from '@/components/location/AddressField';
-import { Avatar, Card, Stars } from '@/components/ui';
+import { Avatar, Card, CheckIcon, Stars } from '@/components/ui';
 import { api } from '@/lib/api';
 import { createClient } from '@/lib/supabase/client';
 import { uploadImage } from '@/lib/upload';
@@ -151,7 +151,15 @@ export default function Profile() {
           disabled={save.isPending}
           className="btn btn-primary w-full"
         >
-          {save.isPending ? 'Saving…' : saved ? 'Saved ✓' : 'Save changes'}
+          {save.isPending ? (
+            'Saving…'
+          ) : saved ? (
+            <span className="inline-flex items-center gap-1.5">
+              <CheckIcon /> Saved
+            </span>
+          ) : (
+            'Save changes'
+          )}
         </button>
       </Card>
 

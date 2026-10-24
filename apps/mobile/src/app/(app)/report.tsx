@@ -1,15 +1,16 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { safeBack } from '@/lib/nav';
 import { useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
-import { spacing } from '@/lib/theme';
+import { spacing, useTheme } from '@/lib/theme';
 import { useCreateReport } from '@/data/misc';
-import { AppText, Button, Chip, Header, Input, Row, Screen } from '@/ui';
+import { AppText, Button, Chip, Header, Input, Ionicons, Row, Screen } from '@/ui';
 
 const REASONS = ['No-show', 'Inappropriate behaviour', 'Payment issue', 'Poor service', 'Other'];
 
 export default function Report() {
+  const { colors } = useTheme();
   const params = useLocalSearchParams<{ userId?: string; bookingId?: string }>();
   const createReport = useCreateReport();
   const [reason, setReason] = useState<string>(REASONS[0]);
@@ -33,9 +34,12 @@ export default function Report() {
       <Header title="Report a problem" onBack={() => safeBack()} />
       <ScrollView contentContainerStyle={{ padding: spacing.lg }} keyboardShouldPersistTaps="handled">
         {done ? (
-          <AppText variant="heading" center style={{ marginTop: spacing.xl }}>
-            ✅ Thanks — our team will review this.
-          </AppText>
+          <View style={{ alignItems: 'center', gap: spacing.md, marginTop: spacing.xl }}>
+            <Ionicons name="checkmark-circle" size={40} color={colors.success} />
+            <AppText variant="heading" center>
+              Thanks — our team will review this.
+            </AppText>
+          </View>
         ) : (
           <>
             <AppText variant="small" color="textMuted" weight="600" style={{ marginBottom: spacing.sm }}>

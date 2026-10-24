@@ -11,7 +11,7 @@ import { LoadingOverlay } from '@/components/LoadingSpinner';
 import { AddressField } from '@/components/location/AddressField';
 import { PasswordInput } from '@/components/PasswordInput';
 import { PhoneInput } from '@/components/PhoneInput';
-import { Field, Steps } from '@/components/ui';
+import { CheckIcon, Field, Steps } from '@/components/ui';
 import { api } from '@/lib/api';
 import { createClient } from '@/lib/supabase/client';
 
@@ -270,7 +270,15 @@ export default function RegisterPage() {
           <Field
             label="Create a password"
             error={tried1 ? e1.password : null}
-            hint={password.length >= 6 ? <span className="text-success">✓ Looks good</span> : 'At least 6 characters'}
+            hint={
+              password.length >= 6 ? (
+                <span className="inline-flex items-center gap-1.5 text-success">
+                  <CheckIcon size={14} /> Looks good
+                </span>
+              ) : (
+                'At least 6 characters'
+              )
+            }
           >
             <PasswordInput value={password} onChange={setPassword} autoComplete="new-password" invalid={tried1 && !!e1.password} />
           </Field>
@@ -344,7 +352,17 @@ export default function RegisterPage() {
           <Field
             label={idType === 'sa_id' ? 'SA ID number' : 'Passport or national ID number'}
             error={serverErrors.idNumber ?? (tried2 ? e2.idNumber : null)}
-            hint={idOk ? <span className="text-success">✓ Looks right</span> : idType === 'sa_id' ? '13 digits. Spaces are fine.' : 'Letters and numbers. Spaces and dashes are fine.'}
+            hint={
+              idOk ? (
+                <span className="inline-flex items-center gap-1.5 text-success">
+                  <CheckIcon size={14} /> Looks right
+                </span>
+              ) : idType === 'sa_id' ? (
+                '13 digits. Spaces are fine.'
+              ) : (
+                'Letters and numbers. Spaces and dashes are fine.'
+              )
+            }
           >
             <input
               className="input tnum"

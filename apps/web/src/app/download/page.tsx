@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 
-import { Button, Card, Container, Hairline, Kicker, Badge } from '@/components/ui';
+import { Badge, Button, Card, Container, DownloadIcon, Hairline, Kicker } from '@/components/ui';
 import { APP_DOWNLOAD } from '@/lib/app-download';
 import { SITE_NAME } from '@/lib/env';
 
@@ -42,7 +42,7 @@ export default function DownloadPage() {
                 download
                 className="btn btn-primary w-fit"
               >
-                ⬇ Download APK
+                <DownloadIcon /> Download APK
                 <span className="tnum text-xs text-text-muted">
                   v{version}
                   {sizeMb ? ` · ${sizeMb} MB` : ''}

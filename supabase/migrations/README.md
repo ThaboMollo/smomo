@@ -43,6 +43,7 @@ after any one of them.
 | 14 | `fix_handle_new_user_after_contact_split` | no (trigger function) | no |
 | 15 | `rpc_param_defaults` | no (function) | no — but deploy the API after |
 | 16 | `optional_coordinates_and_city` | no (adds nullable columns) | no — but deploy all three after |
+| 17 | `withhold_request_address_until_booked` | no (one RLS policy) | no — closes a leak, apply first |
 
 Note: 11 sorts before 10 by timestamp, which is intentional — the contract
 phase stays last. 14 also sorts before 12 and 13; it is a standalone trigger fix
@@ -115,6 +116,19 @@ when the columns move.
   Backwards-compatible with the already-deployed app: every argument name the old API
   sends still exists, with `p_city` defaulted, so nothing fails to resolve. Until the
   deploy lands the feed simply shows a blank address and no distance.
+- **17** `br_select_party` allowed `auth.uid() = target_practitioner_id`, so for a
+  *directed* request the targeted provider could read the whole row — `address` included —
+  off PostgREST with no offer and no booking. `GET /requests/:id` does `select('*')` and
+  relies entirely on that policy, so both apps would hand it over; the request also showed
+  up in that practitioner's own `/requests/mine`. Verified against production before the
+  fix: 1 row, 1 address. The policy is now client-or-admin only.
+
+  Nothing legitimate needed it: directed requests still reach the practitioner through
+  `feed_requests_for_practitioner` (SECURITY DEFINER, city only since 16), offers go
+  through `make_offer`, and both apps build the offer screen from the feed row they already
+  hold. Guarded by `apps/api/test/security/request-address-privacy.spec.ts`, which posts
+  its own directed request rather than reading whatever happens to be in the table — the
+  vacuous version of that assertion is how this survived.
 
 ## Rollback
 
@@ -126,3 +140,5 @@ backup before applying it. 15 is reversible by re-applying 05b's definition of
 `save_business_profile` and dropping the new argument order. 16 is reversible for the
 functions the same way; the two `city` columns can be dropped, and re-adding NOT NULL to
 `booking_requests.location` requires that no pointless rows have been written yet.
+17 is reversible by re-adding the `target_practitioner_id` clause to the policy, which
+re-opens the leak — so only deliberately.

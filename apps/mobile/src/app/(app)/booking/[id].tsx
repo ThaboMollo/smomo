@@ -297,7 +297,7 @@ function PaymentCard({
                 verifyPayment.mutate({ paymentId: payment.id, verified: true, bookingId });
                 notifyBooking(
                   bookingId,
-                  'Payment verified ✅',
+                  'Payment verified',
                   `Your ${formatZar(payment.amount_zar)} payment was confirmed.`,
                   { url: `/(app)/booking/${bookingId}` },
                 );

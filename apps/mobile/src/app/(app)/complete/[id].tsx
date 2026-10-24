@@ -57,7 +57,7 @@ export default function CompleteBooking() {
       });
       notifyBooking(
         booking.id,
-        'Your booking is complete 💜',
+        'Your booking is complete',
         'Tap to leave a review for your provider.',
         { url: `/(app)/booking/${booking.id}` },
       );

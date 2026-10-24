@@ -60,7 +60,7 @@ export default function RequestDetail() {
               const bookingId = await acceptOffer.mutateAsync(offer.id);
               notifyBooking(
                 bookingId,
-                'Offer accepted 🎉',
+                'Offer accepted',
                 'A client accepted your offer. Open Smomo to see the booking.',
                 { url: `/(app)/booking/${bookingId}` },
               );

@@ -7,7 +7,7 @@ import { SOCIAL_PLATFORMS, socialUrl, detectCountry } from '@smomo/shared';
 
 import { CATEGORY_LABEL, CATEGORY_SLUGS } from '@/lib/catalog';
 import { Icon } from '@/components/Icon';
-import { Avatar, Container, Plate, Stars } from '@/components/ui';
+import { Avatar, Container, Plate, StarIcon, Stars } from '@/components/ui';
 import { SHOW_PUBLIC_RATINGS } from '@/lib/flags';
 import { cardPhoto } from '@/lib/images';
 import { SITE_URL } from '@/lib/env';
@@ -99,8 +99,8 @@ export default async function ProviderPage({ params }: Params) {
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-primary-200">
               {SHOW_PUBLIC_RATINGS ? (
                 <>
-                  <span className="tnum">
-                    <span className="text-accent">★</span>{' '}
+                  <span className="tnum inline-flex items-center gap-1.5">
+                    <StarIcon className="text-accent" />
                     {p.rating != null ? `${p.rating.toFixed(1)} · ${p.rating_count} reviews` : 'New on SMOMO'}
                   </span>
                   <span className="tnum">{p.jobs_done} jobs done</span>

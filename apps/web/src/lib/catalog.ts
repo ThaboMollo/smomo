@@ -31,13 +31,8 @@ export const CATEGORY_LABEL: Record<CategorySlug, string> = {
   beauticians: 'Beauticians',
 };
 
-export const CATEGORY_EMOJI: Record<CategorySlug, string> = {
-  'tattoo-artists': '🖋️',
-  hairdressers: '💇',
-  'nail-technicians': '💅',
-  'makeup-artists': '💄',
-  beauticians: '✨',
-};
+// No CATEGORY_EMOJI map: categories are drawn with <CategoryIcon>, which crops
+// CATEGORY_IMAGE. Emoji are not part of the brand and render differently per platform.
 
 export const CATEGORY_SLUG_LIST = Object.keys(SLUG_TO_CATEGORY) as CategorySlug[];
 

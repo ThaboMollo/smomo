@@ -321,7 +321,13 @@ export function Button({
 }
 
 /* ----------------------------- Input ----------------------------- */
-type InputProps = TextInputProps & { label?: string; error?: string; hint?: string };
+// `hint` takes a node, not just a string, so a field can show a vector tick beside
+// "Looks good" the way the web's `<Field hint>` does — without resorting to a glyph.
+type InputProps = TextInputProps & {
+  label?: string;
+  error?: string;
+  hint?: React.ReactNode;
+};
 
 export const Input = forwardRef<TextInput, InputProps>(function Input(
   { label, error, hint, style, ...rest },
@@ -355,9 +361,13 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
           {error}
         </AppText>
       ) : hint ? (
-        <AppText variant="caption" color="textFaint">
-          {hint}
-        </AppText>
+        typeof hint === 'string' ? (
+          <AppText variant="caption" color="textFaint">
+            {hint}
+          </AppText>
+        ) : (
+          hint
+        )
       ) : null}
     </View>
   );
@@ -530,8 +540,9 @@ export function StarRating({
       style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}
       accessibilityLabel={`${value.toFixed(1)} out of 5 stars${count != null ? `, ${count} reviews` : ''}`}
     >
-      {/* The web prints the ★ character in `text-star`, not an icon-font glyph. */}
-      <Text style={{ color: colors.star, fontSize: size }}>★</Text>
+      {/* Vector star, matching the web's `<StarIcon>`. Never a literal glyph: the platform
+          font decides what that looks like and it cannot be sized reliably. */}
+      <Ionicons name="star" size={size} color={colors.star} />
       <Text
         style={{ color: colors.text, fontSize: size, fontFamily: fontFamily.bodyMedium }}
       >

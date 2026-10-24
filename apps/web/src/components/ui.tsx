@@ -90,15 +90,56 @@ export function Button({
   );
 }
 
+/* ───────────────────────────── Small marks ─────────────────────────────
+   Inline SVG, never emoji or symbol characters. A star, tick or cross typed as a literal
+   glyph picks up whatever the platform's font decides - colour-emoji on some, a hairline
+   outline on others - and cannot be sized or coloured reliably. These take
+   `currentColor` and scale with `size`. */
+
+/** Filled star, for ratings. */
+export function StarIcon({ size = 14, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden className={`inline-block shrink-0 ${className}`}>
+      <path d="M12 2.6l2.82 5.72 6.31.92-4.57 4.45 1.08 6.29L12 17.02l-5.64 2.96 1.08-6.29L2.87 9.24l6.31-.92L12 2.6Z" />
+    </svg>
+  );
+}
+
+/** Tick, for confirmations and validated fields. */
+export function CheckIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden className={`inline-block shrink-0 ${className}`}>
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
+/** Cross, for dismiss affordances. */
+export function CloseIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden className={`inline-block shrink-0 ${className}`}>
+      <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
+/** Tray-and-arrow download mark. */
+export function DownloadIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden className={`inline-block shrink-0 ${className}`}>
+      <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5" />
+      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+    </svg>
+  );
+}
+
 export function Stars({ rating, count }: { rating: number | null; count?: number }) {
   if (rating == null) {
     return <span className="text-sm text-text-faint">New</span>;
   }
   return (
     <span className="tnum inline-flex items-center gap-1 text-sm">
-      <span className="text-star" aria-hidden>
-        ★
-      </span>
+      <StarIcon className="text-star" />
       <span className="font-medium text-text">{rating.toFixed(1)}</span>
       {count != null ? <span className="text-text-muted">({count})</span> : null}
       <span className="sr-only">out of 5 stars</span>

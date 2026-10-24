@@ -3,6 +3,8 @@
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { CloseIcon } from '@/components/ui';
+
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
@@ -112,7 +114,7 @@ export function PwaProvider() {
           aria-label="Dismiss"
           className="shrink-0 rounded-full px-3 py-2 text-text-faint transition-colors hover:bg-card-muted"
         >
-          ✕
+          <CloseIcon />
         </button>
       </div>
     </div>
