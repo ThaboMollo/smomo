@@ -2,7 +2,8 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { safeBack } from '@/lib/nav';
 import { Alert, FlatList, View } from 'react-native';
 
-import { categoryEmoji, categoryLabel, BOOKING_MODE_LABEL } from '@/lib/categories';
+import { CategoryIcon } from '@/components/CategoryIcon';
+import { categoryLabel, BOOKING_MODE_LABEL } from '@/lib/categories';
 import { formatBudget, formatWhen, formatZar, timeLeft } from '@/lib/format';
 import { notifyBooking } from '@/lib/push';
 import { spacing, useTheme } from '@/lib/theme';
@@ -39,7 +40,7 @@ export default function RequestDetail() {
     return (
       <Screen>
         <Header title="Request" onBack={() => safeBack()} />
-        <EmptyState emoji="🤷" title="Request not found" />
+        <EmptyState title="Request not found" />
       </Screen>
     );
   }
@@ -98,9 +99,12 @@ export default function RequestDetail() {
           <View style={{ marginBottom: spacing.md }}>
             <Card style={{ marginBottom: spacing.md }}>
               <Row style={{ justifyContent: 'space-between' }}>
-                <AppText variant="heading">
-                  {categoryEmoji(request.category)} {categoryLabel(request.category)}
-                </AppText>
+                <Row style={{ gap: 6 }}>
+              <CategoryIcon category={request.category} size={16} />
+              <AppText variant="heading">
+                {categoryLabel(request.category)}
+              </AppText>
+            </Row>
                 <Badge
                   label={isOpen ? timeLeft(request.expires_at) : request.status}
                   tone={isOpen ? 'primary' : 'default'}
@@ -178,7 +182,7 @@ export default function RequestDetail() {
               <Loader label="Waiting for offers…" />
             </View>
           ) : (
-            <EmptyState emoji="⌛" title="No offers" message="This request is no longer open." />
+            <EmptyState title="No offers" body="This request is no longer open." />
           )
         }
         ListFooterComponent={

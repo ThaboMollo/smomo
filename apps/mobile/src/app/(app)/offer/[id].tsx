@@ -3,12 +3,13 @@ import { safeBack } from '@/lib/nav';
 import { useState } from 'react';
 import { ScrollView } from 'react-native';
 
-import { categoryEmoji, categoryLabel, type ServiceCategory } from '@/lib/categories';
+import { CategoryIcon } from '@/components/CategoryIcon';
+import { categoryLabel, type ServiceCategory } from '@/lib/categories';
 import { formatBudget, formatZar } from '@/lib/format';
 import { notifyRequestClient } from '@/lib/push';
 import { spacing } from '@/lib/theme';
 import { useMakeOffer } from '@/data/requests';
-import { AppText, Button, Card, Header, Input, Screen } from '@/ui';
+import { AppText, Button, Card, Header, Input, Row, Screen } from '@/ui';
 
 export default function MakeOffer() {
   const params = useLocalSearchParams<{
@@ -52,9 +53,12 @@ export default function MakeOffer() {
       <ScrollView contentContainerStyle={{ padding: spacing.lg }} keyboardShouldPersistTaps="handled">
         {params.category ? (
           <Card style={{ marginBottom: spacing.lg }}>
-            <AppText variant="heading">
-              {categoryEmoji(params.category)} {categoryLabel(params.category)}
-            </AppText>
+            <Row style={{ gap: 6 }}>
+              <CategoryIcon category={params.category} size={16} />
+              <AppText variant="heading">
+                {categoryLabel(params.category)}
+              </AppText>
+            </Row>
             {params.description ? (
               <AppText variant="small" color="textMuted" style={{ marginTop: 4 }}>
                 {params.description}

@@ -1,8 +1,10 @@
 import { router } from 'expo-router';
 import { useMemo } from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, View } from 'react-native';
 
-import { categoryEmoji, categoryLabel } from '@/lib/categories';
+import { CategoryIcon } from '@/components/CategoryIcon';
+import { categoryLabel } from '@/lib/categories';
+import { formatWhen } from '@/lib/format';
 import { spacing } from '@/lib/theme';
 import { useMyBookings } from '@/data/bookings';
 import { useAuth } from '@/providers/AuthProvider';
@@ -35,18 +37,31 @@ export function ChatsScreen() {
           const other = item.client_id === userId ? item.practitioner : item.client;
           return (
             <Card onPress={() => router.push(`/(app)/chat/${item.id}`)} style={{ marginBottom: spacing.sm }}>
-              <Row style={{ gap: spacing.md }}>
+              <Row style={{ gap: spacing.md, alignItems: 'flex-start' }}>
                 <Avatar uri={other?.avatar_url} name={other?.full_name} size={44} />
-                <Row style={{ flex: 1, justifyContent: 'space-between' }}>
-                  <AppText weight="600">{other?.full_name ?? 'User'}</AppText>
-                  <Badge label={`${categoryEmoji(item.category)} ${categoryLabel(item.category)}`} />
-                </Row>
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Row style={{ justifyContent: 'space-between', gap: spacing.sm }}>
+                    <AppText weight="500" numberOfLines={1} style={{ flexShrink: 1 }}>
+                      {other?.full_name ?? 'User'}
+                    </AppText>
+                    <Badge
+                      label={item.status.replace('_', ' ')}
+                      tone={item.status === 'completed' ? 'success' : 'primary'}
+                    />
+                  </Row>
+                  <Row style={{ gap: 6 }}>
+                    <CategoryIcon category={item.category} size={14} />
+                    <AppText variant="small" color="textMuted" numberOfLines={1} style={{ flexShrink: 1 }}>
+                      {categoryLabel(item.category)} · {formatWhen(item.scheduled_at)}
+                    </AppText>
+                  </Row>
+                </View>
               </Row>
             </Card>
           );
         }}
         ListEmptyComponent={
-          <EmptyState emoji="💬" title="No chats yet" message="Chats appear once you have a confirmed booking." />
+          <EmptyState title="No chats yet" body="Chats appear once you have a confirmed booking." />
         }
       />
     </Screen>

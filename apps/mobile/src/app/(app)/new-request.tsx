@@ -5,6 +5,7 @@ import { safeBack } from '@/lib/nav';
 import { useEffect, useState } from 'react';
 import { Platform, Pressable, ScrollView, Switch, View } from 'react-native';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
 import {
   BOOKING_MODE_LABEL,
   CATEGORIES,
@@ -113,7 +114,7 @@ export default function NewRequest() {
         </AppText>
         <Row style={{ gap: spacing.sm, flexWrap: 'wrap', marginBottom: spacing.lg }}>
           {CATEGORIES.map((c) => (
-            <Chip key={c.value} label={c.label} emoji={c.emoji} selected={category === c.value} onPress={() => setCategory(c.value)} />
+            <Chip key={c.value} label={c.label} leading={<CategoryIcon category={c.value} size={20} />} selected={category === c.value} onPress={() => setCategory(c.value)} />
           ))}
         </Row>
 

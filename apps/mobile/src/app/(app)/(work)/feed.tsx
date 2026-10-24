@@ -2,7 +2,8 @@ import { router } from 'expo-router';
 import { Switch, View } from 'react-native';
 import { FlatList } from 'react-native';
 
-import { categoryEmoji, categoryLabel, BOOKING_MODE_LABEL } from '@/lib/categories';
+import { CategoryIcon } from '@/components/CategoryIcon';
+import { categoryLabel, BOOKING_MODE_LABEL } from '@/lib/categories';
 import { formatBudget, formatDistance, formatWhen, timeLeft } from '@/lib/format';
 import { spacing, useTheme } from '@/lib/theme';
 import { usePractitionerFeed } from '@/data/requests';
@@ -86,7 +87,7 @@ export default function Feed() {
       ) : null}
 
       {!online ? (
-        <EmptyState emoji="💤" title="You're offline" message="Flip the switch above to start receiving requests." />
+        <EmptyState title="You're offline" body="Flip the switch above to start receiving requests." />
       ) : feed.isLoading ? (
         <Loader label="Loading requests…" />
       ) : (
@@ -99,9 +100,12 @@ export default function Feed() {
           renderItem={({ item }) => (
             <Card style={{ marginBottom: spacing.md }}>
               <Row style={{ justifyContent: 'space-between' }}>
-                <AppText variant="heading">
-                  {categoryEmoji(item.category)} {categoryLabel(item.category)}
-                </AppText>
+                <Row style={{ gap: 6 }}>
+              <CategoryIcon category={item.category} size={16} />
+              <AppText variant="heading">
+                {categoryLabel(item.category)}
+              </AppText>
+            </Row>
                 <Badge label={timeLeft(item.expires_at)} tone="primary" />
               </Row>
               <AppText variant="small" color="textMuted" style={{ marginTop: 4 }}>
@@ -152,7 +156,7 @@ export default function Feed() {
             </Card>
           )}
           ListEmptyComponent={
-            <EmptyState emoji="🕊️" title="No open requests" message="New matching requests will appear here in real time." />
+            <EmptyState title="No open requests" body="New matching requests will appear here in real time." />
           }
         />
       )}

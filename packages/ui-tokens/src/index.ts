@@ -41,8 +41,12 @@ export type AppColors = {
   primarySoft: string;
   /** web `primary-200` — active nav pills, avatar fallbacks. */
   primaryMuted: string;
+  /** web `primary-300` — the dashed/quiet brand border. */
+  primaryBorder: string;
   /** web `primary-700` — text sitting on `primarySoft` / `primaryMuted`. */
   primaryStrong: string;
+  /** web `primary-950` — Midnight Ink, the ground of dark feature panels. */
+  primaryDeep: string;
   /** Signature Pink. Button and fill surfaces only. */
   pink: string;
   /** Ink text for use on `pink`; white on Signature Pink fails AA at button size. */
@@ -78,7 +82,9 @@ export const lightColors: AppColors = {
   primaryDark: palette.pinkDarker,
   primarySoft: '#FCEBF0',
   primaryMuted: '#F9D6DF',
+  primaryBorder: '#F2B3C3',
   primaryStrong: '#8C1A3D',
+  primaryDeep: '#251719',
   pink: palette.pink,
   onPink: palette.ink,
   onPrimary: '#FFFFFF',
@@ -112,7 +118,9 @@ export const darkColors: AppColors = {
   primaryDark: palette.pinkDeep,
   primarySoft: '#2E1D21',
   primaryMuted: '#3D262C',
+  primaryBorder: '#5A3440',
   primaryStrong: '#F5B3C3',
+  primaryDeep: '#120A0C',
   pink: palette.pink,
   onPink: palette.ink,
   onPrimary: '#FFFFFF',

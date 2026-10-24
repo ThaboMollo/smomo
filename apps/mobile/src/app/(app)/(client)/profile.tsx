@@ -1,7 +1,9 @@
+import { faBriefcase } from '@fortawesome/free-solid-svg-icons';
 import { router } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { Icon } from '@/components/Icon';
 import { spacing, useTheme } from '@/lib/theme';
 import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
@@ -30,6 +32,10 @@ export default function ClientProfile() {
   return (
     <Screen edges={['top']}>
       <ScrollView contentContainerStyle={{ padding: spacing.lg }}>
+        <Row style={{ justifyContent: 'flex-end' }}>
+          <ThemeToggle compact />
+        </Row>
+
         {isAnonymous ? (
           <View style={{ alignItems: 'center', gap: spacing.sm, marginVertical: spacing.lg }}>
             <Avatar name="?" size={72} />
@@ -75,7 +81,7 @@ export default function ClientProfile() {
                     {isPractitioner ? 'Go online and receive client requests.' : 'Offer your services and earn on Smomo.'}
                   </AppText>
                 </View>
-                <Ionicons name="briefcase" size={26} color={colors.primary} />
+                <Icon icon={faBriefcase} size={26} color={colors.primary} />
               </Row>
             </Card>
 
@@ -90,13 +96,6 @@ export default function ClientProfile() {
                 </Row>
               </Card>
             ) : null}
-
-            <View style={{ marginTop: spacing.lg, gap: spacing.sm }}>
-              <AppText variant="kicker" color="textMuted">
-                Appearance
-              </AppText>
-              <ThemeToggle />
-            </View>
 
             <Button title="Sign out" variant="ghost" onPress={onSignOut} style={{ marginTop: spacing.xl }} />
           </>

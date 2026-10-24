@@ -3,6 +3,7 @@ import { safeBack } from '@/lib/nav';
 import { useState } from 'react';
 import { ScrollView, Switch, View } from 'react-native';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
 import { CATEGORIES, type ServiceCategory, type ServiceMode } from '@/lib/categories';
 import { toE164 } from '@/lib/format';
 import { geocodeAddress, getCurrentCoords } from '@/lib/location';
@@ -87,7 +88,7 @@ export default function Onboarding() {
         </AppText>
         <Row style={{ gap: spacing.sm, flexWrap: 'wrap', marginBottom: spacing.lg }}>
           {CATEGORIES.map((c) => (
-            <Chip key={c.value} label={c.label} emoji={c.emoji} selected={categories.includes(c.value)} onPress={() => toggleCategory(c.value)} />
+            <Chip key={c.value} label={c.label} leading={<CategoryIcon category={c.value} size={20} />} selected={categories.includes(c.value)} onPress={() => toggleCategory(c.value)} />
           ))}
         </Row>
 

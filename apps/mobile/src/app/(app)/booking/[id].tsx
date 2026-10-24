@@ -3,7 +3,8 @@ import { safeBack } from '@/lib/nav';
 import { useState } from 'react';
 import { Alert, Linking, ScrollView, View } from 'react-native';
 
-import { BOOKING_MODE_LABEL, categoryEmoji, categoryLabel } from '@/lib/categories';
+import { CategoryIcon } from '@/components/CategoryIcon';
+import { BOOKING_MODE_LABEL, categoryLabel } from '@/lib/categories';
 import { formatWhen, formatZar } from '@/lib/format';
 import { notifyBooking } from '@/lib/push';
 import { spacing, useTheme } from '@/lib/theme';
@@ -86,9 +87,12 @@ export default function BookingDetail() {
       <ScrollView contentContainerStyle={{ padding: spacing.lg }}>
         {/* Status */}
         <Row style={{ justifyContent: 'space-between', marginBottom: spacing.md }}>
-          <AppText variant="heading">
-            {categoryEmoji(booking.category)} {categoryLabel(booking.category)}
-          </AppText>
+          <Row style={{ gap: 6 }}>
+              <CategoryIcon category={booking.category} size={16} />
+              <AppText variant="heading">
+                {categoryLabel(booking.category)}
+              </AppText>
+            </Row>
           <Badge label={booking.status.replace('_', ' ')} tone={STATUS_TONE[booking.status]} />
         </Row>
 

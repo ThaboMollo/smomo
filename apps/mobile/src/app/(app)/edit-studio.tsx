@@ -3,6 +3,7 @@ import { safeBack } from '@/lib/nav';
 import { useState } from 'react';
 import { Alert, ScrollView, Switch, View } from 'react-native';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
 import { CATEGORIES, type ServiceCategory, type ServiceMode } from '@/lib/categories';
 import { SOCIAL_PLATFORMS } from '@smomo/shared';
 import { toE164 } from '@/lib/format';
@@ -83,7 +84,7 @@ export default function EditStudio() {
         </AppText>
         <Row style={{ gap: spacing.sm, flexWrap: 'wrap', marginBottom: spacing.lg }}>
           {CATEGORIES.map((c) => (
-            <Chip key={c.value} label={c.label} emoji={c.emoji} selected={categories.includes(c.value)} onPress={() => toggleCategory(c.value)} />
+            <Chip key={c.value} label={c.label} leading={<CategoryIcon category={c.value} size={20} />} selected={categories.includes(c.value)} onPress={() => toggleCategory(c.value)} />
           ))}
         </Row>
 

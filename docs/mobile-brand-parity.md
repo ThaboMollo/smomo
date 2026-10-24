@@ -154,6 +154,8 @@ the app rather than only the source.
 
 ### Deviations from the plan
 
+> Superseded by **Round 2** below: all three were closed on 24 Oct 2026.
+
 1. **The Sparkle is an Ionicon, not the brand's four-point mark.** The web draws it as an inline
    SVG path; React Native would need `react-native-svg`, which is not a dependency and would mean
    a new native module and a rebuild for one decorative glyph. `EmptyState` uses Ionicons
@@ -182,15 +184,89 @@ the app rather than only the source.
   the editorial photography. It was appended to `apps/mobile/.env`; it also needs setting wherever
   the app is built for release.
 
-### Not verified
+### Verified on device (24 Oct 2026)
 
-The app was not run on a simulator or device — the Chrome tooling for a visual pass was
-unavailable, and Expo's static web export fails at SSR prerender because `expo-secure-store` has no
-Node implementation (a pre-existing limitation, unrelated to this work). Everything above is
-verified by typecheck, lint and bundle contents, not by looking at it. **Run it on a device before
-merging**, and check in particular: Space Grotesk's negative tracking at `display` size, the
-ink-on-pink button contrast in dark mode, and the dashed `EmptyState` border, which React Native
-renders less consistently than CSS across platforms.
+Run on an Android emulator (`YaronaTest`, API 35, Google APIs image) via `expo run:android`.
+Confirmed on screen, in both themes:
+
+- Warm Canvas ground, Midnight Ink text, the real SMOMO lockup tinted via `expo-image`
+- Space Grotesk display with its negative tracking; DM Sans body; the `kicker` variant
+  rendering as uppercase letterspaced caps
+- `Button` primary as a pill in Signature Pink with ink text
+- `Chip` and `Segmented` selected states as ink fills, correctly inverting to canvas-on-dark
+- `EmptyState` dashed container, 24px radius, with the caller's glyph preserved
+- Tab bars outline-idle / filled-active, `Avatar` fallback on the `primary-200`/`700` pair
+- The theme toggle cycling light → dark → system, and the choice surviving a force-stop
+  (so the AsyncStorage persistence works, not just the in-memory state)
+
+**Build note:** React Native 0.86 does not work with JDK 25. Android Studio's bundled JBR is
+JDK 25 and hangs Gradle indefinitely in the configure phase with no error. Build with JDK 17
+(`JAVA_HOME=/opt/homebrew/opt/openjdk@17`), which completes in about 8 minutes from cold.
+
+### Two bugs the device run caught
+
+1. **Category chips stretched to the full row height.** A horizontal `ScrollView` stretches its
+   children on the cross axis, so each chip inherited the row's height. Fixed in two places:
+   `styles.chip` now sets `alignSelf: 'center'` with a 40px minimum, and the row in
+   `discover.tsx` sets `style={{ flexGrow: 0 }}` so it no longer claims the column's spare
+   height. The chip style itself was unchanged by the rebrand, so this predates this work.
+2. **The dashed `EmptyState` border was nearly invisible in dark.** It used `primary-200`;
+   the web uses `primary-300`. Added a `primaryBorder` token (`#F2B3C3` light, `#5A3440` dark)
+   and switched to it.
+
+Neither would have been caught by typecheck, lint or bundle inspection.
+
+## Round 2 (24 Oct 2026): closing to 1-to-1
+
+The first pass matched the design *system*. This round removed the three deviations and the
+remaining screen-level differences, so the app draws what the site draws.
+
+**`react-native-svg` plus Font Awesome were added**, which is what makes exact parity possible.
+This is a native dependency, so it needs a rebuild (`expo run:android`), not just a Metro reload.
+
+- **Icons are now the web's own.** `components/NavIcon.tsx` carries the inline SVG paths from
+  `apps/web/src/components/AppNav.tsx`, path for path, at the same 1.75 stroke — used by both tab
+  bars. `components/Icon.tsx` wraps Font Awesome exactly as the web's `Icon` does, so the seven
+  glyphs the site uses (`faBriefcase`, `faCircleHalfStroke`, `faMoon`, `faSun`, …) are the same
+  artwork, not lookalikes.
+- **The Sparkle is the brand's real four-point mark**, the same path as the web's, in Electric Lime
+  (`text-accent`) — replacing the Ionicons stand-in.
+- **`EmptyState` is the web's**: Sparkle, title, body, action. The twelve per-caller emoji are gone
+  and every call site moved to the web's `body` prop.
+- **Category marks are round crops of the editorial photography**, via `components/CategoryIcon.tsx`
+  mirroring the web's. `categoryEmoji` is no longer used by any screen.
+- **Stars print the `★` character** in `--color-star`, as the web does, instead of an icon font.
+- **Discover was rebuilt against `apps/web/src/app/app/discover/page.tsx`**: the ink `primary-950`
+  CTA panel with its pink tile and chevron (it was a pink card), photo chips, "Any" rather than
+  "All", the "Finding pros near you…" plus three 116dp skeletons, the "{n} pros nearby · {m} online
+  now" count, and the web's error and empty copy.
+- **Chats** now matches the web's row: status badge plus a muted "category · when" line, rather
+  than a category badge.
+- **The theme toggle moved into the top-right chrome** on Profile and Studio, which is where the
+  web keeps it, and is no longer inside the signed-in-only branch.
+
+Two tokens were added to carry the web's scale: `primaryBorder` (`primary-300`) and `primaryDeep`
+(`primary-950`).
+
+### A correction
+
+An earlier note in this document claimed the loading skeletons were stretching to 305px. That was
+wrong. Screenshots are in physical pixels and React Native sizes in dp; this device is 420dpi
+(density 2.625), so 116dp renders as 305px. The skeletons were always correct. The `flexGrow`
+guard added on that false reading has been removed. The chip stretching was real and is fixed;
+the dashed-border contrast fix was real and is kept.
+
+### Still not 1-to-1
+
+- Mobile resolves location from device GPS; the web has an address picker, so Discover reads
+  "Within 50 km of you" where the web names the place. Changing that is a functional change.
+- Camera, send, trash and chevron affordances have no web counterpart and stay on Ionicons.
+- `Activity` and `Chats` centre their empty state vertically; the web's sits in the flow.
+
+### Known pre-existing warning
+
+`AuthProvider`'s async session load triggers "Can't perform a React state update on a component
+that hasn't mounted yet" at startup. It predates this work and is untouched.
 
 ### Pre-existing issues left alone
 

@@ -2,7 +2,8 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, View } from 'react-native';
 
-import { categoryEmoji, categoryLabel } from '@/lib/categories';
+import { CategoryIcon } from '@/components/CategoryIcon';
+import { categoryLabel } from '@/lib/categories';
 import { formatBudget, formatWhen, formatZar, timeLeft } from '@/lib/format';
 import { spacing } from '@/lib/theme';
 import { useMyBookings } from '@/data/bookings';
@@ -57,9 +58,12 @@ export default function Activity() {
                     </AppText>
                     <Badge label={item.status.replace('_', ' ')} tone={BOOKING_TONE[item.status]} />
                   </Row>
-                  <AppText variant="small" color="textMuted">
-                    {categoryEmoji(item.category)} {categoryLabel(item.category)} · {formatZar(item.final_price_zar)}
-                  </AppText>
+                  <Row style={{ gap: 6 }}>
+              <CategoryIcon category={item.category} size={14} />
+              <AppText variant="small" color="textMuted">
+                {categoryLabel(item.category)} · {formatZar(item.final_price_zar)}
+              </AppText>
+            </Row>
                   <AppText variant="caption" color="textFaint">
                     {formatWhen(item.scheduled_at)}
                   </AppText>
@@ -68,7 +72,7 @@ export default function Activity() {
             </Card>
           )}
           ListEmptyComponent={
-            <EmptyState emoji="📅" title="No bookings yet" message="Post a request or browse providers to get started." />
+            <EmptyState title="No bookings yet" body="Post a request or browse providers to get started." />
           }
         />
       ) : (
@@ -81,9 +85,10 @@ export default function Activity() {
           renderItem={({ item }) => (
             <Card onPress={() => router.push(`/(app)/request/${item.id}`)} style={{ marginBottom: spacing.sm }}>
               <Row style={{ justifyContent: 'space-between' }}>
-                <AppText weight="600">
-                  {categoryEmoji(item.category)} {categoryLabel(item.category)}
-                </AppText>
+                <Row style={{ gap: 6 }}>
+                  <CategoryIcon category={item.category} size={16} />
+                  <AppText weight="500">{categoryLabel(item.category)}</AppText>
+                </Row>
                 <Badge
                   label={item.status === 'open' ? timeLeft(item.expires_at) : item.status}
                   tone={item.status === 'open' ? 'primary' : 'default'}
@@ -96,7 +101,7 @@ export default function Activity() {
             </Card>
           )}
           ListEmptyComponent={
-            <EmptyState emoji="📣" title="No requests" message="Post a request and nearby pros will send you offers." />
+            <EmptyState title="No requests" body="Post a request and nearby pros will send you offers." />
           }
         />
       )}

@@ -3,6 +3,7 @@ import { safeBack } from '@/lib/nav';
 import { useState } from 'react';
 import { Alert, ScrollView, View } from 'react-native';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
 import { CATEGORIES, categoryLabel, type ServiceCategory } from '@/lib/categories';
 import { formatZar } from '@/lib/format';
 import { spacing, useTheme } from '@/lib/theme';
@@ -47,7 +48,7 @@ export default function Services() {
           </AppText>
           <Row style={{ gap: spacing.sm, flexWrap: 'wrap', marginBottom: spacing.md }}>
             {CATEGORIES.map((c) => (
-              <Chip key={c.value} label={c.label} emoji={c.emoji} selected={category === c.value} onPress={() => setCategory(c.value)} />
+              <Chip key={c.value} label={c.label} leading={<CategoryIcon category={c.value} size={20} />} selected={category === c.value} onPress={() => setCategory(c.value)} />
             ))}
           </Row>
           <Input label="Service name" placeholder="e.g. Gel manicure" value={title} onChangeText={setTitle} error={error} />

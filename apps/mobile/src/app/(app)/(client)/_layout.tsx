@@ -1,22 +1,13 @@
 import { Tabs } from 'expo-router';
 import type { ColorValue } from 'react-native';
 
+import { NavIcon, type NavIconName } from '@/components/NavIcon';
 import { fontFamily, useTheme } from '@/lib/theme';
-import { Ionicons } from '@/ui';
 
-/** Outline when idle, filled when active — the web's nav uses stroke icons and marks
- *  the current destination with weight and colour rather than a different glyph. */
-function icon(name: keyof typeof Ionicons.glyphMap, active: keyof typeof Ionicons.glyphMap) {
-  function TabIcon({
-    color,
-    size,
-    focused,
-  }: {
-    color: ColorValue;
-    size: number;
-    focused: boolean;
-  }) {
-    return <Ionicons name={focused ? active : name} size={size} color={color} />;
+/** The web's nav marks: one stroke family, active state carried by colour and weight. */
+function icon(name: NavIconName) {
+  function TabIcon({ color, size }: { color: ColorValue; size: number; focused: boolean }) {
+    return <NavIcon name={name} size={size} color={String(color)} />;
   }
   return TabIcon;
 }
@@ -27,28 +18,16 @@ export default function ClientTabs() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
+        tabBarActiveTintColor: colors.primaryStrong,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: { backgroundColor: colors.card, borderTopColor: colors.border },
         tabBarLabelStyle: { fontFamily: fontFamily.bodyMedium, fontSize: 11 },
       }}
     >
-      <Tabs.Screen
-        name="discover"
-        options={{ title: 'Discover', tabBarIcon: icon('compass-outline', 'compass') }}
-      />
-      <Tabs.Screen
-        name="activity"
-        options={{ title: 'Activity', tabBarIcon: icon('receipt-outline', 'receipt') }}
-      />
-      <Tabs.Screen
-        name="chats"
-        options={{ title: 'Chats', tabBarIcon: icon('chatbubbles-outline', 'chatbubbles') }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{ title: 'Profile', tabBarIcon: icon('person-outline', 'person') }}
-      />
+      <Tabs.Screen name="discover" options={{ title: 'Discover', tabBarIcon: icon('discover') }} />
+      <Tabs.Screen name="activity" options={{ title: 'Activity', tabBarIcon: icon('requests') }} />
+      <Tabs.Screen name="chats" options={{ title: 'Chats', tabBarIcon: icon('chats') }} />
+      <Tabs.Screen name="profile" options={{ title: 'Profile', tabBarIcon: icon('profile') }} />
     </Tabs>
   );
 }

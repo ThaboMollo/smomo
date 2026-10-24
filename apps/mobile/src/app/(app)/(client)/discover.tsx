@@ -4,12 +4,21 @@ import { FlatList, Pressable, ScrollView, View } from 'react-native';
 // NOTE: Map view is intentionally deferred for now — list-first experience.
 // import MapView, { Marker } from 'react-native-maps';
 
+import { CategoryIcon } from '@/components/CategoryIcon';
+import { NavIcon } from '@/components/NavIcon';
 import { ProviderCardView } from '@/components/ProviderCardView';
 import { CATEGORIES, type BookingMode, type ServiceCategory } from '@/lib/categories';
 import { getCurrentCoords, type Coords } from '@/lib/location';
-import { spacing, useTheme } from '@/lib/theme';
+import { radius, spacing, useTheme } from '@/lib/theme';
 import { useNearbyProviders } from '@/data/discovery';
-import { AppText, Button, Card, Chip, EmptyState, Ionicons, Loader, Row, Screen, Segmented } from '@/ui';
+import { AppText, Button, Chip, EmptyState, Row, Screen, Segmented, Skeleton } from '@/ui';
+
+/** Web labels the first mode "Any", not "All". */
+const MODES: { value: 'all' | BookingMode; label: string }[] = [
+  { value: 'all', label: 'Any' },
+  { value: 'mobile', label: 'They come to me' },
+  { value: 'studio', label: 'At their studio' },
+];
 
 export default function Discover() {
   const { colors } = useTheme();
@@ -21,92 +30,157 @@ export default function Discover() {
     getCurrentCoords().then(setCoords);
   }, []);
 
-  const { data: providers, isLoading, refetch, isRefetching } = useNearbyProviders({
+  const { data: providers, isLoading, isError, refetch, isRefetching } = useNearbyProviders({
     coords,
     category,
     mode: mode === 'all' ? null : mode,
   });
 
-  return (
-    <Screen edges={['top']}>
-      <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.sm }}>
-        <AppText variant="title" weight="700">
+  const list = providers ?? [];
+  const online = list.filter((p) => p.is_online).length;
+  const loading = isLoading || !coords;
+
+  const header = (
+    <>
+      <View style={{ paddingTop: spacing.sm }}>
+        <AppText variant="display" weight="700">
           Discover
         </AppText>
-        <AppText variant="small" color="textMuted">
-          Find beauty & body-service pros around you
+        <AppText variant="small" color="textMuted" style={{ marginTop: spacing.sm }}>
+          Within 50 km of you
         </AppText>
       </View>
 
-      {/* Broadcast CTA — primary, inDrive-style flow */}
-      <Pressable onPress={() => router.push('/(app)/new-request')} style={{ paddingHorizontal: spacing.lg, marginTop: spacing.md }}>
-        <Card style={{ backgroundColor: colors.primary, borderColor: colors.primary }}>
-          <Row style={{ justifyContent: 'space-between' }}>
-            <View style={{ flex: 1 }}>
-              <AppText variant="heading" style={{ color: colors.onPrimary }}>
-                Post a request
-              </AppText>
-              <AppText variant="small" style={{ color: colors.onPrimary, opacity: 0.9 }}>
-                Tell pros what you need — they'll send you offers.
-              </AppText>
-            </View>
-            <Ionicons name="megaphone" size={28} color={colors.onPrimary} />
-          </Row>
-        </Card>
+      {/* Broadcast CTA. The web's is an ink panel, not a pink one. */}
+      <Pressable
+        onPress={() => router.push('/(app)/new-request')}
+        accessibilityRole="button"
+        style={({ pressed }) => [
+          {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing.lg,
+            marginTop: spacing.xl,
+            padding: spacing.lg,
+            borderRadius: radius.xl,
+            backgroundColor: colors.primaryDeep,
+            opacity: pressed ? 0.9 : 1,
+          },
+        ]}
+      >
+        <View
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: radius.lg,
+            backgroundColor: colors.primary,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <NavIcon name="plus" size={20} color={colors.onPrimary} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <AppText variant="heading" weight="500" style={{ color: '#FFFFFF' }}>
+            Post a request
+          </AppText>
+          <AppText variant="small" style={{ color: colors.primaryBorder }}>
+            Tell pros what you need. They send you offers.
+          </AppText>
+        </View>
+        <NavIcon name="chevronRight" size={18} color={colors.primaryBorder} />
       </Pressable>
+    </>
+  );
 
-      {/* Category chips */}
+  const filters = (
+    <View style={{ gap: spacing.md, marginTop: spacing.lg }}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: spacing.lg, gap: spacing.sm, paddingVertical: spacing.md }}
+        // Without flexGrow: 0 the row stretches to fill the column's spare height.
+        style={{ flexGrow: 0, marginHorizontal: -spacing.lg }}
+        contentContainerStyle={{ paddingHorizontal: spacing.lg, gap: spacing.sm }}
       >
         <Chip label="All" selected={category === null} onPress={() => setCategory(null)} />
         {CATEGORIES.map((c) => (
           <Chip
             key={c.value}
             label={c.label}
-            emoji={c.emoji}
+            leading={<CategoryIcon category={c.value} size={20} />}
             selected={category === c.value}
             onPress={() => setCategory((prev) => (prev === c.value ? null : c.value))}
           />
         ))}
       </ScrollView>
 
-      <View style={{ paddingHorizontal: spacing.lg }}>
-        <Segmented
-          value={mode}
-          onChange={setMode}
-          options={[
-            { value: 'all', label: 'All' },
-            { value: 'mobile', label: 'They come to me' },
-            { value: 'studio', label: 'At their studio' },
-          ]}
-        />
-      </View>
+      <Segmented value={mode} onChange={setMode} options={MODES} />
+    </View>
+  );
 
-      {isLoading || !coords ? (
-        <Loader label="Finding providers near you…" />
-      ) : (
-        <FlatList
-          data={providers ?? []}
-          keyExtractor={(p) => p.id}
-          contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.md, flexGrow: 1 }}
-          onRefresh={refetch}
-          refreshing={isRefetching}
-          renderItem={({ item }) => (
-            <ProviderCardView provider={item} onPress={() => router.push(`/(app)/provider/${item.id}`)} />
-          )}
-          ListEmptyComponent={
+  return (
+    <Screen edges={['top']}>
+      <FlatList
+        data={loading || isError ? [] : list}
+        keyExtractor={(p) => p.id}
+        contentContainerStyle={{ padding: spacing.lg, gap: spacing.md }}
+        onRefresh={coords ? refetch : undefined}
+        refreshing={isRefetching}
+        ListHeaderComponent={
+          <View style={{ gap: spacing.lg, marginBottom: spacing.md }}>
+            {header}
+            {filters}
+            {!loading && !isError && list.length > 0 ? (
+              <Row>
+                <AppText weight="500">
+                  {list.length} pro{list.length === 1 ? '' : 's'} nearby
+                </AppText>
+                {online > 0 ? (
+                  <AppText color="textMuted"> · {online} online now</AppText>
+                ) : null}
+              </Row>
+            ) : null}
+          </View>
+        }
+        renderItem={({ item }) => (
+          <ProviderCardView
+            provider={item}
+            onPress={() => router.push(`/(app)/provider/${item.id}`)}
+          />
+        )}
+        ListFooterComponent={
+          list.length > 0 && !loading && !isError ? null : loading ? (
+            <View style={{ gap: spacing.md }}>
+              <AppText variant="small" color="textMuted">
+                Finding pros near you…
+              </AppText>
+              <Skeleton height={116} />
+              <Skeleton height={116} />
+              <Skeleton height={116} />
+            </View>
+          ) : isError ? (
             <EmptyState
-              emoji="🔍"
-              title="No providers online nearby"
-              message="Try a different category or post a request — pros will come to you."
-              action={<Button title="Post a request" icon="megaphone" onPress={() => router.push('/(app)/new-request')} />}
+              fill={false}
+              title="We couldn't load pros right now"
+              body="Check your connection and try again."
+              action={<Button title="Try again" variant="secondary" full={false} onPress={() => refetch()} />}
             />
-          }
-        />
-      )}
+          ) : (
+            <EmptyState
+              fill={false}
+              title="No pros nearby for this filter"
+              body="Try another service, or post a request and pros will come to you."
+              action={
+                <Button
+                  title="Post a request"
+                  full={false}
+                  onPress={() => router.push('/(app)/new-request')}
+                />
+              }
+            />
+          )
+        }
+      />
     </Screen>
   );
 }

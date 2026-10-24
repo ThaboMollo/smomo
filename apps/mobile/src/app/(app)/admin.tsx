@@ -81,7 +81,7 @@ export default function Admin() {
               ) : null}
             </Card>
           )}
-          ListEmptyComponent={<EmptyState emoji="🛡️" title="No reports" />}
+          ListEmptyComponent={<EmptyState title="No reports" />}
         />
       ) : (
         <FlatList
@@ -128,7 +128,7 @@ export default function Admin() {
               </Row>
             </Card>
           )}
-          ListEmptyComponent={<EmptyState emoji="✅" title="No disputes" />}
+          ListEmptyComponent={<EmptyState title="No disputes" />}
         />
       )}
     </Screen>

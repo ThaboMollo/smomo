@@ -4,7 +4,7 @@ import { safeBack } from '@/lib/nav';
 import { Linking, Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 
 import { SOCIAL_PLATFORMS, handleFromSocials, socialUrl } from '@smomo/shared';
-import { SERVICE_MODE_LABEL, categoryEmoji, categoryLabel } from '@/lib/categories';
+import { SERVICE_MODE_LABEL, categoryLabel } from '@/lib/categories';
 import { formatTimeAgo, formatZar } from '@/lib/format';
 import { radius, spacing, useTheme } from '@/lib/theme';
 import { useProviderDetail } from '@/data/discovery';
@@ -92,7 +92,7 @@ export default function ProviderProfile() {
 
         <Row style={{ gap: spacing.sm, flexWrap: 'wrap', marginTop: spacing.sm }}>
           {practitioner.categories.map((c) => (
-            <Badge key={c} label={`${categoryEmoji(c)} ${categoryLabel(c)}`} tone="primary" />
+            <Badge key={c} label={categoryLabel(c)} tone="primary" />
           ))}
         </Row>
 

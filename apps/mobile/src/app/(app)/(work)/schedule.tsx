@@ -2,7 +2,8 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
 
-import { categoryEmoji, categoryLabel } from '@/lib/categories';
+import { CategoryIcon } from '@/components/CategoryIcon';
+import { categoryLabel } from '@/lib/categories';
 import { formatWhen, formatZar } from '@/lib/format';
 import { spacing } from '@/lib/theme';
 import { useMyBookings } from '@/data/bookings';
@@ -59,9 +60,12 @@ export default function Schedule() {
                   </AppText>
                   <Badge label={item.status.replace('_', ' ')} tone={TONE[item.status]} />
                 </Row>
-                <AppText variant="small" color="textMuted">
-                  {categoryEmoji(item.category)} {categoryLabel(item.category)} · {formatZar(item.final_price_zar)}
-                </AppText>
+                <Row style={{ gap: 6 }}>
+              <CategoryIcon category={item.category} size={14} />
+              <AppText variant="small" color="textMuted">
+                {categoryLabel(item.category)} · {formatZar(item.final_price_zar)}
+              </AppText>
+            </Row>
                 <AppText variant="caption" color="textFaint">
                   {formatWhen(item.scheduled_at)}
                 </AppText>
@@ -71,9 +75,8 @@ export default function Schedule() {
         )}
         ListEmptyComponent={
           <EmptyState
-            emoji="🗓️"
             title={tab === 'upcoming' ? 'No upcoming jobs' : 'No past jobs'}
-            message={tab === 'upcoming' ? 'Accepted bookings show up here.' : undefined}
+            body={tab === 'upcoming' ? 'Accepted bookings show up here.' : undefined}
           />
         }
       />

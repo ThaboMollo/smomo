@@ -25,6 +25,10 @@ export default function Studio() {
   return (
     <Screen edges={['top']}>
       <ScrollView contentContainerStyle={{ padding: spacing.lg }}>
+        <Row style={{ justifyContent: 'flex-end' }}>
+          <ThemeToggle compact />
+        </Row>
+
         <View style={{ alignItems: 'center', gap: spacing.sm, marginVertical: spacing.md }}>
           <Avatar uri={profile?.avatar_url} name={practitioner?.business_name} size={88} />
           <AppText variant="title" weight="700">
@@ -83,13 +87,6 @@ export default function Studio() {
             router.replace('/(app)');
           }}
         />
-        <View style={{ marginTop: spacing.lg, gap: spacing.sm }}>
-          <AppText variant="kicker" color="textMuted">
-            Appearance
-          </AppText>
-          <ThemeToggle />
-        </View>
-
         <Button title="Sign out" variant="ghost" onPress={onSignOut} style={{ marginTop: spacing.lg }} />
       </ScrollView>
     </Screen>

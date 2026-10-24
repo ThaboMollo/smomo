@@ -16,6 +16,7 @@ import {
   type ViewProps,
 } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 
 import {
   fontFamily,
@@ -115,6 +116,35 @@ export function AppText({
       ]}
       {...rest}
     />
+  );
+}
+
+/* ----------------------------- Brand marks ----------------------------- */
+/**
+ * The brand's four-point sparkle — the same path as the web's `Sparkle` in
+ * `apps/web/src/components/ui.tsx`, not a lookalike from an icon font.
+ */
+export function Sparkle({ size = 16, color }: { size?: number; color?: string }) {
+  const { colors } = useTheme();
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M12 0C12.6 7 17 11.4 24 12C17 12.6 12.6 17 12 24C11.4 17 7 12.6 0 12C7 11.4 11.4 7 12 0Z"
+        fill={color ?? colors.accent}
+      />
+    </Svg>
+  );
+}
+
+/** Diagonal arrow used on bento tiles, matching the web's `ArrowUpRight`. */
+export function ArrowUpRight({ size = 18, color }: { size?: number; color?: string }) {
+  const { colors } = useTheme();
+  const stroke = color ?? colors.text;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M7 17L17 7" stroke={stroke} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M8 7h9v9" stroke={stroke} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
   );
 }
 
@@ -499,7 +529,8 @@ export function StarRating({
       style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}
       accessibilityLabel={`${value.toFixed(1)} out of 5 stars${count != null ? `, ${count} reviews` : ''}`}
     >
-      <Ionicons name="star" size={size} color={colors.star} />
+      {/* The web prints the ★ character in `text-star`, not an icon-font glyph. */}
+      <Text style={{ color: colors.star, fontSize: size }}>★</Text>
       <Text
         style={{ color: colors.text, fontSize: size, fontFamily: fontFamily.bodyMedium }}
       >
@@ -517,12 +548,13 @@ export function StarRating({
 /* ----------------------------- Chip ----------------------------- */
 export function Chip({
   label,
-  emoji,
+  leading,
   selected,
   onPress,
 }: {
   label: string;
-  emoji?: string;
+  /** The web puts a round category photo here and tightens the left padding. */
+  leading?: React.ReactNode;
   selected?: boolean;
   onPress?: () => void;
 }) {
@@ -536,13 +568,14 @@ export function Chip({
       accessibilityState={{ selected: !!selected }}
       style={[
         styles.chip,
+        leading ? { paddingLeft: 6 } : null,
         {
           backgroundColor: selected ? colors.text : colors.card,
           borderColor: selected ? colors.text : colors.border,
         },
       ]}
     >
-      {emoji ? <Text style={{ fontSize: 14 }}>{emoji}</Text> : null}
+      {leading}
       <Text
         style={{
           color: selected ? colors.bg : colors.text,
@@ -602,50 +635,41 @@ export function Segmented<T extends string>({
 
 /* ----------------------------- EmptyState ----------------------------- */
 /**
- * The web's empty state is a dashed, brand-tinted box rather than loose centred text.
- * It keeps the per-state glyph each caller passes — that carries information the web's
- * single sparkle does not — and falls back to the sparkle when none is given.
- * `fill` centres the box in a flex parent, which is how every current caller uses it.
+ * The web's `EmptyState`: a dashed brand-bordered card with the four-point Sparkle,
+ * a title and optional body and action. Matches `apps/web/src/components/ui.tsx`.
+ * `fill` centres it in a flex parent, which is how the app's screens use it.
  */
 export function EmptyState({
-  emoji,
   title,
-  message,
+  body,
   action,
   fill = true,
 }: {
-  emoji?: string;
   title: string;
-  message?: string;
+  body?: string;
   action?: React.ReactNode;
   fill?: boolean;
 }) {
   const { colors } = useTheme();
   const box = (
     <View
-      style={[styles.empty, { backgroundColor: colors.card, borderColor: colors.primaryMuted }]}
+      style={[styles.empty, { backgroundColor: colors.card, borderColor: colors.primaryBorder }]}
     >
-      {emoji ? (
-        <Text style={{ fontSize: 30 }}>{emoji}</Text>
-      ) : (
-        <Ionicons name="sparkles" size={24} color={colors.primary} />
-      )}
-      <AppText variant="heading" center>
+      <Sparkle size={22} />
+      <AppText variant="heading" weight="500" center>
         {title}
       </AppText>
-      {message ? (
+      {body ? (
         <AppText variant="small" color="textMuted" center style={{ maxWidth: 320 }}>
-          {message}
+          {body}
         </AppText>
       ) : null}
-      {action ? <View style={{ marginTop: spacing.xs, alignSelf: 'stretch' }}>{action}</View> : null}
+      {action ? <View style={{ marginTop: spacing.xs }}>{action}</View> : null}
     </View>
   );
 
   if (!fill) return box;
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', padding: spacing.lg }}>{box}</View>
-  );
+  return <View style={{ flex: 1, justifyContent: 'center', padding: spacing.lg }}>{box}</View>;
 }
 
 /* ----------------------------- Misc ----------------------------- */
@@ -786,8 +810,12 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
+    // A horizontal ScrollView stretches its children on the cross axis, which made chips
+    // inherit the whole row's height. Centring keeps them pills at their content height.
+    alignSelf: 'center',
     gap: 6,
-    paddingHorizontal: spacing.md,
+    minHeight: 40,
+    paddingHorizontal: spacing.lg,
     paddingVertical: 8,
     borderRadius: radius.pill,
     borderWidth: 1,

@@ -1,10 +1,12 @@
+import { faBriefcase } from '@fortawesome/free-solid-svg-icons';
 import { router } from 'expo-router';
 import { View } from 'react-native';
 
 import { SmomoLockup } from '@/components/SmomoMark';
+import { Icon } from '@/components/Icon';
 import { spacing, useTheme } from '@/lib/theme';
 import { useMode } from '@/providers/ModeProvider';
-import { AppText, Card, Ionicons, Row, Screen } from '@/ui';
+import { AppText, Card, Row, Screen, Sparkle } from '@/ui';
 
 export default function Welcome() {
   const { colors } = useTheme();
@@ -39,7 +41,7 @@ export default function Welcome() {
                 Find pros near you and post a request.
               </AppText>
             </View>
-            <Ionicons name="sparkles" size={28} color={colors.primary} />
+            <Sparkle size={28} color={colors.primary} />
           </Row>
         </Card>
 
@@ -51,7 +53,7 @@ export default function Welcome() {
                 Set up your profile and get client requests.
               </AppText>
             </View>
-            <Ionicons name="briefcase" size={28} color={colors.text} />
+            <Icon icon={faBriefcase} size={28} color={colors.text} />
           </Row>
         </Card>
 
