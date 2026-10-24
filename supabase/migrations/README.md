@@ -38,9 +38,14 @@ after any one of them.
 | 09 | `complete_booking_rpc` | no (function) | no |
 | 11 | `reharden_trigger_function_grants` | no (grants only) | no |
 | 10 | `contract_drop_legacy_columns` | **yes — drops columns** | **YES — must be last** |
+| 12 | `column_level_write_grants` | no (grants only) | no |
+| 13 | `admin_write_rpcs` | no (functions) | yes — admin.ts calls them |
+| 14 | `fix_handle_new_user_after_contact_split` | no (trigger function) | no |
+| 15 | `rpc_param_defaults` | no (function) | no — but deploy the API after |
 
 Note: 11 sorts before 10 by timestamp, which is intentional — the contract
-phase stays last.
+phase stays last. 14 also sorts before 12 and 13; it is a standalone trigger fix
+and does not depend on them.
 
 Filename order is also the correct apply order, so `supabase db push` does the
 right thing: 10 is the contract phase and deliberately sorts last.
@@ -87,6 +92,15 @@ when the columns move.
   the `revoke execute` hardening the original schema applies to its own trigger
   functions, leaving them callable via `/rest/v1/rpc`. Caught by the Supabase
   security advisor after 01–09 were applied.
+- **15** `save_business_profile` declared 12 arguments with defaults on only the
+  last 5, so `p_bio` and `p_years_experience` were required. PostgREST resolves an
+  RPC overload by the exact set of argument names in the body and supabase-js drops
+  `undefined` values, so saving a studio profile with no bio sent 5 keys, matched no
+  overload, and returned PGRST202 — a 500 to the client. This is spec RC-2, and it was
+  live. Required arguments move to the front, every nullable one gets `default null`,
+  and the old signature is dropped. The paired half is the `?? null` sweep in
+  `apps/api/src/modules/*.ts`; the guard is
+  `apps/api/test/contract/rpc-params.spec.ts`.
 
 ## Rollback
 
@@ -94,4 +108,5 @@ when the columns move.
 re-applying the previous definition (recoverable from `supabase db pull` output
 taken before you start). 04–07 add tables and backfill; dropping the new tables
 reverts them. **10 is not reversible** — the dropped columns are gone. Take a
-backup before applying it.
+backup before applying it. 15 is reversible by re-applying 05b's definition of
+`save_business_profile` and dropping the new argument order.

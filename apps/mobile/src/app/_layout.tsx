@@ -17,6 +17,7 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { GlobalLoadingOverlay } from '@/components/GlobalLoadingOverlay';
 import { usePushNotifications } from '@/lib/notifications';
 import { queryClient } from '@/lib/queryClient';
 import { useTheme } from '@/lib/theme';
@@ -63,6 +64,8 @@ function RootNavigator() {
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(app)" />
       </Stack>
+      {/* One spinner for the whole app; see GlobalLoadingOverlay for what counts. */}
+      <GlobalLoadingOverlay />
     </>
   );
 }

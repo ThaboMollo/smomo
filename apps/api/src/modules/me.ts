@@ -97,9 +97,9 @@ class MeController {
 
     if (phone !== undefined || whatsapp_number !== undefined || home_address !== undefined) {
       const { error } = await db.rpc('set_profile_contact', {
-        p_phone: phone ?? undefined,
-        p_whatsapp_number: whatsapp_number ?? undefined,
-        p_home_address: home_address ?? undefined,
+        p_phone: phone ?? null,
+        p_whatsapp_number: whatsapp_number ?? null,
+        p_home_address: home_address ?? null,
       });
       if (error) throw error;
     }

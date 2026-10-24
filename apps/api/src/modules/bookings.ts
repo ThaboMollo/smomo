@@ -121,7 +121,7 @@ class BookingsController {
       p_booking_id: id,
       p_rating: input.rating,
       p_proof_image_url: input.proofImageUrl,
-      p_comment: input.comment,
+      p_comment: input.comment ?? null,
     });
     if (error) throw error;
     return { ok: true };
@@ -167,7 +167,7 @@ class PaymentsController {
     const { error } = await db.rpc('verify_payment', {
       p_payment_id: input.paymentId,
       p_verified: input.verified,
-      p_dispute_reason: input.disputeReason,
+      p_dispute_reason: input.disputeReason ?? null,
     });
     if (error) throw error;
     return { ok: true };

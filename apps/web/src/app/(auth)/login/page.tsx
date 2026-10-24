@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { LoadingOverlay } from '@/components/LoadingSpinner';
 import { Field } from '@/components/ui';
 import { PasswordInput } from '@/components/PasswordInput';
 import { createClient } from '@/lib/supabase/client';
@@ -44,6 +45,7 @@ export default function LoginPage() {
 
   return (
     <div>
+      {loading ? <LoadingOverlay label="Logging in…" /> : null}
       <p className="kicker">Log in</p>
       <h1 className="mt-3 text-5xl">Welcome back</h1>
       <p className="mt-3 text-text-muted">

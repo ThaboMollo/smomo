@@ -16,7 +16,7 @@ class OffersController {
     const { data, error } = await db.rpc('make_offer', {
       p_request_id: input.requestId,
       p_price: input.price,
-      p_message: input.message,
+      p_message: input.message ?? null,
     });
     if (error) throw error;
     return { id: data as string };

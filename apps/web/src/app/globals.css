@@ -169,9 +169,21 @@ textarea.input { min-height: 110px; resize: vertical; }
 @keyframes pulse-ring { 0% { transform: scale(.8); opacity: .7 } 100% { transform: scale(2.2); opacity: 0 } }
 .pulse-ring { animation: pulse-ring 1.6s ease-out infinite; }
 
+/* ── Loading: the official symbol spinning in place. The mark itself is the mask in
+      `.smomo-mark`, so this only turns it — the artwork is never redrawn or distorted. ── */
+@keyframes smomo-spin { to { transform: rotate(360deg) } }
+@keyframes smomo-fade-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes smomo-throb { 0%, 100% { opacity: 1 } 50% { opacity: .3 } }
+.smomo-spin { animation: smomo-spin 1.4s linear infinite; transform-origin: 50% 50%; }
+/* Held back a beat so a fast request never flashes the overlay. */
+.smomo-overlay { animation: smomo-fade-in 200ms ease-out both; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .pulse-ring { animation: none; }
+  /* No rotation for anyone who asked for less motion — it throbs instead. */
+  .smomo-spin { animation: smomo-throb 1.6s ease-in-out infinite; }
+  .smomo-overlay { animation: none; }
   * { transition: none !important; }
 }
 

@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ApiError } from '@smomo/api-client';
 import { COUNTRIES, COUNTRY_LIST, normalizeIdNumber, toE164, validatePassport, validateSaId, type CountryCode } from '@smomo/shared';
 
+import { LoadingOverlay } from '@/components/LoadingSpinner';
 import { AddressField } from '@/components/location/AddressField';
 import { PasswordInput } from '@/components/PasswordInput';
 import { PhoneInput } from '@/components/PhoneInput';
@@ -212,6 +213,7 @@ export default function RegisterPage() {
 
   return (
     <div>
+      {loading ? <LoadingOverlay label="Creating your account…" /> : null}
       <p className="kicker">{role === 'pro' ? 'Join as a pro' : 'Join SMOMO'}</p>
       <h1 className="mt-3 text-5xl">{step === 1 ? 'Create your account' : 'Verify it’s you'}</h1>
       <p className="mt-3 text-text-muted">

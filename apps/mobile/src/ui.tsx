@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { forwardRef, useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   Animated,
   Image,
   Pressable,
@@ -18,6 +17,7 @@ import {
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
+import { SmomoSpinner } from '@/components/SmomoSpinner';
 import {
   fontFamily,
   fontSize,
@@ -303,7 +303,8 @@ export function Button({
       {({ pressed }) => {
         const fg = pressed && !isDisabled ? skin.pressedFg : skin.fg;
         return loading ? (
-          <ActivityIndicator color={fg} />
+          // The Pressable already reports `busy`, so the mark itself stays unlabelled.
+          <SmomoSpinner size="sm" color={fg} label={null} />
         ) : (
           <View style={styles.btnInner}>
             {icon ? <Ionicons name={icon} size={18} color={fg} /> : null}
@@ -726,11 +727,16 @@ export function Skeleton({
   );
 }
 
+/**
+ * Inline wait: the SMOMO symbol turning, in place of the platform spinner. For a wait
+ * that should take the whole screen, use `LoadingOverlay` from `@/components/SmomoSpinner`
+ * — though React Query's own waits are already covered app-wide by
+ * `<GlobalLoadingOverlay>`, so most screens need neither.
+ */
 export function Loader({ label }: { label?: string }) {
-  const { colors } = useTheme();
   return (
     <View style={styles.loader}>
-      <ActivityIndicator color={colors.primary} />
+      <SmomoSpinner size="md" label={label ? null : 'Loading'} />
       {label ? (
         <AppText variant="small" color="textMuted">
           {label}

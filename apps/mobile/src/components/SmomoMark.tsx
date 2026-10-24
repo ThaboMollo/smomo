@@ -1,8 +1,7 @@
 import { Image } from 'expo-image';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { fontFamily, tracking, useTheme } from '@/lib/theme';
-import { AppText } from '@/ui';
 
 /** The symbol's fixed aspect ratio, from the approved artwork trimmed to 734 × 665. */
 const ASPECT = 734 / 665;
@@ -61,7 +60,7 @@ export function SmomoLockup({
       style={{ flexDirection: 'row', alignItems: 'center', gap: height * 0.3 }}
     >
       <SmomoMark height={height} color={tint} />
-      <AppText
+      <Text
         style={{
           color: tint,
           fontFamily: fontFamily.heading,
@@ -71,7 +70,7 @@ export function SmomoLockup({
         }}
       >
         smomo
-      </AppText>
+      </Text>
     </View>
   );
 }

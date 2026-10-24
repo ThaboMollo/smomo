@@ -48,7 +48,7 @@ class AdminController {
       // Safe to omit when absent: p_resolution is declared `default null`, so PostgREST
       // still resolves the overload. (The save_business_profile 500 was the same shape
       // with no DB default — see spec RC-2.)
-      p_resolution: body.resolution,
+      p_resolution: body.resolution ?? null,
     });
     if (error) throw error;
     return { ok: true };

@@ -3,6 +3,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
 
+import { GlobalLoadingOverlay } from '@/components/GlobalLoadingOverlay';
+
 export function QueryProvider({ children }: { children: ReactNode }) {
   const [client] = useState(
     () =>
@@ -12,5 +14,11 @@ export function QueryProvider({ children }: { children: ReactNode }) {
         },
       }),
   );
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={client}>
+      {children}
+      {/* One spinner for the whole signed-in app; see GlobalLoadingOverlay for what counts. */}
+      <GlobalLoadingOverlay />
+    </QueryClientProvider>
+  );
 }

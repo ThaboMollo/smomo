@@ -2,7 +2,32 @@ import { Injectable } from '@nestjs/common';
 import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js';
 import type { Database } from '@smomo/shared';
 
-export type Db = SupabaseClient<Database>;
+/**
+ * `supabase gen types` models an RPC argument that carries a DB default as `p_x?: T` —
+ * optional, but never `null`. In Postgres those arguments are `default null` and accept
+ * null perfectly well, and we *must* send an explicit null rather than omit the key:
+ * PostgREST resolves an overload by the exact set of argument names in the body, and
+ * supabase-js drops any key whose value is `undefined`. An omitted key can therefore
+ * fail to resolve — that is spec RC-2, and the live 500 on `save_business_profile`.
+ *
+ * So the generated type pushes callers towards `?? undefined`, which is the broken form.
+ * This widens every *optional* RPC argument to accept null, leaving required ones alone,
+ * so the correct call is the one that typechecks. It lives here rather than in
+ * `database.ts` because that file is overwritten by `pnpm gen:types`.
+ */
+type AcceptsNull<Args> = {
+  [K in keyof Args]: undefined extends Args[K] ? Args[K] | null : Args[K];
+};
+
+type Fns = Database['public']['Functions'];
+
+export type DbSchema = Omit<Database, 'public'> & {
+  public: Omit<Database['public'], 'Functions'> & {
+    Functions: { [K in keyof Fns]: Omit<Fns[K], 'Args'> & { Args: AcceptsNull<Fns[K]['Args']> } };
+  };
+};
+
+export type Db = SupabaseClient<DbSchema>;
 
 /**
  * Central Supabase access for the API (Hybrid model).
@@ -25,13 +50,13 @@ export class SupabaseService {
     if (!this.url || !this.anonKey) {
       throw new Error('Missing SUPABASE_URL or SUPABASE_ANON_KEY');
     }
-    this.authClient = createClient<Database>(this.url, this.anonKey, {
+    this.authClient = createClient<DbSchema>(this.url, this.anonKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
   }
 
   forUser(token: string | null | undefined): Db {
-    return createClient<Database>(this.url, this.anonKey, {
+    return createClient<DbSchema>(this.url, this.anonKey, {
       auth: { persistSession: false, autoRefreshToken: false },
       global: token ? { headers: { Authorization: `Bearer ${token}` } } : {},
     });

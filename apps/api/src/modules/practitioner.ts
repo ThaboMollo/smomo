@@ -48,17 +48,17 @@ class PractitionerController {
   ) {
     const { error } = await db.rpc('save_business_profile', {
       p_business_name: input.businessName,
-      p_bio: input.bio,
+      p_bio: input.bio ?? null,
       p_categories: input.categories,
-      p_years_experience: input.yearsExperience ?? undefined,
+      p_years_experience: input.yearsExperience ?? null,
       p_service_mode: input.serviceMode,
       p_travel_radius_km: input.travelRadiusKm,
       p_requires_deposit: input.requiresDeposit,
-      p_deposit_percentage: input.depositPercentage ?? undefined,
-      p_instagram: input.instagram ?? undefined,
-      p_facebook: input.facebook ?? undefined,
-      p_tiktok: input.tiktok ?? undefined,
-      p_x_handle: input.xHandle ?? undefined,
+      p_deposit_percentage: input.depositPercentage ?? null,
+      p_instagram: input.instagram ?? null,
+      p_facebook: input.facebook ?? null,
+      p_tiktok: input.tiktok ?? null,
+      p_x_handle: input.xHandle ?? null,
     });
     if (error) throw error;
     return { ok: true };
@@ -72,7 +72,7 @@ class PractitionerController {
     const { error } = await db.rpc('set_practitioner_location', {
       p_lat: input.lat,
       p_lng: input.lng,
-      p_address: input.address ?? undefined,
+      p_address: input.address ?? null,
     });
     if (error) throw error;
     return { ok: true };
@@ -126,7 +126,7 @@ class PractitionerController {
     const { error: locErr } = await db.rpc('set_practitioner_location', {
       p_lat: input.lat,
       p_lng: input.lng,
-      p_address: input.address ?? undefined,
+      p_address: input.address ?? null,
     });
     if (locErr) throw locErr;
     const trialEnds = new Date();
